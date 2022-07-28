@@ -1,0 +1,4 @@
+--pdb sequences_0_model_1_multimer_v2_0_unrelaxed.pdb
+--mut_res B1-B59
+--default_mutres_setting all
+--output pd1_3helixbundle_5djt.json

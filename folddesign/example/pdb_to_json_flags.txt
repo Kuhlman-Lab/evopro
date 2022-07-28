@@ -1,0 +1,4 @@
+--pdb sequence_0_unrelaxed.pdb
+--mut_res B19-B37
+--default_mutres_setting all-PC
+--output /proj/kuhl_lab/folddesign/folddesign/example/residue_specs.json

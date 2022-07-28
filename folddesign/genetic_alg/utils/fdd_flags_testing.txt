@@ -1,0 +1,6 @@
+--input_dir /pine/scr/a/m/amritan/kuhlmanlab/folddesign/folddesign/tests/pd1_threehelix_test
+--num_iter 10
+--pool_size 20
+--num_gpus 2
+--score_file /pine/scr/a/m/amritan/kuhlmanlab/folddesign/folddesign/score_funcs/score_pd1_gpus.py
+--score_func score_pd1_func

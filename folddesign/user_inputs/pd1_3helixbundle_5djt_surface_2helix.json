@@ -1,0 +1,86 @@
+{
+    "sequence": {
+        "A": "WNPPTFSPALLVVTEGDNATFTCSFSNTSESFHVVWHRESPSGQTDTLAAFPEDRSQPGQDSRFRVTQLPNGRDFHMSVVRARRNDSGTYVCGVISLAPKIQIKESLRAELRVTERRAE",
+        "B": "SVDNKFNKEMLSARVEIYGLPNLNWGQRFAFISSLTDDPSQSANLLAEAKKLNDAQAPK"
+    },
+    "designable": [
+        {
+            "chain": "B",
+            "resid": 24,
+            "WTAA": "N",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 28,
+            "WTAA": "R",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 29,
+            "WTAA": "F",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 32,
+            "WTAA": "I",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 35,
+            "WTAA": "L",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 36,
+            "WTAA": "T",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 40,
+            "WTAA": "S",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 43,
+            "WTAA": "A",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 46,
+            "WTAA": "L",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 47,
+            "WTAA": "A",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 49,
+            "WTAA": "A",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 50,
+            "WTAA": "K",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 53,
+            "WTAA": "N",
+            "MutTo": "all-PC"
+        }
+    ]
+}

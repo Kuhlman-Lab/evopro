@@ -83,7 +83,7 @@ class DesignSeq:
 
             if "custom" in res["MutTo"]:
                 try:
-                    weighted_aas = res["aalist"]
+                    weighted_aas = [float(x) for x in str(res["aalist"]).strip("[]").split(",")]
                 except:
                     print("Custom weights not specified. Defaulting to all")
                     weighted_aas = [1 for x in range(20)]
@@ -103,8 +103,9 @@ class DesignSeq:
             chain = re.split('(\d+)', resid)[0]
             aa = int(re.split('(\d+)', resid)[1])
             aa_id = self.get_aa_identity(resid)
-            mutto = "all" #PLACEHOLDER
-            des_dict = {"chain":chain, "resid":aa, "WTAA":aa_id, "MutTo":mutto}
+            mutto = "custom"
+            aalist = self.mutable[resid]
+            des_dict = {"chain":chain, "resid":aa, "WTAA":aa_id, "MutTo":mutto, "aalist": aalist}
             des.append(des_dict)
         json_dict["designable"] = des
         json_dict["symmetric"] = sym

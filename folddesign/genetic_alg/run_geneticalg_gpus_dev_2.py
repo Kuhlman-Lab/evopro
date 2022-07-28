@@ -24,14 +24,14 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
         if len(startingseqs[0].seq.values())>1:
             lengths = [[len(x) for x in startingseqs[0].seq.values()], [len(x) for x in startingseqs[0].seq.values()][-1]]
         else:
-            lengths = [[len(x) for x in startingseqs[0].seq.values()], len_binder]
+            lengths = [[len(x) for x in startingseqs[0].seq.values()], [len_binder]]
             with_linker=True
 
     else:
         lengths = [[len(x) for x in startingseqs[0].seq.values()]]
     
     print(lengths)
-    dist = Distributor(n_workers, af2_init_2models, af2_flags_file, lengths, score_func)
+    dist = Distributor(n_workers, af2_init, af2_flags_file, lengths, score_func)
 
     scored_seqs = {}
     curr_iter = 1
@@ -106,7 +106,8 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
             for comp, bind, cscore, bscore in zip(complex_seqs, binder_seqs, complex_scores, binder_scores):
                 key_seq = " ".join(comp[0])
                 seq = (" ".join(comp[0]), bind[0])
-                rmsd_score = rmsd_func(cscore[0][-2], bscore[0][-2])
+                if rmsd_func:
+                    rmsd_score = rmsd_func(cscore[0][-2], bscore[0][-2])
                 score = ((cscore[0][0]/10.0 + 5*bscore[0][0] + 100*rmsd_score, cscore[0][0], bscore[0][0], rmsd_score), (cscore[0][-2], bscore[0][-2]))
                 scored_seqs[key_seq] = (seq, score)
         else:
@@ -213,8 +214,12 @@ if __name__ == "__main__":
 
             for filename in onlyfiles:
                 if "starting" in filename:
-                    starting_seqs = read_starting_seqs(input_dir + filename, dsobj1)
-                    starting_seqs.append(dsobj1)
+                    if "mut" in filename:
+                        starting_seqs = read_starting_seqs(input_dir + filename, dsobj1, mut_only=True)
+                        starting_seqs.append(dsobj1)
+                    else:
+                        starting_seqs = read_starting_seqs(input_dir + filename, dsobj1)
+                        starting_seqs.append(dsobj1)
             if not starting_seqs:
                 print("No starting sequences file provided. Random sequences will be generated.")
                 
@@ -235,9 +240,9 @@ if __name__ == "__main__":
         raise ValueError("Invalid score function")
 
     if args.rmsd_func:
-            rmsdfunc = getattr(mod, args.rmsd_func)
-        else:
-            rmsdfunc = None
+        rmsdfunc = getattr(mod, args.rmsd_func)
+    else:
+        rmsdfunc = None
 
     sym_list=None
     if args.symmetry:

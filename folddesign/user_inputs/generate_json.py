@@ -7,7 +7,7 @@ def generate_json(pdbfile, mut_res, opf, default):
     from folddesign.utils.pdb_parser import get_coordinates_pdb
     from folddesign.utils.aa_utils import three_to_one
 
-    chains, residues, resindices = get_coordinates_pdb(pdbfile)
+    chains, residues, resindices = get_coordinates_pdb(pdbfile, fil=True)
 
     pdbids = {}
     chain_seqs = {}

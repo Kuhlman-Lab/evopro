@@ -1,7 +1,6 @@
 from folddesign.utils.pdb_parser import get_coordinates_pdb
 from folddesign.utils.write_pdb import PDBio
 from folddesign.utils.calc_rmsd import RMSDcalculator
-from alphafold.common import protein
 import math
 import pickle
 import numpy as np
@@ -12,11 +11,11 @@ def distance(p1, p2):
     dist = math.sqrt((float(p2[0])-float(p1[0]))**2+(float(p2[1])-(float(p1[1])))**2+(float(p2[2])-float(p1[2]))**2)
     return dist
 
-def score_contacts(pdbfile, reslist1, reslist2, fil = True, orient=None, dist=4):
+def score_contacts(pdbfile, reslist1, reslist2, fil = True, orient=None, dist=4, of=False):
     if fil:
-        chains, residues, resindices = get_coordinates_pdb(pdbfile)
+        chains, residues, resindices = get_coordinates_pdb(pdbfile, of=of)
     else:
-        chains, residues, resindices = get_coordinates_pdb(pdbfile, fil = False)
+        chains, residues, resindices = get_coordinates_pdb(pdbfile, fil = False, of=of)
     score = 0
     pairs = []
     for res1 in reslist1:
@@ -57,7 +56,6 @@ def score_confidence_pairs(resultsfile, reslist1, reslist2, resindices, fil = Tr
             for res1,res2 in zip(reslist1,reslist2):
                 res1_id = resindices[res1]
                 res2_id = resindices[res2]
-                #print(score)
                 score = score + pae[res1_id][res2_id]
     else:
         pae = resultsfile['pae_output'][0]
@@ -65,7 +63,6 @@ def score_confidence_pairs(resultsfile, reslist1, reslist2, resindices, fil = Tr
         for res1,res2 in zip(reslist1,reslist2):
             res1_id = resindices[res1]
             res2_id = resindices[res2]
-            #print(score)
             score = score + pae[res1_id][res2_id]
     return score
 
@@ -120,11 +117,10 @@ def get_rmsd(reslist1, pdb1, reslist2, pdb2):
     B = B.astype(float)
     from calculate_rmsd import kabsch_rmsd
     rmsd = kabsch_rmsd(A, B)
-    print(rmsd)
     return rmsd
 
 def write_raw_plddt(results, filename):
-    print("inside plddt")
+    from alphafold.common import protein
     pdb = protein.to_pdb(results['unrelaxed_protein'])
     chains, residues, resindices = get_coordinates_pdb(pdb, fil = False)
     reslist = [x for x in residues.keys()]
@@ -136,6 +132,7 @@ def write_raw_plddt(results, filename):
             opf.write(str(res) + "\t" + str(plddt[resid]) + "\n")
 
 def write_pairwise_scores(pairs, results, filename):
+    from alphafold.common import protein
     pdb = protein.to_pdb(results['unrelaxed_protein'])
     chains, residues, resindices = get_coordinates_pdb(pdb, fil = False)
     pae = results['pae_output'][0]

@@ -6,116 +6,98 @@
     "designable": [
         {
             "chain": "B",
-            "resid": 19,
+            "resid": 1,
             "WTAA": "K",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 20,
+            "resid": 2,
+            "WTAA": "S",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 3,
             "WTAA": "R",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 21,
-            "WTAA": "Q",
+            "resid": 4,
+            "WTAA": "K",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 22,
-            "WTAA": "A",
-            "MutTo": "all-PC"
-        },
-        {
-            "chain": "B",
-            "resid": 23,
-            "WTAA": "P",
-            "MutTo": "all-PC"
-        },
-        {
-            "chain": "B",
-            "resid": 24,
-            "WTAA": "P",
-            "MutTo": "all-PC"
-        },
-        {
-            "chain": "B",
-            "resid": 25,
-            "WTAA": "R",
-            "MutTo": "all-PC"
-        },
-        {
-            "chain": "B",
-            "resid": 26,
-            "WTAA": "T",
-            "MutTo": "all-PC"
-        },
-        {
-            "chain": "B",
-            "resid": 27,
+            "resid": 5,
             "WTAA": "V",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 28,
-            "WTAA": "F",
+            "resid": 6,
+            "WTAA": "M",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 29,
-            "WTAA": "C",
+            "resid": 7,
+            "WTAA": "S",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 30,
-            "WTAA": "F",
+            "resid": 8,
+            "WTAA": "S",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 31,
-            "WTAA": "H",
-            "MutTo": "all-PC"
-        },
-        {
-            "chain": "B",
-            "resid": 32,
+            "resid": 9,
             "WTAA": "N",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 33,
-            "WTAA": "E",
+            "resid": 10,
+            "WTAA": "N",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 34,
-            "WTAA": "T",
+            "resid": 11,
+            "WTAA": "K",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 35,
-            "WTAA": "Q",
+            "resid": 12,
+            "WTAA": "G",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 36,
-            "WTAA": "F",
+            "resid": 13,
+            "WTAA": "I",
             "MutTo": "all-PC"
         },
         {
             "chain": "B",
-            "resid": 37,
-            "WTAA": "V",
+            "resid": 14,
+            "WTAA": "H",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 15,
+            "WTAA": "C",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "B",
+            "resid": 16,
+            "WTAA": "Y",
             "MutTo": "all-PC"
         }
     ]

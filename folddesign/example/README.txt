@@ -1,7 +1,7 @@
 1. creating json file from pdb:
 
 specify pdb file and residues to mutate in pdb_to_json_flags.txt
-"python /proj/kuhl_lab/folddesign/folddesign/user_inputs/generate_json.py @pdb_to_json_flags.txt" from directory
+"python /proj/kuhl_lab/folddesign/folddesign/user_inputs/generate_json.py @pdb_to_json.txt" from directory
 
 2. make sure residue_specs.json file was created correctly, create starting_seqs.txt file (optional)
 

@@ -100,6 +100,10 @@ def getFDDParser() -> FileArgumentParser:
                         type=int,
                         help='Number of residues in binder, used to find binder when linker is included. Default is 0.')
 
+    parser.add_argument('--use_omegafold',
+                         action='store_true',
+                         help='Default is False.')
+
     return parser
 
 if __name__ == "__main__":

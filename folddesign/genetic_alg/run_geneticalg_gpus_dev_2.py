@@ -7,17 +7,16 @@ import sys, os
 from DesignSeq import DesignSeq
 from typing import Sequence, Union
 from folddesign.utils.distributor import Distributor
-from geneticalg_helpers import af2_init_2models, generate_random_seqs, read_starting_seqs, create_new_seqs, create_new_seqs_mpnn
+from geneticalg_helpers import generate_random_seqs, read_starting_seqs, create_new_seqs, create_new_seqs_mpnn
 from folddesign.user_inputs.inputs import getFDDParser
 from folddesign.score_funcs.score_funcs import write_raw_plddt, write_pairwise_scores
 
 sys.path.append('/proj/kuhl_lab/alphafold/run')
 
-from run_af2 import af2
 from functools import partial
 import numpy as np
 
-def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, poolsize = 50, num_iter = 20, n_workers=2, write_raw_plddts=False, write_pair_confs=False, stabilize_binder=False, rmsd_func=None ,write_pdbs=False, mpnn_freq=10, symmetry=None, len_binder=0):
+def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, poolsize = 50, num_iter = 20, n_workers=2, write_raw_plddts=False, write_pair_confs=False, stabilize_binder=False, rmsd_func=None ,write_pdbs=False, mpnn_freq=10, symmetry=None, len_binder=0, use_of=False):
 
     with_linker=False
     if stabilize_binder:
@@ -29,15 +28,26 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
 
     else:
         lengths = [[len(x) for x in startingseqs[0].seq.values()]]
+
+    if use_of:
+        from geneticalg_helpers import of_init
+        sys.path.append('/proj/kuhl_lab/OmegaFold/')
+        #from omegafold.__main__ import main
+        dist = Distributor(n_workers, of_init, af2_flags_file, lengths, score_func)
+        print("initialized distributor")
     
-    print(lengths)
-    dist = Distributor(n_workers, af2_init, af2_flags_file, lengths, score_func)
+    else:
+        from geneticalg_helpers import af2_init
+        from run_af2 import af2
+        dist = Distributor(n_workers, af2_init, af2_flags_file, lengths, score_func)
+        print("initialized distributor")
 
     scored_seqs = {}
     curr_iter = 1
     seqs_per_iteration = []
     newpool = startingseqs
 
+    print("starting iterative process")
     while curr_iter <= num_iter:
         all_seqs = []
         all_scores = []
@@ -47,9 +57,10 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
             print("Not a valid frequency for Protein MPNN usage.")
 
         if curr_iter == 1:
+            print("creating new sequences")
             pool = create_new_seqs(pool, poolsize)
 
-        #using protein mpnn to refill pool every _ steps
+        #using protein mpnn to refill pool every $mpnn_freq steps
         elif curr_iter % mpnn_freq == 0:
             pool = create_new_seqs_mpnn(pool, scored_seqs, poolsize, run_dir, curr_iter)
             #pool = create_new_seqs(pool, poolsize)
@@ -72,9 +83,11 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
                 work_list_2 = [[[dsobj.seq[chain] for chain in dsobj.seq][-1]] for dsobj in scoring_pool]
 
         work_list_all = work_list + work_list_2
+        print("finalized work list for iter ", curr_iter, work_list_all)
 
         results = dist.churn(work_list_all)
 
+        print("done churning work list")
         #separating complex and binder sequences, if needed
         all_seqs = []
         complex_seqs = []
@@ -107,8 +120,9 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
                 key_seq = " ".join(comp[0])
                 seq = (" ".join(comp[0]), bind[0])
                 if rmsd_func:
-                    rmsd_score = rmsd_func(cscore[0][-2], bscore[0][-2])
-                score = ((cscore[0][0]/10.0 + 5*bscore[0][0] + 100*rmsd_score, cscore[0][0], bscore[0][0], rmsd_score), (cscore[0][-2], bscore[0][-2]))
+                    rmsd_score = rmsd_func(cscore[0][-2], bscore[0][-2], with_linker=with_linker)
+                    score = ((cscore[0][0]/10.0 + 5*bscore[0][0] + 500*rmsd_score, cscore[0][0], bscore[0][0], rmsd_score), (cscore[0][-2], bscore[0][-2]))
+                score = ((cscore[0][0]/10.0 + 5*bscore[0][0], cscore[0][0], bscore[0][0]), (cscore[0][-2], bscore[0][-2]))
                 scored_seqs[key_seq] = (seq, score)
         else:
             for seq, score in zip(all_seqs, all_scores):
@@ -199,13 +213,15 @@ if __name__ == "__main__":
             for filename in onlyfiles:
                 if "flag" in filename and "af2" in filename:
                     flagsfile = filename
+                if "flag" in filename and "of" in filename:
+                    flagsfile = filename
             
             for filename in onlyfiles:
                 if "residue" in filename and "spec" in filename:
                     resfile = filename
 
             if flagsfile is None:
-                raise ValueError("Flags file for Alphafold runs not provided.")
+                raise ValueError("Flags file for Alphafold/OmegaFold runs not provided. (if omegafold, please provide an empty flags file for now)")
             if resfile is None:
                 raise ValueError("Please provide a residue specifications file.")    
 
@@ -253,6 +269,6 @@ if __name__ == "__main__":
     else:
         len_binder=0
 
-    run_genetic_alg_gpus(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsize = args.pool_size, num_iter = args.num_iter, n_workers=args.num_gpus, write_raw_plddts=args.write_plddt, write_pair_confs=args.write_pae, stabilize_binder=args.stabilize_binder, rmsd_func=rmsdfunc, write_pdbs=args.write_pdbs, mpnn_freq=args.mpnn_freq, symmetry=sym_list, len_binder=len_binder)
+    run_genetic_alg_gpus(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsize = args.pool_size, num_iter = args.num_iter, n_workers=args.num_gpus, write_raw_plddts=args.write_plddt, write_pair_confs=args.write_pae, stabilize_binder=args.stabilize_binder, rmsd_func=rmsdfunc, write_pdbs=args.write_pdbs, mpnn_freq=args.mpnn_freq, symmetry=sym_list, len_binder=len_binder, use_of=args.use_omegafold)
 
     

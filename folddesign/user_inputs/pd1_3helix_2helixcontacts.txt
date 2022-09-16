@@ -1,4 +1,4 @@
---pdb /pine/scr/a/m/amritan/kuhlmanlab/run_folddesign/pd1/threehelixbundle/surface_patch_2helix/part1/sequence_0_model_1_unrelaxed.pdb
+--pdb sequence_0_model_1_unrelaxed.pdb
 --mut_res B1-B16
 --default_mutres_setting all-PC
---output /pine/scr/a/m/amritan/kuhlmanlab/run_folddesign/pd1/threehelixbundle/surface_patch_2helix/part2/residue_specs.json
+--output /proj/kuhl_lab/folddesign/folddesign/user_inputs/residue_specs.json

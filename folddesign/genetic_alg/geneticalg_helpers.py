@@ -13,12 +13,36 @@ from typing import Sequence, Union
 from folddesign.utils.distributor import Distributor
 
 sys.path.append('/proj/kuhl_lab/alphafold/run')
-from run_af2 import af2
 from functools import partial
 import numpy as np
+
+
 all_aas = ["A", "C",  "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 
+def of_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[str]]], fitness_fxn):
+    sys.path.append('/proj/kuhl_lab/OmegaFold/')
+    from omegafold.__main__ import main 
+    from omegafold import pipeline
+    import omegafold as of
+    print('initialization of process', proc_id)
+
+    args, state_dict, forward_config = pipeline.get_args(arg_file, proc_id)
+
+    # get the model
+    print("constructing omegafold...")
+    model = of.OmegaFold(of.make_config())
+    if "model" in state_dict:
+        state_dict = state_dict.pop("model")
+    model.load_state_dict(state_dict)
+    model.eval()
+    model.to(args.device)
+
+    of_partial = partial(main, arg_file=arg_file, proc_id=proc_id, fitness_fxn=fitness_fxn, model=model)
+
+    return of_partial
+
 def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[str]]], fitness_fxn):
+    from run_af2 import af2
     print('initialization of process', proc_id)
 
     os.environ['TF_FORCE_UNITED_MEMORY'] = '1'
@@ -28,14 +52,14 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
 
     import jax
     from features import (getRawInputs, getChainFeatures, getInputFeatures)
-    from setup import (getAF2Parser, QueryManager, getOutputDir)
+    from run.setup import (getAF2Parser, QueryManager, getOutputDir)
     from model import (getModelNames, getModelRunner, predictStructure, getRandomSeeds)
     from utils.query_utils import generate_random_sequences
 
     parser = getAF2Parser()
     args = parser.parse_args([f'@{arg_file}'])
 
-    output_dir = getOutputDir(out_dir=args.output_dir)
+    output_dir = getOutputDir(out_dir=args.output_dir, suffix="_"+str(proc_id))
 
     print(f'lengths: {lengths}')
     sequences = []
@@ -69,7 +93,8 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
         queries=queries,
         msa_mode=args.msa_mode,
         use_templates=args.use_templates,
-        output_dir=output_dir)
+        output_dir=output_dir,
+        proc_id=proc_id)
 
     print('finished generating raw inputs')
     print(raw_inputs)
@@ -87,7 +112,8 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
         features_for_chain = getChainFeatures(
             sequences=sequences,
             raw_inputs=raw_inputs,
-            use_templates=args.use_templates)
+            use_templates=args.use_templates,
+            proc_id=proc_id)
 
         input_features = getInputFeatures(
             sequences=sequences,
@@ -122,9 +148,11 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
 
             t = time.time()
             result = predictStructure(
+                model_name=model_name,
                 model_runner=model_runner,
                 feature_dict=input_features,
-                run_multimer=run_multimer)
+                run_multimer=run_multimer,
+                use_templates=args.use_templates)
             print(f'Model {model_name} took {time.time()-t} sec on GPU {proc_id}.')
 
         models.append((model_name, model_runner))
@@ -186,7 +214,6 @@ def create_new_seqs(startseqs, num_seqs, crossoverpercent = 0.2, symmetry=None):
         newseq = obj.mutate(symmetry=symmetry)
         if newseq not in pool:
             pool.append(newseq)
-
     while len(pool)<num_seqs:
         if len(startseqs) > 1:
             oldseqs = random.sample(startseqs, 2)
@@ -195,7 +222,6 @@ def create_new_seqs(startseqs, num_seqs, crossoverpercent = 0.2, symmetry=None):
         newseq = oldseqs[0].crossover(oldseqs[1])
         if newseq not in pool:
             pool.append(newseq)
-
     return pool
 
 def mutate_by_protein_mpnn(pdb_dir, dsobj):

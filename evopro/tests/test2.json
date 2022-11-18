@@ -1,0 +1,37 @@
+{
+    "sequence": {
+        "A": "HPETLVKVKDAEDQLGARVGYIELDLNSGKILESFRPEERFPMMSTFKVLLCGAVLSRVDAGQEQLGRRIHYSQRDLVEYSPVTEKHLTDGMTVRELCSAAITMSDNTAANLLLTTIGGPKELTAFLHNMGDHVTRLDRWEPELNEAIPNDERDTTMPAAMATTLRKLLTGELLTLASRQQLIDWMEADKVAGPLLRSALPAGWFIADKSGAGERGSRGIIAALGPDGKPSRIVVIYTTGSQATMDERNRQIAEIGASLIKHW"
+    },
+    "designable": [
+        {
+            "chain": "A",
+            "resid": 3,
+            "WTAA": "E",
+            "MutTo": "all-PC"
+        },
+        {
+            "chain": "A",
+            "resid": 4,
+            "WTAA": "T",
+            "MutTo": "all"
+        },
+        {
+            "chain": "A",
+            "resid": 5,
+            "WTAA": "L",
+            "MutTo": "all"
+        },
+        {
+            "chain": "A",
+            "resid": 7,
+            "WTAA": "K",
+            "MutTo": "all"
+        },
+        {
+            "chain": "A",
+            "resid": 8,
+            "WTAA": "V",
+            "MutTo": "all"
+        }
+    ]
+}

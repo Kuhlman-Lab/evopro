@@ -1,0 +1,362 @@
+{
+    "sequence": {
+        "A": "WNPPTFSPALLVVTEGDNATFTCSFSNTSESFHVVWHRESPSGQTDTLAAFPEDRSQPGQDSRFRVTQLPNGRDFHMSVVRARRNDSGTYVCGVISLAPKIQIKESLRAELRVTERRAE",
+        "B": "SVDNKFNKEMLSARVEIYGLPNLNWGQRFAFISSLTDDPSQSANLLAEAKKLNDAQAPK"
+    },
+    "designable": [
+        {
+            "chain": "B",
+            "resid": 1,
+            "WTAA": "S",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 2,
+            "WTAA": "V",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 3,
+            "WTAA": "D",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 4,
+            "WTAA": "N",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 5,
+            "WTAA": "K",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 6,
+            "WTAA": "F",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 7,
+            "WTAA": "N",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 8,
+            "WTAA": "K",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 9,
+            "WTAA": "E",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 10,
+            "WTAA": "M",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 11,
+            "WTAA": "L",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 12,
+            "WTAA": "S",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 13,
+            "WTAA": "A",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 14,
+            "WTAA": "R",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 15,
+            "WTAA": "V",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 16,
+            "WTAA": "E",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 17,
+            "WTAA": "I",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 18,
+            "WTAA": "Y",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 19,
+            "WTAA": "G",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 20,
+            "WTAA": "L",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 21,
+            "WTAA": "P",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 22,
+            "WTAA": "N",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 23,
+            "WTAA": "L",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 24,
+            "WTAA": "N",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 25,
+            "WTAA": "W",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 26,
+            "WTAA": "G",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 27,
+            "WTAA": "Q",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 28,
+            "WTAA": "R",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 29,
+            "WTAA": "F",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 30,
+            "WTAA": "A",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 31,
+            "WTAA": "F",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 32,
+            "WTAA": "I",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 33,
+            "WTAA": "S",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 34,
+            "WTAA": "S",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 35,
+            "WTAA": "L",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 36,
+            "WTAA": "T",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 37,
+            "WTAA": "D",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 38,
+            "WTAA": "D",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 39,
+            "WTAA": "P",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 40,
+            "WTAA": "S",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 41,
+            "WTAA": "Q",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 42,
+            "WTAA": "S",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 43,
+            "WTAA": "A",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 44,
+            "WTAA": "N",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 45,
+            "WTAA": "L",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 46,
+            "WTAA": "L",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 47,
+            "WTAA": "A",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 48,
+            "WTAA": "E",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 49,
+            "WTAA": "A",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 50,
+            "WTAA": "K",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 51,
+            "WTAA": "K",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 52,
+            "WTAA": "L",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 53,
+            "WTAA": "N",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 54,
+            "WTAA": "D",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 55,
+            "WTAA": "A",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 56,
+            "WTAA": "Q",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 57,
+            "WTAA": "A",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 58,
+            "WTAA": "P",
+            "MutTo": "all"
+        },
+        {
+            "chain": "B",
+            "resid": 59,
+            "WTAA": "K",
+            "MutTo": "all"
+        }
+    ]
+}

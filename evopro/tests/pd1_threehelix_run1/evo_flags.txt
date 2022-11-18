@@ -1,0 +1,8 @@
+--input_dir /proj/kuhl_lab/evopro/evopro/tests/pd1_threehelix_run1
+--num_iter 4
+--pool_size 5
+--num_gpus 1
+--score_file /proj/kuhl_lab/folddesign/folddesign/score_funcs/score_pd1_tests.py
+--score_func score_test
+--stabilize_binder B
+--rmsd_func score_binder_rmsd_test

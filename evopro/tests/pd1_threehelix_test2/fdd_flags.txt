@@ -1,0 +1,9 @@
+--input_dir /proj/kuhl_lab/folddesign/folddesign/tests/pd1_threehelix_test2
+--num_iter 3
+--pool_size 3
+--num_gpus 1
+--score_file /proj/kuhl_lab/folddesign/folddesign/score_funcs/score_pd1_gpus.py
+--score_func score_pd1_func_6
+--stabilize_binder
+--rmsd_func score_binder_rmsd
+--mpnn_freq 2

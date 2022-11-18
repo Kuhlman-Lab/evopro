@@ -1,0 +1,4 @@
+--pdb sequences_0_model_1_multimer_v2_0_unrelaxed.pdb
+--mut_res B19-B37
+--default_mutres_setting all-PC
+--output /pine/scr/a/m/amritan/kuhlmanlab/run_folddesign/pd1/threehelixbundle/surface_patch_2helix_3/part2/residue_specs.json

@@ -1,0 +1,4 @@
+--pdb complex_scaffold_2.pdb
+--mut_res B1-B59
+--default_mutres_setting all-PC
+--output residue_specs.json

@@ -1,0 +1,6 @@
+--input_dir /proj/kuhl_lab/folddesign/folddesign/example
+--num_iter 10
+--pool_size 5
+--num_gpus 2
+--score_file /proj/kuhl_lab/folddesign/folddesign/score_funcs/score_pd1_gpus.py
+--score_func score_pd1_func

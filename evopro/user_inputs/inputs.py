@@ -81,6 +81,11 @@ def getEvoProParser() -> FileArgumentParser:
                         type=int,
                         help='How much the length is allowed to vary. Default is 0.')
 
+    parser.add_argument('--define_contact_area',
+                        default=None,
+                        type=str,
+                        help='File defining residues on target interface to be targeted for contacts. Default is None.')
+
     parser.add_argument('--write_plddt',
                          action='store_true',
                          help='Default is False.')
@@ -118,17 +123,19 @@ def getEvoProParser() -> FileArgumentParser:
                          action='store_true',
                          help='Default is False.')
 
+    parser.add_argument('--pae_output',
+                         action='store_true',
+                         help='Default is False. THIS DOES NOT WORK YET')
+
+    parser.add_argument('--plot_scores',
+                         action='store_true',
+                         help='Default is False.')
+
     parser.add_argument('--crossover_percent',
                         default='0.2',
                         type=float,
                         help='Fraction of pool refilled by crossover.'
                         'Default is 0.2.')
-
-    #deprecated and will be removed soon
-    parser.add_argument('--complex_binder_rmsd_weights',
-                        default=None,
-                        type=str,
-                        help='Specify weighting of final score between complex score, binder score, and rmsd score. Default is 1,1,1. Optional, requires stabilize_monomer.')
 
     parser.add_argument('--substitution_insertion_deletion_weights',
                         default=None,

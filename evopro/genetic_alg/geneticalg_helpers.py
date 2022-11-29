@@ -6,7 +6,8 @@ import string
 import time
 import sys, os
 import re
-from DesignSeq import DesignSeq
+import json
+from evopro.genetic_alg.DesignSeq import DesignSeq
 from typing import Sequence, Union
 
 #import custom packages
@@ -18,7 +19,7 @@ import numpy as np
 
 all_aas = ["A", "C",  "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 
-def of_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[str]]], fitness_fxn):
+def of_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[str]]]):
     sys.path.append('/proj/kuhl_lab/OmegaFold/')
     from omegafold.__main__ import main 
     from omegafold import pipeline
@@ -36,11 +37,11 @@ def of_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[s
     model.eval()
     model.to(args.device)
 
-    of_partial = partial(main, arg_file=arg_file, proc_id=proc_id, fitness_fxn=fitness_fxn, model=model)
+    of_partial = partial(main, arg_file=arg_file, proc_id=proc_id, model=model)
 
     return of_partial
 
-def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[str]]], fitness_fxn):
+def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[str]]]):
     from run_af2 import af2
     print('initialization of process', proc_id)
 
@@ -156,7 +157,7 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
 
         models.append((model_name, model_runner))
 
-    af2_partial = partial(af2, arg_file=arg_file, proc_id=proc_id, fitness_fxn=fitness_fxn, compiled_runners=models)
+    af2_partial = partial(af2, arg_file=arg_file, proc_id=proc_id, compiled_runners=models)
 
     return af2_partial
 
@@ -228,13 +229,14 @@ def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0,
 def mutate_by_protein_mpnn(pdb_dir, dsobj):
     sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
     from run_protein_mpnn import run_protein_mpnn_func
-    results = run_protein_mpnn_func(pdb_dir, dsobj.jsondata)
+    results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata))
 
     return results
 
 def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = []):
     pool = startseqs.copy()
     exampleds = None
+    pdb_dirs = []
     
     #create a directory within running dir to run protein mpnn
     output_folder = run_dir + "MPNN_" + str(iter_num) + "/"
@@ -242,20 +244,29 @@ def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, al
         os.makedirs(output_folder)
     for dsobj, j in zip(startseqs, range(len(startseqs))):
         key_seq = dsobj.get_sequence_string()
-        pdb = scored_seqs[key_seq]["pdb"]
+        print(key_seq)
+        pdb = scored_seqs[key_seq]["pdb"][0]
         exampleds = dsobj
-        with open(output_folder + "seq_" + str(j) + ".pdb", "w") as pdbf:
+        pdb_dir = output_folder + "seq_" + str(j) + "/"
+        if not os.path.isdir(pdb_dir):
+            os.makedirs(pdb_dir)
+        with open(output_folder + "seq_" + str(j) + "/seq_" + str(j) + ".pdb", "w") as pdbf:
             pdbf.write(str(pdb))
+        pdb_dirs.append(pdb_dir)
 
+    k=0
     while len(pool) < num_seqs:
-        results = mutate_by_protein_mpnn(output_folder, startseqs[0])
+        results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k])
         for result in results:
             seq = result[-1][-1].strip().split("/")
             newseq_sequence = "".join(seq)
             newseq_sequence_check = ",".join(seq)
-            newseqobj = DesignSeq(seq=newseq_sequence, sequence=dsobj.sequence, mutable=dsobj.mutable, sym=dsobj.sym)
+            newseqobj = DesignSeq(seq=newseq_sequence, sequence=dsobj.sequence, mutable=dsobj.mutable, symmetric=dsobj.symmetric)
             if newseq_sequence_check not in all_seqs:
                 pool.append(newseqobj)
+        k+=1
+        if k>=len(startseqs):
+            k=0
 
     return pool
 

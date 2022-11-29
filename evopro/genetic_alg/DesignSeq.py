@@ -13,6 +13,8 @@ class DesignSeq:
             self.mutable = mut
             self.symmetric = sym
             self.jsondata = jdata
+            self._create_jsondata()
+
         elif seq is not None:
             self.sequence = sequence
             self.mutable = mutable
@@ -154,13 +156,15 @@ class DesignSeq:
         json_dict = {"sequence":newjsonseq_joined}
 
         chains = []
+        numbering = {}
         i = 1
         for resid in self.sequence:
             chain = re.split('(\d+)', resid)[0]
-            #checking if need to restart the numbering from 1 because new chain
+            #checking if we need to restart the numbering from 1 because new chain
             if chain not in chains:
                 chains.append(chain)
                 i = 1
+                numbering[chain] = []
 
             resval = self.sequence[resid]
             if resid in self.mutable:
@@ -170,12 +174,12 @@ class DesignSeq:
                         new_des.append(des_dict)
                         #print("designable", des_dict)
                         i+=1
+                        numbering[chain].append(resid)
                     else:
-                        #i-=1
-                        #print(i)
                         pass
             else:
                 i+=1
+                numbering[chain].append(resid)
 
         json_dict["designable"] = new_des
 
@@ -228,6 +232,7 @@ class DesignSeq:
         new_sym = [list(s) for s in sym_sets]
 
         json_dict["symmetric"] = new_sym
+        self.numbering = numbering
         self.jsondata = json_dict
 
     def _update_mutable_from_seq(self, seq):
@@ -372,7 +377,6 @@ class DesignSeq:
                     new_res["resid"][2] = new_res["resid"][2] - 1
 
                 new_res["resid"][3] = new_aa
-                #CHECK length range constraint
                 num_mut_curr += 1
                 # if deletion, replace dict with no-aa dict
                 new_mut[mut_id][-1] = new_res

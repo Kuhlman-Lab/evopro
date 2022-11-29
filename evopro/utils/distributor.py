@@ -5,7 +5,6 @@ import time
 import sys, os
 from typing import Sequence, Union
 
-
 from functools import partial
 import numpy as np
 
@@ -19,7 +18,7 @@ class Distributor:
     """
 
    
-    def __init__(self, n_workers, f_init, arg_file, lengths, fitness_fxn):
+    def __init__(self, n_workers, f_init, arg_file, lengths):
         """
         Construct a Distributor that manages n_workers sub-processes.
         The distributor will give work to its sub-processes in the
@@ -44,8 +43,7 @@ class Distributor:
                     self.qs_out[i],
                     self.q_in,
 		    arg_file,
-		    lengths,
-                    fitness_fxn)
+		    lengths)
             )
             for i in range(n_workers)
         ]
@@ -120,9 +118,9 @@ class Distributor:
 
            
     @staticmethod
-    def _worker_loop(f_init, proc_id, lock, q_in, q_out, arg_file, lengths, fitness_fxn):
+    def _worker_loop(f_init, proc_id, lock, q_in, q_out, arg_file, lengths):
 
-        f = f_init(proc_id, arg_file, lengths, fitness_fxn)
+        f = f_init(proc_id, arg_file, lengths)
    
         is_job, val = q_in.get()
         while is_job:

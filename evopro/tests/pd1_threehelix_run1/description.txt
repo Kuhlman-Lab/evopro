@@ -1,6 +1,0 @@
-using the revamped version with 2 models and protein mpnn (every 10 iter) to design a binder starting from david baker paper scaffold
-
-all residues mutable
-
-scoring based on contacts (num, confidence) of complex and confidence of binder only prediction
-also scoring based on rmsd between binder when bound to complex vs when alone

@@ -1,4 +1,0 @@
---pdb sequences_0_model_1_multimer_v2_0_unrelaxed.pdb
---mut_res B43,B44,B47,B48,B51,B54,B55,B56,B57,B58,B59
---default_mutres_setting all-PC
---output pd1_3helixbundle_5djt_surface_1helix.json

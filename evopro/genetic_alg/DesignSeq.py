@@ -173,13 +173,15 @@ class DesignSeq:
                         des_dict = {"chain":chain, "resid":i, "WTAA":res["resid"][3], "MutTo":res["MutTo"]}
                         new_des.append(des_dict)
                         #print("designable", des_dict)
-                        i+=1
                         numbering[chain].append(resid)
+                        i+=1
+
                     else:
                         pass
             else:
+                numbering[chain].append(resid) 
                 i+=1
-                numbering[chain].append(resid)
+
 
         json_dict["designable"] = new_des
 
@@ -244,13 +246,24 @@ class DesignSeq:
             if resid in self.mutable:
                 new_res = copy.deepcopy(self.mutable[resid])
                 if len(self.sequence[resid]) == 1:
+                    print(self.sequence[resid], new_res, seq, i)
                     new_res[0]["resid"][3] = seq[i]
                 elif len(self.sequence[resid]) > 1:
+                    print(self.sequence[resid], new_res, seq, i)
                     for aa, j in zip(self.sequence[resid], range(len(self.sequence[resid]))):
-                        new_res[j]["resid"][3] = seq[i+j]
+                        if len(new_res)<=j:
+                            new_res.append(copy.deepcopy(new_res[0]))
+                            print(new_res, j)
+                            print(new_res[j])
+                            print(new_res[j]["resid"])
+                            new_res[j]["resid"][2] = j
+                        new_res[j]["resid"][3] = aa
 
                 newmut[resid] = new_res
             i+= len(self.sequence[resid])
+            print(i)
+            if i>=len(seq):
+                break
         return newmut
 
     def _update_sequence(self):
@@ -334,7 +347,7 @@ class DesignSeq:
 
             method = "sub"
             if var > 0:
-                print(len("".join([self.jsondata["sequence"][chain] for chain in self.jsondata["sequence"]])), len(self.sequence.keys()), var)
+                #print(len("".join([self.jsondata["sequence"][chain] for chain in self.jsondata["sequence"]])), len(self.sequence.keys()), var)
                 if len("".join([self.jsondata["sequence"][chain] for chain in self.jsondata["sequence"]])) >= len(self.sequence.keys()) + var:
                     method = random.choices(["sub", "del"], [var_weights[0], var_weights[2]])[0]
 

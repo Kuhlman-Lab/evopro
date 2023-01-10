@@ -124,6 +124,7 @@ class Distributor:
    
         is_job, val = q_in.get()
         while is_job:
+            print(val)
             result = f(val)
        
             lock.acquire()

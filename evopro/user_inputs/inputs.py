@@ -52,6 +52,10 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Size of "genetic pool", or the number of sequences evaluated per '
                         'iteration. Default is 40.')
 
+    parser.add_argument('--pool_size_variable',
+                        action='store_true',
+                        help='Specify a file pool_sizes.txt with pool sizes for every iteration. Defaults to False and uses constant pool size.')
+
     parser.add_argument('--num_gpus',
                         default='4',
                         type=int,
@@ -75,6 +79,13 @@ def getEvoProParser() -> FileArgumentParser:
                         type=str,
                         help='Name of the rmsd function in the score file'
                         ' used to evaluate fitness of the alphafold predictions. Optional, requires stabilize_binder=True.')
+
+    parser.add_argument('--rmsd_to_starting',
+                        default=None,
+                        type=str,
+                        help='Name of the rmsd function in the score file'
+                        ' used to evaluate rmsd to the starting scaffold using a U-shaped potential. '
+                        'Optional, requires stabilize_binder=True.')
 
     parser.add_argument('--vary_length',
                         default='0',
@@ -114,6 +125,17 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Protein MPNN is used to refill the pool once every _ iterations.'
                         'Default is 10.')
 
+    parser.add_argument('--skip_mpnn',
+                        default='1-10',
+                        type=str,
+                        help='Skip MPNN refilling in these iterations. Default is first 10.')
+    
+    parser.add_argument('--mpnn_temp',
+                        default='0.1',
+                        type=str,
+                        help='Protein MPNN is used to refill the pool at this sampling temperature.'
+                        'Default is 0.1.')
+
     parser.add_argument('--len_binder',
                         default='0',
                         type=int,
@@ -123,11 +145,19 @@ def getEvoProParser() -> FileArgumentParser:
                          action='store_true',
                          help='Default is False.')
 
-    parser.add_argument('--pae_output',
+    parser.add_argument('--plot_confidences',
                          action='store_true',
-                         help='Default is False. THIS DOES NOT WORK YET')
+                         help='Default is False.')
 
-    parser.add_argument('--plot_scores',
+    parser.add_argument('--plot_scores_avg',
+                         action='store_true',
+                         help='Default is False.')
+
+    parser.add_argument('--plot_scores_median',
+                         action='store_true',
+                         help='Default is False.')
+    
+    parser.add_argument('--plot_scores_top',
                          action='store_true',
                          help='Default is False.')
 

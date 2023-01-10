@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from folddesign.utils.write_pdb import PDBio
+from evopro.utils.write_pdb import PDBio
 
 def fit_rms(ref_c,c):
     # move geometric center to the origin

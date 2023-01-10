@@ -1,6 +1,6 @@
 import sys
-#sys.path.append("/proj/kuhl_lab/evopro/")
-sys.path.append("/nas/longleaf/home/amritan/Desktop/evopro/")
+sys.path.append("/proj/kuhl_lab/evopro/")
+#sys.path.append("/nas/longleaf/home/amritan/Desktop/evopro/")
 from evopro.utils.pdb_parser import get_coordinates_pdb
 from evopro.utils.write_pdb import PDBio
 from evopro.utils.calc_rmsd import RMSDcalculator
@@ -26,6 +26,7 @@ def get_seq_indices(dsobj, reslist, first_only=True):
     for resid_orig in reslist:
         chain = re.split('(\d+)', resid_orig)[0]
         numbering = dsobj.numbering[chain]
+        print(resid_orig, numbering)
         if first_only:
             try:
                 new_resind = numbering.index(resid_orig)
@@ -34,10 +35,13 @@ def get_seq_indices(dsobj, reslist, first_only=True):
             except:
                 print(resid_orig + " has been deleted")
         else:
-            new_resinds = [i for i, x in enumerate(numbering) if x == resid_orig]
-            resids_new = [chain + str(x+1) for x in new_resinds]
+            new_resinds = [i for i, x in enumerate(numbering, start=1) if x == resid_orig]
+            print(new_resinds)
+            resids_new = [chain + str(x) for x in new_resinds]
             new_reslist = new_reslist + resids_new
 
+    print(reslist)
+    print(new_reslist)
     return new_reslist
 
 def score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dist=4, contact_cap=36, dsobj=None, first_only=False):
@@ -66,7 +70,7 @@ def score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dist=4, contac
                                 res2_id = resindices[res2]
                                 pae_contact = pae[res1_id][res2_id] + pae[res2_id][res1_id]
                                 weight = (70-pae_contact)/70
-                            pairs.append(pair)
+                                pairs.append(pair)
 
             score = score + contact*weight
     
@@ -119,6 +123,12 @@ def orientation_score(pdb, pairs, orient_dist = 10, penalty = 10, dsobj=None, fi
 def score_pae_confidence_pairs(resultsfile, pairs, resindices, fil = False, dsobj=None, first_only=True):
     """calculates confidence score of all pairwise residue interactions"""
     score = 0
+    reslist1 = []
+    reslist2 = []
+    for pair in pairs:
+        reslist1.append(pair[0])
+        reslist2.append(pair[1])
+
     if dsobj:
         reslist1 = get_seq_indices(dsobj, reslist1, first_only=first_only)
         reslist2 = get_seq_indices(dsobj, reslist2, first_only=first_only)

@@ -1,5 +1,5 @@
 import sys
-from folddesign.utils.read_pdb import PDB
+from evopro.utils.read_pdb import PDB
 
 class PDBio(PDB):
     template = "{head:6s}{serial:5d} {name:<4}{altLoc:1s}{resName:3s} {chainID:1s}{resSeq:4d}{iCode:1s}   {x:8.3f}{y:8.3f}{z:8.3f}{occupancy:6.2f}{tempFactor:6.2f}          {element:>2s}{charge:2s}\n"

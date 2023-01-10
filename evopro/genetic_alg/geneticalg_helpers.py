@@ -226,14 +226,14 @@ def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0,
 
     return pool
 
-def mutate_by_protein_mpnn(pdb_dir, dsobj):
+def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp):
     sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
     from run_protein_mpnn import run_protein_mpnn_func
-    results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata))
+    results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp)
 
     return results
 
-def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = []):
+def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = [], mpnn_temp="0.1"):
     pool = startseqs.copy()
     exampleds = None
     pdb_dirs = []
@@ -256,7 +256,8 @@ def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, al
 
     k=0
     while len(pool) < num_seqs:
-        results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k])
+        results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k], mpnn_temp)
+        dsobj = startseqs[k]
         for result in results:
             seq = result[-1][-1].strip().split("/")
             newseq_sequence = "".join(seq)

@@ -102,7 +102,10 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
     model_names = getModelNames(
         first_n_seqs=len(queries[0][1]),
         last_n_seqs=len(queries[-1][1]),
-        use_ptm=args.use_ptm, num_models=args.num_models)
+        use_ptm=args.use_ptm, num_models=args.num_models,
+        use_multimer=not args.no_multimer_models,
+        use_multimer_v1=args.use_multimer_v1,
+        use_multimer_v2=args.use_multimer_v2)
     print('model names', model_names)
 
     query_features = []
@@ -163,7 +166,7 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
 
 #NEEDS REWRITE
 def generate_random_seqs(num_seqs, lengths):
-    seqs = []
+    oplist = []
     chainnames = list(string.ascii_uppercase)
     for i in range(num_seqs):
         sequences = []
@@ -226,14 +229,14 @@ def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0,
 
     return pool
 
-def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp):
+def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp, mpnn_version="s_48_020"):
     sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
     from run_protein_mpnn import run_protein_mpnn_func
-    results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp)
+    results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp, model_name=mpnn_version)
 
     return results
 
-def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = [], mpnn_temp="0.1"):
+def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = [], mpnn_temp="0.1", mpnn_version="s_48_020"):
     pool = startseqs.copy()
     exampleds = None
     pdb_dirs = []
@@ -244,9 +247,8 @@ def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, al
         os.makedirs(output_folder)
     for dsobj, j in zip(startseqs, range(len(startseqs))):
         key_seq = dsobj.get_sequence_string()
-        print(key_seq)
-        pdb = scored_seqs[key_seq]["pdb"][0]
-        exampleds = dsobj
+        #print(key_seq)
+        pdb = scored_seqs[key_seq]["data"][0]["pdb"][0]
         pdb_dir = output_folder + "seq_" + str(j) + "/"
         if not os.path.isdir(pdb_dir):
             os.makedirs(pdb_dir)
@@ -256,7 +258,44 @@ def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, al
 
     k=0
     while len(pool) < num_seqs:
-        results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k], mpnn_temp)
+        results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k], mpnn_temp, mpnn_version=mpnn_version)
+        dsobj = startseqs[k]
+        for result in results:
+            seq = result[-1][-1].strip().split("/")
+            newseq_sequence = "".join(seq)
+            newseq_sequence_check = ",".join(seq)
+            newseqobj = DesignSeq(seq=newseq_sequence, sequence=dsobj.sequence, mutable=dsobj.mutable, symmetric=dsobj.symmetric)
+            if newseq_sequence_check not in all_seqs:
+                pool.append(newseqobj)
+        k+=1
+        if k>=len(startseqs):
+            k=0
+
+    return pool
+
+def create_new_seqs_mpnn_old(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = [], mpnn_temp="0.1", mpnn_version="s_48_020"):
+    pool = startseqs.copy()
+    exampleds = None
+    pdb_dirs = []
+    
+    #create a directory within running dir to run protein mpnn
+    output_folder = run_dir + "MPNN_" + str(iter_num) + "/"
+    if not os.path.isdir(output_folder):
+        os.makedirs(output_folder)
+    for dsobj, j in zip(startseqs, range(len(startseqs))):
+        key_seq = dsobj.get_sequence_string()
+        #print(key_seq)
+        pdb = scored_seqs[key_seq]["pdb"][0]
+        pdb_dir = output_folder + "seq_" + str(j) + "/"
+        if not os.path.isdir(pdb_dir):
+            os.makedirs(pdb_dir)
+        with open(output_folder + "seq_" + str(j) + "/seq_" + str(j) + ".pdb", "w") as pdbf:
+            pdbf.write(str(pdb))
+        pdb_dirs.append(pdb_dir)
+
+    k=0
+    while len(pool) < num_seqs:
+        results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k], mpnn_temp, mpnn_version=mpnn_version)
         dsobj = startseqs[k]
         for result in results:
             seq = result[-1][-1].strip().split("/")

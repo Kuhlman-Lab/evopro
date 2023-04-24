@@ -1,9 +1,0 @@
---params_dir /proj/kuhl_lab/alphafold/alphafold/data
---compress_output
---use_templates
---use_ptm
---num_models 1
---max_recycle 1
---save_timing
---design_run
---no_multimer_models

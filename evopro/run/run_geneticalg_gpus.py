@@ -10,9 +10,9 @@ sys.path.append("/proj/kuhl_lab/evopro/")
 #sys.path.append("/nas/longleaf/home/amritan/Desktop/evopro/")
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor
-from evopro.utils.plot_scores import plot_scores_stabilize_monomer_top, plot_scores_stabilize_monomer_avg, plot_scores_stabilize_monomer_median
+from evopro.utils.plot_scores import plot_scores_stabilize_monomer_top_old, plot_scores_stabilize_monomer_avg_old, plot_scores_stabilize_monomer_median_old
 from evopro.run.generate_json import parse_mutres_input
-from evopro.genetic_alg.geneticalg_helpers import generate_random_seqs, read_starting_seqs, create_new_seqs, create_new_seqs_mpnn
+from evopro.genetic_alg.geneticalg_helpers import generate_random_seqs, read_starting_seqs, create_new_seqs, create_new_seqs_mpnn_old, create_new_seqs_mpnn
 from evopro.user_inputs.inputs import getEvoProParser
 from evopro.score_funcs.score_funcs import write_raw_plddt, write_pairwise_scores
 
@@ -21,11 +21,10 @@ from functools import partial
 import numpy as np
 
 def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], num_iter = 50, 
-    n_workers=2, write_raw_plddts=False, write_pair_confs=False, rmsd_func=None, 
-    rmsd_to_starting_func=None, rmsd_to_starting_pdb=None, 
-    write_pdbs=False, mpnn_iters=None, len_binder=0, use_of=False, crossover_percent=0.2, vary_length=0, 
+    n_workers=2, rmsd_func=None, rmsd_to_starting_func=None, rmsd_to_starting_pdb=None,
+    write_pdbs=False, mpnn_iters=None, use_of=False, crossover_percent=0.2, vary_length=0, 
     mut_percents=None, stabilize_monomer=None, contacts=None, plot=[], conf_plot=False, mpnn_temp="0.1", 
-    skip_mpnn=[]):
+    skip_mpnn=[], repeat_af2=False):
 
     num_af2=0
     lengths = [[x + vary_length for x in startingseqs[0].get_lengths()]]
@@ -33,14 +32,17 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
         for chain in stabilize_monomer:
             lengths.append([x + vary_length for x in startingseqs[0].get_lengths([chain])])
 
+    print(lengths)
+    print("Varying length:", vary_length!=0)
+
     if use_of:
         from evopro.genetic_alg.geneticalg_helpers import of_init
         sys.path.append('/proj/kuhl_lab/OmegaFold/')
         dist = Distributor(n_workers, of_init, af2_flags_file, lengths)
     
     else:
-        from evopro.genetic_alg.geneticalg_helpers import af2_init
-        from run_af2 import af2
+        #from evopro.genetic_alg.geneticalg_helpers import af2_init
+        from run_af2 import af2, af2_init
         print("initializing distributor")
         dist = Distributor(n_workers, af2_init, af2_flags_file, lengths)
 
@@ -52,7 +54,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
 
     while len(poolsizes) < num_iter:
         poolsizes.append(poolsizes[-1])
-    print(len(poolsizes))
+    #print(len(poolsizes))
 
     output_dir = run_dir + "outputs/"
     if not os.path.isdir(output_dir):
@@ -68,6 +70,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
         all_seqs = []
         all_scores = []
         pool = newpool
+        #print("Varying length:", vary_length!=0)
 
         if curr_iter == 1:
             print("Iteration 1: Creating new sequences.")
@@ -77,7 +80,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
         #using protein mpnn to refill pool when specified
         elif curr_iter in mpnn_iters and curr_iter not in skip_mpnn:
             print("Iteration "+str(curr_iter)+": refilling with ProteinMPNN.")
-            pool = create_new_seqs_mpnn(pool, scored_seqs, poolsizes[curr_iter-1], run_dir, curr_iter, all_seqs = list(scored_seqs.keys()), mpnn_temp=mpnn_temp)
+            pool = create_new_seqs_mpnn_old(pool, scored_seqs, poolsizes[curr_iter-1], run_dir, curr_iter, all_seqs = list(scored_seqs.keys()), mpnn_temp=mpnn_temp)
 
         #otherwise refilling pool with just mutations and crossovers
         else:
@@ -85,8 +88,11 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
             pool = create_new_seqs(pool, poolsizes[curr_iter-1], crossover_percent=crossover_percent, mut_percent=mut_percents[curr_iter-1], all_seqs = list(scored_seqs.keys()), vary_length=vary_length)
 
         #print("Starting iteration " + str(curr_iter))
-
-        scoring_pool = [p for p in pool if p.get_sequence_string() not in scored_seqs]
+        
+        if repeat_af2:
+            scoring_pool = [p for p in pool]
+        else:
+            scoring_pool = [p for p in pool if p.get_sequence_string() not in scored_seqs]
         work_list = [[[dsobj.jsondata["sequence"][chain] for chain in dsobj.jsondata["sequence"]]] for dsobj in scoring_pool]
 
         #if needed, also running af2 on the binder alone
@@ -116,8 +122,18 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
             scoring_dsobjs = scoring_dsobjs + scoring_pool
 
         all_scores = []
+        print("These should be equal", len(work_list_all), len(results), len(scoring_dsobjs))
         for seq, result, dsobj in zip(work_list_all, results, scoring_dsobjs):
-            all_scores.append(score_func(result[0], dsobj, contacts=contacts))
+            while type(result) is list:
+                print(result)
+                result = result[0]
+            print(seq, result, dsobj, contacts)
+            if contacts is not None:
+                all_scores.append(score_func(result, None, contacts=contacts))
+            else:
+                all_scores.append(score_func(result, None))
+            print("All scores length", len(all_scores))
+            #all_scores.append(score_func(result, dsobj, contacts=contacts))
 
         #separating complex and binder sequences, if needed
         complex_seqs = []
@@ -168,6 +184,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
             print("adding sequences and scores into the dictionary")
             for dsobj, seq, cscore, bscores in zip(scoring_pool, complex_seqs, complex_scores, binder_scores):
                 key_seq = dsobj.get_sequence_string()
+                print(key_seq)
                 if key_seq != ",".join(seq[0]):
                     print(key_seq, str(seq[0]))
                     raise ValueError("Sequence does not match DSobj sequence")
@@ -175,10 +192,11 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
                 rmsd_score_list = []
                 if rmsd_func:
                     for bscore,chain in zip(bscores, stabilize_monomer):
+                        print("calculating rmsd")
                         rmsd_score_list.append(rmsd_func(cscore[-2], bscore[-2], binder_chain=chain, dsobj=dsobj))
                 if rmsd_to_starting_func:
                     for bscore,chain in zip(bscores, stabilize_monomer):
-                        rmsd_score_list.append(rmsd_to_starting_func(bscore[-2], path_to_starting, dsobj=dsobj))
+                        rmsd_score_list.append(rmsd_to_starting_func(bscore[-2], rmsd_to_starting_pdb, dsobj=dsobj))
                 
                 rmsd_score = sum(rmsd_score_list)
                 bscore = sum([b[0] for b in bscores])
@@ -191,7 +209,9 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
             print("adding sequences and scores into the dictionary, no stabilize_monomer")
             for dsobj, seq, cscore in zip(scoring_pool, complex_seqs, complex_scores):
                 key_seq = dsobj.get_sequence_string()
-                score = (cscore[0], cscore[1])
+                if rmsd_to_starting_func:
+                    rmsd_score = rmsd_to_starting_func(bscore[-2], rmsd_to_starting_pdb, dsobj=dsobj)
+                score = (cscore[0] + rmsd_score, cscore[1], rmsd_score)
                 pdb = (cscore[-2], None)
                 result = (cscore[-1], )
                 scored_seqs[key_seq] = {"dsobj": dsobj, "score": score, "pdb": pdb, "result": result}
@@ -256,22 +276,22 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
     if "avg" in plot:
         if stabilize_monomer:
             if not rmsd_func:
-                plot_scores_stabilize_monomer_avg(seqs_per_iteration, output_dir, rmsd=False)
+                plot_scores_stabilize_monomer_avg_old(seqs_per_iteration, output_dir, rmsd=False)
             else:
-                plot_scores_stabilize_monomer_avg(seqs_per_iteration, output_dir)
+                plot_scores_stabilize_monomer_avg_old(seqs_per_iteration, output_dir)
     if "top" in plot:
         if stabilize_monomer:
             if not rmsd_func:
-                plot_scores_stabilize_monomer_top(seqs_per_iteration, output_dir, rmsd=False)
+                plot_scores_stabilize_monomer_top_old(seqs_per_iteration, output_dir, rmsd=False)
             else:
-                plot_scores_stabilize_monomer_top(seqs_per_iteration, output_dir)
+                plot_scores_stabilize_monomer_top_old(seqs_per_iteration, output_dir)
 
     if "median" in plot:
         if stabilize_monomer:
             if not rmsd_func:
-                plot_scores_stabilize_monomer_median(seqs_per_iteration, output_dir, rmsd=False)
+                plot_scores_stabilize_monomer_median_old(seqs_per_iteration, output_dir, rmsd=False)
             else:
-                plot_scores_stabilize_monomer_median(seqs_per_iteration, output_dir)
+                plot_scores_stabilize_monomer_median_old(seqs_per_iteration, output_dir)
 
     for key_seq, j in zip(newpool_seqs, range(len(newpool_seqs))):
         seq = key_seq.split(" ")
@@ -396,11 +416,6 @@ if __name__ == "__main__":
         rmsd_to_starting_func=None
         path_to_starting=None
 
-    if args.len_binder:
-        len_binder=args.len_binder
-    else:
-        len_binder=0
-
     mult = args.num_iter
     mut_percents = []
     if args.mutation_percents:
@@ -415,8 +430,8 @@ if __name__ == "__main__":
     
     mut_percents = mut_percents[:args.num_iter]
 
-    if args.stabilize_monomer:
-        stabilize = [x.strip() for x in args.stabilize_monomer.split(",")]
+    if args.af2_preds_extra:
+        stabilize = [x.strip() for x in args.af2_preds_extra.split(",")]
     else:
         stabilize=None
 
@@ -429,8 +444,15 @@ if __name__ == "__main__":
             if i % freq == 0:
                 mpnn_iters.append(i)
 
+    contacts=[None,None,None]
     if args.define_contact_area:
-        contacts = parse_mutres_input(args.define_contact_area)
+        contacts[0] = parse_mutres_input(args.define_contact_area)
+    
+    if args.bonus_contacts:
+        contacts[1] = parse_mutres_input(args.bonus_contacts)
+        
+    if args.penalize_contacts:
+        contacts[2] = parse_mutres_input(args.penalize_contacts)
 
     mpnn_skips = []
     if args.skip_mpnn:
@@ -465,10 +487,9 @@ if __name__ == "__main__":
     print(pool_sizes)
 
     run_genetic_alg_gpus(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, 
-        num_iter = args.num_iter, n_workers=args.num_gpus, write_raw_plddts=args.write_plddt, 
-        write_pair_confs=args.write_pae, stabilize_monomer=stabilize, rmsd_func=rmsdfunc, 
+        num_iter = args.num_iter, n_workers=args.num_gpus, stabilize_monomer=stabilize, rmsd_func=rmsdfunc, 
         rmsd_to_starting_func=rmsd_to_starting_func, rmsd_to_starting_pdb=path_to_starting, 
-        write_pdbs=args.write_pdbs, mpnn_iters=mpnn_iters, use_of=args.use_omegafold, 
+        write_pdbs=args.write_pdbs, mpnn_iters=mpnn_iters, use_of=False, 
         crossover_percent=args.crossover_percent, vary_length=args.vary_length, mut_percents=mut_percents, 
         contacts=contacts, plot=plot_style, conf_plot=args.plot_confidences, mpnn_temp=args.mpnn_temp, 
-        skip_mpnn=mpnn_skips)
+        skip_mpnn=mpnn_skips, repeat_af2=not args.no_repeat_af2)

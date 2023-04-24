@@ -26,7 +26,7 @@ def get_seq_indices(dsobj, reslist, first_only=True):
     for resid_orig in reslist:
         chain = re.split('(\d+)', resid_orig)[0]
         numbering = dsobj.numbering[chain]
-        print(resid_orig, numbering)
+        #print(resid_orig, numbering)
         if first_only:
             try:
                 new_resind = numbering.index(resid_orig)
@@ -36,12 +36,12 @@ def get_seq_indices(dsobj, reslist, first_only=True):
                 print(resid_orig + " has been deleted")
         else:
             new_resinds = [i for i, x in enumerate(numbering, start=1) if x == resid_orig]
-            print(new_resinds)
+            #print(new_resinds)
             resids_new = [chain + str(x) for x in new_resinds]
             new_reslist = new_reslist + resids_new
 
-    print(reslist)
-    print(new_reslist)
+    #print(reslist)
+    #print(new_reslist)
     return new_reslist
 
 def score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dist=4, contact_cap=36, dsobj=None, first_only=False):

@@ -4,41 +4,75 @@ import sys
 sys.path.append("/proj/kuhl_lab/evopro/")
 #sys.path.append("/nas/longleaf/home/amritan/Desktop/evopro/")
 from evopro.user_inputs.inputs import FileArgumentParser
+from evopro.utils.aa_utils import three_to_one, one_to_three
+from evopro.utils.pdb_parser import get_coordinates_pdb, get_coordinates_pdb_old
 import math
 
-def generate_json(pdbfile, mut_res, opf, default, symmetric_res):
-    from evopro.utils.pdb_parser import get_coordinates_pdb, get_coordinates_pdb_old
-    from evopro.utils.aa_utils import three_to_one
-
-    chains, residues, resindices = get_coordinates_pdb_old(pdbfile, fil=True)
-
-    pdbids = {}
-    chain_seqs = {}
-
+def parse_seqfile(filename):
+    ids = {}
+    chains = {}
+    with open(filename, "r") as f:
+        i=0
+        for lin in f:
+            l = lin.strip().split(":")
+            chains[l[0]] = l[1]
+    
     for chain in chains:
-        chain_seqs[chain]=[]
+        reslist = list(chains[chain])
+        for aa, i in zip(reslist, range(len(reslist))):
+            resid = chain + str(i+1)
+            extended_resid = chain + "_" + one_to_three(aa) + "_" + str(i+1)
+            ids[resid] = (extended_resid, chain, i+1)
 
-    res_index_chain = 1
-    chain_test = chains[0]
-    for residue in residues:
-        num_id = int(residue.split("_")[-1])
-        chain = residue.split("_")[0]
-        if chain != chain_test:
-            res_index_chain = 1
-            chain_test = chain
-        pdbid = chain+str(num_id)
-        pdbids[pdbid] = (residue, chain, res_index_chain)
-        ##########
-        aa = three_to_one(residue.split("_")[1])
-        chain_seqs[chain].append(aa)
-        res_index_chain += 1
+    return ids, chains
+            
 
-    for chain in chains:
-        chain_seqs[chain] = "".join([x for x in chain_seqs[chain] if x is not None])
+def generate_json(filename, mut_res, opf, default, symmetric_res, seqfile=False):
 
+    if seqfile:
+        pdbids, chain_seqs = parse_seqfile(filename)
+    else:
+        chains, residues, resindices = get_coordinates_pdb_old(filename, fil=True)
+
+        pdbids = {}
+        chain_seqs = {}
+
+        for chain in chains:
+            chain_seqs[chain]=[]
+
+        
+
+        res_index_chain = 1
+        chain_test = chains[0]
+        for residue in residues:
+            num_id = int(residue.split("_")[-1])
+            chain = residue.split("_")[0]
+            if chain != chain_test:
+                res_index_chain = 1
+                chain_test = chain
+            pdbid = chain+str(num_id)
+            pdbids[pdbid] = (residue, chain, res_index_chain)
+
+            aa = three_to_one(residue.split("_")[1])
+            chain_seqs[chain].append(aa)
+            res_index_chain += 1
+
+        for chain in chains:
+            chain_seqs[chain] = "".join([x for x in chain_seqs[chain] if x is not None])
+        
+    #print(pdbids, chain_seqs)
+    
     mutable = []
     for resind in mut_res:
-        if resind in pdbids:
+        if "*" in resind:
+            try:
+                chain = resind.split("*")[0]
+                for pdbid in pdbids:
+                    if pdbid.startswith(chain):
+                        mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
+            except:
+                raise ValueError("Invalid specification. Try using the asterisk after the chain ID.")
+        elif resind in pdbids:
             mutable.append({"chain":pdbids[resind][1], "resid": pdbids[resind][2], "WTAA": three_to_one(pdbids[resind][0].split("_")[1]), "MutTo": default})
 
     symmetric = []
@@ -69,13 +103,17 @@ def getPDBParser() -> FileArgumentParser:
     """Gets an FileArgumentParser with necessary arguments to run generate_json"""
 
     parser = FileArgumentParser(description='Script that can take a PDB and PDB residue numbers'
-                                ' and convert to json file format for input to FDD', 
+                                ' and convert to json file format for input to EvoPro', 
                                 fromfile_prefix_chars='@')
 
     parser.add_argument('--pdb',
-                        default='',
+                        default=None,
                         type=str,
-                        help='Path to and name of PDB file')
+                        help='Path to and name of PDB file to extract chains and sequences.')
+    parser.add_argument('--sequence_file',
+                        default=None,
+                        type=str,
+                        help='Path to and name of text file to extract chains and sequences. Only provide if there is no PDB file.')
     parser.add_argument('--mut_res',
                         default='',
                         type=str,
@@ -177,5 +215,8 @@ if __name__=="__main__":
     args = parser.parse_args(sys.argv[1:])
     mutres = parse_mutres_input(args.mut_res)
     symres = parse_symmetric_res(args.symmetric_res)
-    generate_json(args.pdb, mutres, args.output, args.default_mutres_setting, symres)
+    if args.pdb:
+        generate_json(args.pdb, mutres, args.output, args.default_mutres_setting, symres)
+    elif args.sequence_file:
+        generate_json(args.sequence_file, mutres, args.output, args.default_mutres_setting, symres, seqfile=True)
 

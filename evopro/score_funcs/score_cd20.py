@@ -80,10 +80,7 @@ def score_binder_complex(results, dsobj, contacts, orient=None):
     reslist1 = contacts
     reslist2 = [x for x in residues.keys() if x.startswith("C")]
     contacts, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False)
-    if orient:
-        orientation_penalty = orientation_score(orient, pdb, dsobj=dsobj)
-    else:
-        orientation_penalty = 0
+
     score = -contactscore + orientation_penalty
     return score, (score, len(contacts), contactscore, orientation_penalty), contacts, pdb, results
 

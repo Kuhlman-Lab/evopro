@@ -1,4 +1,0 @@
---pdb sequence_0_model_1_unrelaxed.pdb
---mut_res B41-B59
---default_mutres_setting alpha
---output pd1_beta.json

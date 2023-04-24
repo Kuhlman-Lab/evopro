@@ -47,20 +47,20 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Number of iterations of genetic algorithm. Default is 50.')
 
     parser.add_argument('--pool_size',
-                        default='40',
+                        default='20',
                         type=int,
                         help='Size of "genetic pool", or the number of sequences evaluated per '
-                        'iteration. Default is 40.')
+                        'iteration. Default is 20.')
 
     parser.add_argument('--pool_size_variable',
                         action='store_true',
-                        help='Specify a file pool_sizes.txt with pool sizes for every iteration. Defaults to False and uses constant pool size.')
+                        help='Specify a file pool_sizes.txt with pool sizes for every iteration (or until pool size stops changing). '
+                        'Defaults to False and uses constant pool size.')
 
     parser.add_argument('--num_gpus',
-                        default='4',
+                        default='1',
                         type=int,
-                        help='Number of gpus available.'
-                        'Default is 4.')
+                        help='Number of gpus available. Default is 1.')
 
     parser.add_argument('--score_file',
                         default='',
@@ -83,10 +83,14 @@ def getEvoProParser() -> FileArgumentParser:
     parser.add_argument('--rmsd_to_starting',
                         default=None,
                         type=str,
-                        help='Name of the rmsd function in the score file'
-                        ' used to evaluate rmsd to the starting scaffold using a U-shaped potential. '
-                        'Optional, requires stabilize_binder=True.')
+                        help='Name of the rmsd function in the score file and the path/filename to pdb for RMSD.'
+                        ' used to evaluate rmsd to the starting scaffold using a U-shaped potential. ')
+    parser.add_argument('--path_to_starting',
+                        default=None,
+                        type=str,
+                        help='path/filename to pdb to pass to scoring function for RMSD to starting.')
 
+    #not in use
     parser.add_argument('--vary_length',
                         default='0',
                         type=int,
@@ -96,19 +100,28 @@ def getEvoProParser() -> FileArgumentParser:
                         default=None,
                         type=str,
                         help='File defining residues on target interface to be targeted for contacts. Default is None.')
-
-    parser.add_argument('--write_plddt',
-                         action='store_true',
-                         help='Default is False.')
-
-    parser.add_argument('--write_pae',
-                         action='store_true',
-                         help='Default is False.')
-
-    parser.add_argument('--stabilize_monomer',
+    
+    parser.add_argument('--bonus_contacts',
                         default=None,
                         type=str,
-                        help='Chain ID to run through AF2 individually (optional). Default is none.')
+                        help='File defining residues on target interface to be given a bonus for making contacts, followed by the'
+                        'distance cutoff. Default is None and 4A.')
+    
+    parser.add_argument('--penalize_contacts',
+                        default=None,
+                        type=str,
+                        help='File defining residues on target interface to be given a penalty for making contacts, followed by the'
+                        'distance cutoff. Default is None and 4A.')
+    
+    parser.add_argument('--no_repeat_af2',
+                         action='store_false',
+                         help='Use this flag to specify if you want AF2 to be multiple times on the same sequence, and the score averaged.'
+                         'This means that all sequences will be rescored every iteration (like FoldDesign protocol) until each sequence has'
+                         'been scored 5 times. Default is False.')
+
+    parser.add_argument('--dont_write_compressed_data',
+                         action='store_false',
+                         help='Default is True.')
 
     parser.add_argument('--write_pdbs',
                          action='store_true',
@@ -126,24 +139,20 @@ def getEvoProParser() -> FileArgumentParser:
                         'Default is 10.')
 
     parser.add_argument('--skip_mpnn',
-                        default='1-10',
+                        default=None,
                         type=str,
-                        help='Skip MPNN refilling in these iterations. Default is first 10.')
+                        help='Skip MPNN refilling in these iterations. Default is None.')
     
     parser.add_argument('--mpnn_temp',
                         default='0.1',
                         type=str,
                         help='Protein MPNN is used to refill the pool at this sampling temperature.'
                         'Default is 0.1.')
-
-    parser.add_argument('--len_binder',
-                        default='0',
-                        type=int,
-                        help='Number of residues in binder, used to find binder when linker is included. Default is 0.')
-
-    parser.add_argument('--use_omegafold',
-                         action='store_true',
-                         help='Default is False.')
+    
+    parser.add_argument('--mpnn_version',
+                        default="s_48_020",
+                        type=str,
+                        help='Model version used to run MPNN. Default is s_48_020 (soluble).')
 
     parser.add_argument('--plot_confidences',
                          action='store_true',
@@ -167,6 +176,7 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Fraction of pool refilled by crossover.'
                         'Default is 0.2.')
 
+    #not in use
     parser.add_argument('--substitution_insertion_deletion_weights',
                         default=None,
                         type=str,
@@ -177,6 +187,16 @@ def getEvoProParser() -> FileArgumentParser:
                         type=str,
                         help='Number of mutations made as a percentage of sequence length.'
                         'Default is 0.125 for every iteration. If more than one value is provided, number of iterations will be split evenly and assigned.')
+    
+    parser.add_argument('--af2_preds',
+                        default="AB",
+                        type=str,
+                        help='Chain ID permutations to run through individual AF2 runs, separated by commas. Only used for multistate design. Default is None.')
+    
+    parser.add_argument('--af2_preds_extra',
+                        default=None,
+                        type=str,
+                        help='Chain ID permutations to run through individual AF2 runs, separated by commas. Default is None.')
 
     return parser
 

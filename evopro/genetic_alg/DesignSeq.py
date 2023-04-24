@@ -246,22 +246,22 @@ class DesignSeq:
             if resid in self.mutable:
                 new_res = copy.deepcopy(self.mutable[resid])
                 if len(self.sequence[resid]) == 1:
-                    print(self.sequence[resid], new_res, seq, i)
+                    #print(self.sequence[resid], new_res, seq, i)
                     new_res[0]["resid"][3] = seq[i]
                 elif len(self.sequence[resid]) > 1:
-                    print(self.sequence[resid], new_res, seq, i)
+                    #print(self.sequence[resid], new_res, seq, i)
                     for aa, j in zip(self.sequence[resid], range(len(self.sequence[resid]))):
                         if len(new_res)<=j:
                             new_res.append(copy.deepcopy(new_res[0]))
-                            print(new_res, j)
-                            print(new_res[j])
-                            print(new_res[j]["resid"])
+                            #print(new_res, j)
+                            #print(new_res[j])
+                            #print(new_res[j]["resid"])
                             new_res[j]["resid"][2] = j
                         new_res[j]["resid"][3] = aa
 
                 newmut[resid] = new_res
             i+= len(self.sequence[resid])
-            print(i)
+            #print(i)
             if i>=len(seq):
                 break
         return newmut

@@ -192,6 +192,8 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
                 key_seq = dsobj.get_sequence_string()
                 if rmsd_to_starting_func:
                     rmsd_score = rmsd_to_starting_func(bscore[-2], rmsd_to_starting_pdb, dsobj=dsobj)
+                else:
+                    rmsd_score = 0
                 score = (cscore[0] + rmsd_score, cscore[1], rmsd_score)
                 pdb = (cscore[-2], None)
                 result = (cscore[-1], )

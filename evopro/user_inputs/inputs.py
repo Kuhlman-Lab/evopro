@@ -90,23 +90,17 @@ def getEvoProParser() -> FileArgumentParser:
                         type=str,
                         help='path/filename to pdb to pass to scoring function for RMSD to starting.')
 
-    #not in use
-    parser.add_argument('--vary_length',
-                        default='0',
-                        type=int,
-                        help='How much the length is allowed to vary. Default is 0.')
-
     parser.add_argument('--define_contact_area',
                         default=None,
                         type=str,
-                        help='File defining residues on target interface to be targeted for contacts. Default is None.')
-    
+                        help='Defining residues on target interface to be targeted for contacts. Default is None.')
+
     parser.add_argument('--bonus_contacts',
                         default=None,
                         type=str,
                         help='File defining residues on target interface to be given a bonus for making contacts, followed by the'
                         'distance cutoff. Default is None and 4A.')
-    
+
     parser.add_argument('--penalize_contacts',
                         default=None,
                         type=str,
@@ -115,9 +109,7 @@ def getEvoProParser() -> FileArgumentParser:
     
     parser.add_argument('--no_repeat_af2',
                          action='store_false',
-                         help='Use this flag to specify if you want AF2 to be multiple times on the same sequence, and the score averaged.'
-                         'This means that all sequences will be rescored every iteration (like FoldDesign protocol) until each sequence has'
-                         'been scored 5 times. Default is False.')
+                         help='Use this flag to specify if you do not want AF2 to be run multiple times on the same sequence. Default is False.')
 
     parser.add_argument('--dont_write_compressed_data',
                          action='store_false',
@@ -176,22 +168,11 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Fraction of pool refilled by crossover.'
                         'Default is 0.2.')
 
-    #not in use
-    parser.add_argument('--substitution_insertion_deletion_weights',
-                        default=None,
-                        type=str,
-                        help='Specify probability of substitutions, insertions, and deletions (in that order) during mutation. Default is 0.8,0.1,0.1')
-
     parser.add_argument('--mutation_percents',
                         default='0.125',
                         type=str,
                         help='Number of mutations made as a percentage of sequence length.'
                         'Default is 0.125 for every iteration. If more than one value is provided, number of iterations will be split evenly and assigned.')
-    
-    parser.add_argument('--af2_preds',
-                        default="AB",
-                        type=str,
-                        help='Chain ID permutations to run through individual AF2 runs, separated by commas. Only used for multistate design. Default is None.')
     
     parser.add_argument('--af2_preds_extra',
                         default=None,

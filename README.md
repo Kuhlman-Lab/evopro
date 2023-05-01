@@ -83,7 +83,7 @@ python /path/to/evopro/run/run_geneticalg_gpus.py @evopro.flags
 <!-- CONTACT -->
 ## Contact
 
-Amrita Nallathambi - [@amrita_nal](https://twitter.com/twitter_handle) - anallathambi@unc.edu
+Amrita Nallathambi - [@amritanalla](https://twitter.com/twitter_handle) - anallathambi@unc.edu
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

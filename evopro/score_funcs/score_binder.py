@@ -62,7 +62,6 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
         pae_per_contact = (70.0-(70.0*contactscore)/num_contacts)/2
     
     score = -contactscore + penalty + bonus
-    print(score, (score, len(contacts), contactscore, pae_per_contact, bonus, penalty))
     return score, (score, len(contacts), contactscore, pae_per_contact, bonus, penalty), contacts, pdb, results
 
 def score_binder_monomer(results, dsobj):
@@ -72,7 +71,6 @@ def score_binder_monomer(results, dsobj):
     reslist2 = [x for x in residues.keys()]
     confscore2 = score_plddt_confidence(results, reslist2, resindices, dsobj=dsobj, first_only=False)
     score = -confscore2/10
-    print(score)
     return score, (score, confscore2), pdb, results
 
 def score_binder_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None):
@@ -132,5 +130,3 @@ def score_binder_complex_old(results, dsobj, contacts, orient=None):
     score = -contactscore + pae_score + orientation_penalty
     return score, (score, contactscore, pae_score, orientation_penalty), contacts, pdb, results
 
-if __name__=="__main__":
-    print("no main functionality")

@@ -77,17 +77,6 @@ class DesignSeq:
                 else:
                     weighted_aas.append(w[i])
 
-            """
-            #code for handling custom weights...needs rewrite for new rep
-            #maybe have a separate file for specifying custom weights?
-            if "custom" in res["MutTo"]:
-                try:
-                    weighted_aas = [float(x) for x in str(res["aalist"]).strip("[]").split(",")]
-                except:
-                    print("Custom weights not specified. Defaulting to all")
-                    weighted_aas = [1 for x in range(20)]
-            """
-
             if not weighted_aas:
                 weighted_aas = [1 for x in range(20)]
                 print("User did not specify valid residue substitution options for residue " + res["chain"]+str(res["resid"]) + ". Defaulting to all")
@@ -297,9 +286,6 @@ class DesignSeq:
                         if res1["resid"][2] != res2["resid"][2]:
                             res2["resid"][2] = res1["resid"][2]
 
-    def _check_length_constraints(self):
-        print("not working")
-
     def _check_symmetry(self):
         """checks symmetry"""
         for mut_id in self.mutable:
@@ -454,17 +440,3 @@ if __name__ == "__main__":
     print(newdsobj.mutable)
     print(dsobj == newdsobj)
     print(dsobj == dupdsobj)
-    """
-    print(dsobj.sequence)
-    newdsobj = dsobj.mutate(var=5, var_weights = [0.1, 0.8, 0.1])
-    print(newdsobj.sequence)
-    #print(dsobj.sequence, newdsobj.sequence)
-    #print("after", newdsobj.sequence, newdsobj.mutable, newdsobj.symmetric,newdsobj.jsondata)
-    #print(newdsobj.sequence, newdsobj.jsondata["sequence"])
-    newdsobj2 = newdsobj.mutate(var=5, var_weights = [0, 0.8, 0.1])
-    print(newdsobj2.sequence)
-    newdsobj3 = newdsobj2.mutate(var=5, var_weights = [0, 0.8, 0.1])
-    print(newdsobj3.sequence)
-    print(dsobj.jsondata["sequence"], newdsobj.jsondata["sequence"], newdsobj2.jsondata["sequence"], newdsobj3.jsondata["sequence"])
-    #print(dsobj.get_lengths())
-    """

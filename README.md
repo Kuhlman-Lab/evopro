@@ -79,8 +79,9 @@ python /path/to/evopro/run/generate_json.py @json.flags
 
 
 You can set options for EvoPro in the evopro.flags file.
- To run EvoPro, activate conda environment and confirm availability of GPUs. Then, 
+ To run EvoPro, confirm availability of GPUs. Then, 
  ```sh
+conda activate evopro
 python /path/to/evopro/run/run_geneticalg_gpus.py @evopro.flags
  ```
 

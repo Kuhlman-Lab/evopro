@@ -47,7 +47,7 @@ Installation of Anaconda is required to load dependencies.
    git clone https://github.com/Kuhlman-Lab/alphafold.git
    git clone https://github.com/Kuhlman-Lab/proteinmpnn.git
    ```
-3. Load AlphaFold2 model weights from source.
+3. Load AlphaFold2 model weights from source using script: https://github.com/Kuhlman-Lab/alphafold/blob/main/setup/download_alphafold_params.sh 
 
 4. Set paths at the top of the script evopro/run/run_geneticalg_gpus.py.
    

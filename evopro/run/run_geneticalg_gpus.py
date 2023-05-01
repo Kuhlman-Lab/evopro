@@ -6,17 +6,23 @@ import time
 import math
 import sys, os
 from typing import Sequence, Union
-sys.path.append("/proj/kuhl_lab/evopro/")
-#sys.path.append("/nas/longleaf/home/amritan/Desktop/evopro/")
+
+#SET PATHS HERE
+#set path to evopro here, for example:
+sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
+#set path to alphafold run directory here:
+sys.path.append('/proj/kuhl_lab/alphafold/run')
+#set path to proteinmpnn directory here:
+sys.path.append('/proj/kuhl_lab/proteinmpnn/run')
+
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor
 from evopro.utils.plot_scores import plot_scores_stabilize_monomer_top_old, plot_scores_stabilize_monomer_avg_old, plot_scores_stabilize_monomer_median_old
 from evopro.run.generate_json import parse_mutres_input
-from evopro.genetic_alg.geneticalg_helpers import generate_random_seqs, read_starting_seqs, create_new_seqs, create_new_seqs_mpnn_old, create_new_seqs_mpnn
+from evopro.genetic_alg.geneticalg_helpers import read_starting_seqs, create_new_seqs, create_new_seqs_mpnn_old, create_new_seqs_mpnn
 from evopro.user_inputs.inputs import getEvoProParser
 from evopro.score_funcs.score_funcs import write_raw_plddt, write_pairwise_scores
 
-sys.path.append('/proj/kuhl_lab/alphafold/run')
 from functools import partial
 import numpy as np
 
@@ -32,7 +38,6 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
         for chain in stabilize_monomer:
             lengths.append([x + vary_length for x in startingseqs[0].get_lengths([chain])])
 
-    #from evopro.genetic_alg.geneticalg_helpers import af2_init
     from run_af2 import af2, af2_init
     print("initializing distributor")
     dist = Distributor(n_workers, af2_init, af2_flags_file, lengths)
@@ -63,7 +68,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
         #print("Varying length:", vary_length!=0)
 
         if curr_iter == 1:
-            print("Iteration 1: Creating new sequences.")
+            print("Iteration 1: Creating new sequences by random mutation.")
             #do not use crossover to create the initial pool
             pool = create_new_seqs(pool, poolsizes[curr_iter-1], crossover_percent=0, all_seqs = list(scored_seqs.keys()), vary_length=vary_length)
 
@@ -97,7 +102,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
         num_af2 += len(work_list_all)
 
         results = dist.churn(work_list_all)
-        print("done churning")
+        print("done churning work list through AF2")
 
         if stabilize_monomer:
             num_lists = 1 + len(stabilize_monomer)
@@ -187,7 +192,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
                 result = (cscore[-1], [bscore[-1] for bscore in bscores])
                 scored_seqs[key_seq] = {"dsobj": dsobj, "score": score, "pdb": pdb, "result": result}
         else:
-            print("adding sequences and scores into the dictionary, no stabilize_monomer")
+            print("adding sequences and scores into the dictionary")
             for dsobj, seq, cscore in zip(scoring_pool, complex_seqs, complex_scores):
                 key_seq = dsobj.get_sequence_string()
                 if rmsd_to_starting_func:
@@ -228,7 +233,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
             logf.write("starting iteration " + str(curr_iter)+ " log\n")
             for elem in sorted_scored_pool:
                 logf.write(str(elem[0]) + "\t" + str(elem[1]) + "\n")
-        print("done writing runtime results")
+        print("done writing runtime results for iteration", str(curr_iter))
 
         #create a new pool of only 50% top scoring sequences for the next iteration
         newpool_size = round(len(sorted_scored_pool)/2)
@@ -239,7 +244,7 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
         newpool_seqs = []
         for sp in sorted_scored_pool[:newpool_size]:
             newpool_seqs.append(sp[0])
-        print("newpool", newpool_seqs)
+        print("new pool", newpool_seqs)
 
         newpool = []
         #pulling back DS objects for each sequence in new pool
@@ -341,11 +346,11 @@ if __name__ == "__main__":
                     break
 
             if flagsfile is None:
-                raise ValueError("Flags file for Alphafold/OmegaFold runs not provided. (if omegafold, please provide an empty flags file for now)")
+                raise ValueError("Flags file for Alphafold not provided.")
             if resfile is None:
                 raise ValueError("Please provide a residue specifications file.")
 
-            print(input_dir + resfile)
+            print("Reading", input_dir + resfile)
             dsobj1 = DesignSeq(jsonfile=input_dir + resfile)
 
             for filename in onlyfiles:
@@ -358,7 +363,7 @@ if __name__ == "__main__":
                         starting_seqs.append(dsobj1)
                     break
             if not starting_seqs:
-                print("No starting sequences file provided. Random sequences will be generated.")
+                print("No starting sequences file provided. Initial pool will be generated by random mutation.")
 
                 starting_seqs = [dsobj1]
                 starting_seqs = create_new_seqs(starting_seqs, args.pool_size, crossover_percent=0)
@@ -470,6 +475,6 @@ if __name__ == "__main__":
         num_iter = args.num_iter, n_workers=args.num_gpus, stabilize_monomer=stabilize, rmsd_func=rmsdfunc, 
         rmsd_to_starting_func=rmsd_to_starting_func, rmsd_to_starting_pdb=path_to_starting, 
         write_pdbs=args.write_pdbs, mpnn_iters=mpnn_iters,
-        crossover_percent=args.crossover_percent, vary_length=args.vary_length, mut_percents=mut_percents, 
+        crossover_percent=args.crossover_percent, mut_percents=mut_percents, 
         contacts=contacts, plot=plot_style, conf_plot=args.plot_confidences, mpnn_temp=args.mpnn_temp, 
         skip_mpnn=mpnn_skips, repeat_af2=not args.no_repeat_af2)

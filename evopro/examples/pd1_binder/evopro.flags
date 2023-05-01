@@ -1,7 +1,7 @@
 --num_iter 3
 --pool_size 6
 --num_gpus 1
---score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_binder.py
+--score_file /nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/evopro/score_funcs/score_binder.py
 --score_func score_binder
 --rmsd_func score_binder_rmsd
 --af2_preds_extra B

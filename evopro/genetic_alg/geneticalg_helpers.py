@@ -13,33 +13,12 @@ from typing import Sequence, Union
 #import custom packages
 from evopro.utils.distributor import Distributor
 
-sys.path.append('/proj/kuhl_lab/alphafold/run')
+#sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
+#sys.path.append('/proj/kuhl_lab/alphafold/run')
 from functools import partial
 import numpy as np
 
 all_aas = ["A", "C",  "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-
-def of_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[str]]]):
-    sys.path.append('/proj/kuhl_lab/OmegaFold/')
-    from omegafold.__main__ import main 
-    from omegafold import pipeline
-    import omegafold as of
-    print('initialization of process', proc_id)
-
-    args, state_dict, forward_config = pipeline.get_args(arg_file, proc_id)
-
-    # get the model
-    print("constructing omegafold...")
-    model = of.OmegaFold(of.make_config())
-    if "model" in state_dict:
-        state_dict = state_dict.pop("model")
-    model.load_state_dict(state_dict)
-    model.eval()
-    model.to(args.device)
-
-    of_partial = partial(main, arg_file=arg_file, proc_id=proc_id, model=model)
-
-    return of_partial
 
 def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[str]]]):
     from run_af2 import af2
@@ -164,19 +143,6 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
 
     return af2_partial
 
-#NEEDS REWRITE
-def generate_random_seqs(num_seqs, lengths):
-    oplist = []
-    chainnames = list(string.ascii_uppercase)
-    for i in range(num_seqs):
-        sequences = []
-        for chain, j in zip(lengths, range(len(lengths))):
-            sequences.append("".join(random.choices(all_aas, k=chain)))
-        newseq = {chainnames[k]:seq for k,seq in zip(range(len(sequences)), sequences)}
-        oplist.append(DesignSeq(seq=newseq))
-
-    return oplist
-
 def read_starting_seqs(seqfile, dsobj):
     seqs = []
     newseqs = []
@@ -230,7 +196,6 @@ def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0,
     return pool
 
 def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp, mpnn_version="s_48_020"):
-    sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
     from run_protein_mpnn import run_protein_mpnn_func
     results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp, model_name=mpnn_version)
 
@@ -317,10 +282,3 @@ def write_outputs(seqs, scores, opfilename):
 
     print("done writing ", opfilename)
 
-
-if __name__ == "__main__":
-    rand_seqs = generate_random_seqs(20, [59])
-    #print(rand_seqs)
-    #path = "/pine/scr/a/m/amritan/kuhlmanlab/fdd/fdd/tests/pd1_threehelix_test/"
-    #dsobj = DesignSeq(jsonfile=path+"resfile.json")
-    #print(read_starting_seqs(path+"starting_seqs.txt", dsobj))

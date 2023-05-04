@@ -12,7 +12,7 @@
 #SBATCH --mail-user=amritan@ad.unc.edu
 
 source ~/.bashrc
-conda activate af2_mpnn
+conda activate evopro2
 module load gcc
-module add cuda
+module load cuda
 python /nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/evopro/run/run_geneticalg_gpus.py @evopro.flags

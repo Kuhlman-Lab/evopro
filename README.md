@@ -67,7 +67,7 @@ Installation of Anaconda is required to load dependencies.
 ## Usage
 
 Usage of EvoPro requires GPUs.
-The running directory should contail input files for target protein, starting scaffolds for binders, and flags files for EvoPro specifications and AF2 specifications. See evopro/examples/ for examples directory setups.
+The running directory should contain input files for the target protein, starting scaffolds for binders, and flags files for EvoPro specifications and AF2 specifications. See evopro/examples/ for examples of directory setups.
 
 The residue_specs.json file should be generated from pdb or sequence file.
 Specify pdb/sequence file and residues to mutate in json.flags.

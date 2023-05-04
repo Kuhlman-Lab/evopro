@@ -52,7 +52,6 @@ Installation of Anaconda is required to load dependencies.
 4. Set up conda environment:
    ```sh
    conda env create -n evopro -f setup_conda.yaml
-   pip3 install -r /path/to/alphafold/requirements.txt
    pip3 install --upgrade jax==0.3.25 jaxlib==0.3.25+cuda11.cudnn805 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
    python3 -m pip install /path/to/alphafold/alphafold/
    ```

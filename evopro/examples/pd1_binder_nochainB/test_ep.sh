@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -p kuhlab
+#SBATCH -p beta-gpu
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH --mem=16g

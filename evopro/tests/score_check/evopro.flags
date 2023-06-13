@@ -1,0 +1,15 @@
+--num_iter 7
+--pool_size 4
+--num_gpus 1
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/update_score_cd19.py
+--score_func score_binder_doublecontact
+--rmsd_func score_binder_rmsd
+--af2_preds_extra B
+--define_contact_area A1-A263 4 
+--bonus_contacts A174,A176,A182 4
+--penalize_contacts A15,A54,A154,A201 4
+--plot_scores_top
+--plot_scores_avg
+--plot_scores_median
+--mpnn_freq 5
+--plot_confidences

@@ -1,0 +1,4 @@
+--pdb_dir ./
+--designable_res scaffold_14:B1-B60;scaffold_21:B1-B60
+--constraints scaffold_14:B1-B60:1,scaffold_21:B1-B60:1
+--bidirectional

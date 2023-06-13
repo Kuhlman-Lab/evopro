@@ -387,6 +387,44 @@ def kabsch_rmsd(P, Q, W=None, translate=False):
     P = kabsch_rotate(P, Q)
     return rmsd(P, Q)
 
+def kabsch_rmsd_superimposeall(P, Q, P2, Q2, translate=True):
+    """
+    Rotate matrix P unto Q using Kabsch algorithm and calculate the RMSD between P2 and Q2.
+    An optional vector of weights W may be provided.
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+    W : array or None
+        (N) vector, where N is points.
+    translate : bool
+        Use centroids to translate vector P and Q unto each other.
+
+    Returns
+    -------
+    rmsd : float
+        root-mean squared deviation
+    """
+
+    if translate:
+        Q = Q - centroid(Q)
+        P = P - centroid(P)
+        Q2 = Q2 - centroid(Q)
+        P2 = P2 - centroid(P)
+    
+    #calculate rotation matrix
+    U = kabsch(P, Q)
+    # Rotate P2
+    P2 = np.dot(P2, U)
+    
+    return rmsd(P2, Q2)
 
 def kabsch_rotate(P, Q):
     """

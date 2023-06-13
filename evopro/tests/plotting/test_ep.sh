@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -p volta-gpu
+#SBATCH -p kuhlab
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH --mem=16g
@@ -14,5 +14,5 @@
 source ~/.bashrc
 conda activate af2_mpnn
 module load gcc
-module add cuda
-python /proj/kuhl_lab/evopro/evopro/run/run_geneticalg_gpus.py @evopro.flags
+module load cuda
+python /proj/kuhl_lab/evopro/evopro/run/run_evopro_multistate_dev.py @evopro.flags

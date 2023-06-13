@@ -1,0 +1,363 @@
+{
+    "sequence": {
+        "A": "EEPLVVKVEEGDNAVLQCLQQLTWSRESPLKPFLKLSLGLPGLGIHMRPLAIELTIENVSQQMGGFYLCQPGPPSEKAWQPGWTVNVEGSGELFRWNVSDLGGLGCGLKSPKLYVWAKDRPEIWEGEPPCLPPLSQDRTMAPGSTLSLSCGVPPDSVSRGPLSWTHVHPKGPKSLLSLELKDDRPARDMTVMETGLTLPRATAQDAGKYYCHRGNLTMSFHLEITARGSHHHHH",
+        "B": "RDEIKERIFKAVVRAIVTGNPEQLKEAKKLLEKLKKLGRLDQDAKKFEKAIRQVEKRLR"
+    },
+    "designable": [
+        {
+            "chain": "B",
+            "resid": 1,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 2,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 3,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 4,
+            "WTAA": "I",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 5,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 6,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 7,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 8,
+            "WTAA": "I",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 9,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 10,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 11,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 12,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 13,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 14,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 15,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 16,
+            "WTAA": "I",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 17,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 18,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 19,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 20,
+            "WTAA": "N",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 21,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 22,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 23,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 24,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 25,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 26,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 27,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 28,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 29,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 30,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 31,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 32,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 33,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 34,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 35,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 36,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 37,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 38,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 39,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 40,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 41,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 42,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 43,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 44,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 45,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 46,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 47,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 48,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 49,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 50,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 51,
+            "WTAA": "I",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 52,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 53,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 54,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 55,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 56,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 57,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 58,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 59,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        }
+    ],
+    "symmetric": []
+}

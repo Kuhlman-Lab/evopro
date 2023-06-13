@@ -1,0 +1,12 @@
+>scaffold_14, fixed_chains=[], designed_chains=['B'], state_score=1.6528, scores_per_chain={'B': '1.6528'}, model=v_48_020
+SLKDKAKSLYESATKSVKNASSEEEKKRILDTAVSELNKIPDPTAQKLSEKLERVWRSLS
+>scaffold_14, sample=0, state_score=3.6323, scores_per_chain={'B': '3.6323'}, state_recovery=0.0500, seq_recovery_per_chain={'B': '0.0500'}, model=v_48_020
+ILYCYCCPIRRAHCVSHSTSTGGIWSAYFYTVTIYTDLSACGSSGCADNGGIRAFKRHTA
+>scaffold_14, sample=0, state_score=3.4804, scores_per_chain={'B': '3.4804'}, state_recovery=0.0500, seq_recovery_per_chain={'B': '0.0500'}, model=v_48_020
+VCEGRSRSIRRCYGVSHSLSLGGIWGSHSDRIPVNFHLRAGSRCRCFHYSRVSSREYYFT
+>scaffold_14, sample=0, state_score=3.3598, scores_per_chain={'B': '3.3598'}, state_recovery=0.0167, seq_recovery_per_chain={'B': '0.0167'}, model=v_48_020
+IRYSDFSTIGRSYGIRYSLSFRRIVGFHSHLISIDRYLSTSSFSCFLHNRGIHSLEHHRA
+>scaffold_14, sample=0, state_score=3.3912, scores_per_chain={'B': '3.3912'}, state_recovery=0.0667, seq_recovery_per_chain={'B': '0.0667'}, model=v_48_020
+ILNGCFGAVGCLHSISNGLCLGGICSLHRDLIAIYFHLSPGSSRGFFNDRWVYPSEYHLT
+>scaffold_14, sample=0, state_score=3.4639, scores_per_chain={'B': '3.4639'}, state_recovery=0.0500, seq_recovery_per_chain={'B': '0.0500'}, model=v_48_020
+RRHSNSCTIGCGYTGCDSICLSRIGGRNGDSGPIDGHSSPSSCSTCLHGGGIHTRKCNGS

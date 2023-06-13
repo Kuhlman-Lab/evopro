@@ -1,0 +1,12 @@
+>1a0o_chainB_monomer, fixed_chains=[], designed_chains=['B'], state_score=1.5101, scores_per_chain={'B': '1.5101'}, model=v_48_020
+PRRIILSRLKAGEVDLLEEELGHLTTLTDVVKGADSLSAILPGDIAEDDITAVLCFVIEADQITFETVEV
+>1a0o_chainB_monomer, sample=0, state_score=3.9827, scores_per_chain={'B': '3.9827'}, state_recovery=0.0000, seq_recovery_per_chain={'B': '0.0000'}, model=v_48_020
+QCNVKPDHAEAGEVDLLEEELGHLTTLTDVVKGADSLSAILPGDIAEDDITAVLCFVIEADQITFETVEV
+>1a0o_chainB_monomer, sample=0, state_score=4.1588, scores_per_chain={'B': '4.1588'}, state_recovery=0.1000, seq_recovery_per_chain={'B': '0.1000'}, model=v_48_020
+PQLSNNQVDPAGEVDLLEEELGHLTTLTDVVKGADSLSAILPGDIAEDDITAVLCFVIEADQITFETVEV
+>1a0o_chainB_monomer, sample=0, state_score=3.9839, scores_per_chain={'B': '3.9839'}, state_recovery=0.0000, seq_recovery_per_chain={'B': '0.0000'}, model=v_48_020
+HLNLDENVKQAGEVDLLEEELGHLTTLTDVVKGADSLSAILPGDIAEDDITAVLCFVIEADQITFETVEV
+>1a0o_chainB_monomer, sample=0, state_score=3.4900, scores_per_chain={'B': '3.4900'}, state_recovery=0.4000, seq_recovery_per_chain={'B': '0.4000'}, model=v_48_020
+NVPHALSILKAGEVDLLEEELGHLTTLTDVVKGADSLSAILPGDIAEDDITAVLCFVIEADQITFETVEV
+>1a0o_chainB_monomer, sample=0, state_score=3.6167, scores_per_chain={'B': '3.6167'}, state_recovery=0.2000, seq_recovery_per_chain={'B': '0.2000'}, model=v_48_020
+NDAGNLRRTEAGEVDLLEEELGHLTTLTDVVKGADSLSAILPGDIAEDDITAVLCFVIEADQITFETVEV

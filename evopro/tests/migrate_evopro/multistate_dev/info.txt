@@ -1,0 +1,1 @@
+First run trial with scaffold 3 (chain A) as a binder and scaffold 25 (chain B) as a condormational switch; 50 iterations with pool size 5; score function:-contacts + confscore2 -RMSD*3

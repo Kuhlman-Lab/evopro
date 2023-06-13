@@ -1,0 +1,3 @@
+--sequence_files chainA.txt chainB.txt
+--representative_directory rep_dir
+--num_replicates 2

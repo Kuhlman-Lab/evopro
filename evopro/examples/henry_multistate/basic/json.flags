@@ -1,0 +1,5 @@
+--pdb_dir ./pdbs
+--mut_res 6MRR_A:A1-A68;6MRR_B:A1-A68
+--constraints 6MRR_A:A1-A68:1,6MRR_B:A1-A68:1
+--default_mutres_setting all
+--output residue_specs.json

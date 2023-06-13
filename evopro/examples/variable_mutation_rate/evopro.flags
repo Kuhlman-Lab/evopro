@@ -1,0 +1,12 @@
+--num_iter 50
+--pool_size 20
+--num_gpus 1
+--mutation_percents 0.125,0.1,0.075,0.05,0.025
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_binder.py
+--score_func score_binder
+--rmsd_func score_binder_rmsd
+--af2_preds_extra B
+--define_contact_area A31-A58,A88-A108
+--mpnn_freq 1
+--skip_mpnn 1-10
+--plot_confidences

@@ -1,0 +1,4 @@
+--pdb full_length_CD19mut81_sc42.pdb
+--mut_res B1-B57
+--default_mutres_setting all-C
+--output residue_specs.json

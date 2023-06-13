@@ -1,0 +1,13 @@
+--num_iter 50
+--pool_size 20
+--num_gpus 1
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_binder.py
+--score_func score_binder
+--rmsd_func score_binder_rmsd
+--af2_preds_extra B
+--define_contact_area A1-A263
+--define_contact_area A1-A263 4
+--bonus_contacts A40 4
+--penalize_contacts A81 8
+--mpnn_freq 10
+--plot_confidences

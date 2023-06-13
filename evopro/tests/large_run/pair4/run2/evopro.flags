@@ -1,0 +1,14 @@
+--num_iter 100
+--pool_size 20
+--num_gpus 1
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_cd19.py
+--score_func score_binder_clashpenalty
+--rmsd_func score_binder_rmsd
+--stabilize_monomer B
+--define_contact_area A1-A263
+--plot_scores_top
+--plot_scores_avg
+--plot_scores_median
+--mpnn_freq 2
+--plot_confidences
+--repeat_af2

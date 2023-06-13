@@ -1,0 +1,10 @@
+For this example, we will be using 1a0o.pdb, which is a hetero-dimeric antibody fragment, to demonstrate how to use multiple constraints for multi-state design.
+
+As inputs, we will use the hetero-dimer assembly and the monomer versions of the two chains (A and B).
+
+We will tell MPNN to come up with a hetero-dimer that stabilizes the dimer and A-monomer while destabilizing the B-monomer.
+
+To do this, we make one constraint to tie together the A-monomer and A chain of the dimer for positive design.
+Then we make a second constraint to tie together the B-monomer and B chain of the dimer for mixed design (positive for the dimer, negative for the monomer).
+
+To separate multiple constraints, use semicolons. To separate multiple positions within a constraint, use commas.

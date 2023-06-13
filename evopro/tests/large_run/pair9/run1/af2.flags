@@ -1,0 +1,12 @@
+--output_dir outputs/predictions
+--params_dir /proj/kuhl_lab/alphafold/alphafold/data
+--compress_output
+--use_ptm
+--msa_mode single_sequence
+--custom_msa_path /nas/longleaf/home/amritan/Desktop/kuhlmanlab/msas/mmseqs2_mutcd19_2/
+--use_templates
+--custom_template_path templates
+--num_models 1
+--max_recycle 1
+--save_timing
+--design_run

@@ -1,0 +1,3 @@
+--pdb_dir ./
+--designable_res 12E8:L1-L214,H1-H221;12E8_chainL_monomer:L1-L214
+--constraints 12E8:L1-L214:1,12E8_chainL_monomer:L1-L214:-2

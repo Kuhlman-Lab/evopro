@@ -1,0 +1,4 @@
+--pdb 6MRR.pdb
+--mut_res A1-A68
+--default_mutres_setting all
+--output residue_specs.json

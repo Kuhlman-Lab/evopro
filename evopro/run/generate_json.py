@@ -40,8 +40,6 @@ def generate_json(filename, mut_res, opf, default, symmetric_res, seqfile=False)
         for chain in chains:
             chain_seqs[chain]=[]
 
-        
-
         res_index_chain = 1
         chain_test = chains[0]
         for residue in residues:
@@ -60,8 +58,6 @@ def generate_json(filename, mut_res, opf, default, symmetric_res, seqfile=False)
         for chain in chains:
             chain_seqs[chain] = "".join([x for x in chain_seqs[chain] if x is not None])
         
-    #print(pdbids, chain_seqs)
-    
     mutable = []
     for resind in mut_res:
         if "*" in resind:
@@ -72,6 +68,19 @@ def generate_json(filename, mut_res, opf, default, symmetric_res, seqfile=False)
                         mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
             except:
                 raise ValueError("Invalid specification. Try using the asterisk after the chain ID.")
+        elif "<" in resind:
+            try:
+                residue = resind.split("<")[0]
+                chain = re.split('(\d+)', residue)[0]
+                num_id = int(re.split('(\d+)', residue)[1])
+                for pdbid in pdbids:
+                    chain_compare = re.split('(\d+)', pdbid)[0]
+                    num_id_compare = int(re.split('(\d+)', pdbid)[1])
+                    if chain == chain_compare and num_id<=num_id_compare:
+                        mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
+            except:
+                raise ValueError("Invalid specification. Try using the less than sign after the residue ID.")
+            
         elif resind in pdbids:
             mutable.append({"chain":pdbids[resind][1], "resid": pdbids[resind][2], "WTAA": three_to_one(pdbids[resind][0].split("_")[1]), "MutTo": default})
 
@@ -134,7 +143,7 @@ def getPDBParser() -> FileArgumentParser:
 
 def parse_mutres_input(mutresstring):
     mutres_temp = mutresstring.strip().split(",")
-    mutres_temp = [x for x in mutres_temp if x]
+    mutres_temp = [x.strip() for x in mutres_temp if x]
     mutres = []
     for elem in mutres_temp:
         if "-" not in elem:

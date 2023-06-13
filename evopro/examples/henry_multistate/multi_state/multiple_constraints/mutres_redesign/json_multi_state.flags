@@ -1,0 +1,3 @@
+--pdb_dir ./
+--designable_res 1a0o:A100-A128,B1-B10;1a0o_chainA_monomer:A100-A128;1a0o_chainB_monomer:B1-B10
+--constraints 1a0o:A100-A128:1,1a0o_chainA_monomer:A100-A128:1;1a0o:B1-B10:1,1a0o_chainB_monomer:B1-B10:-1

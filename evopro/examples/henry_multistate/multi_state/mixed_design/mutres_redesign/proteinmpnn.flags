@@ -1,0 +1,8 @@
+--pdb_dir ./msd # current directory (MSD special case)
+--backbone_noise 0.0 # likely doesn't need changing
+--num_seq_per_target 5 # specify how many output sequences per pdb per temp
+--batch_size 1 # likely doesn't need changing
+--sampling_temp 0.1 # specify what sampling temperatures to use
+--out_folder outs
+--design_specs_json proteinmpnn_res_specs.json
+--model_name v_48_020 # specify which model to use

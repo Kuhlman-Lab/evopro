@@ -1,0 +1,4 @@
+--pdb_dir ./
+--designable_res 4GYT_dimer:A7-A18,B7-B18;4GYT_monomer:A7-A18
+--constraints 4GYT_dimer:A7-A183:0.5,4GYT_dimer:B7-B183:0.5,4GYT_monomer:A7-A183:1
+--cluster_center 4GYT_dimer:A175,A100-A102;4GYT_monomer:A50,A7-A10

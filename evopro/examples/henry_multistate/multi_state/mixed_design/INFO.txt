@@ -1,0 +1,9 @@
+This example uses 12E8.pdb, which contains a 2E8 FAB FRAGMENT.
+
+This structure is a hetero-dimer with chains L and H. We will use this to demonstrate how to mix positive/negative design constraints, as well as mixing standard MPNN design with multi-state constraints.
+
+For this example, we will re-design chain L to stabilize the dimer and de-stabilize the monomer.
+We will also tell MPNN to re-design chain H to stabilize the dimer, but we don't care what it does for the chain H monomer, so no constraint is needed.
+
+To do this, we pass both the dimer (chains L and H) and monomer (just chain L) and specify a mixed (positive/negative) constraint on just chain L.
+We also include chain H in our list of design-able residues, but without any multi-state constraints.

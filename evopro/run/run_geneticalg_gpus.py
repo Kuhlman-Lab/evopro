@@ -33,7 +33,6 @@ def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, pool
             lengths.append([x + vary_length for x in startingseqs[0].get_lengths([chain])])
 
     print(lengths)
-    print("Varying length:", vary_length!=0)
 
     if use_of:
         from evopro.genetic_alg.geneticalg_helpers import of_init
@@ -483,8 +482,6 @@ if __name__ == "__main__":
     else:
         for i in range(args.num_iter):
             pool_sizes.append(args.pool_size)
-
-    print(pool_sizes)
 
     run_genetic_alg_gpus(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, 
         num_iter = args.num_iter, n_workers=args.num_gpus, stabilize_monomer=stabilize, rmsd_func=rmsdfunc, 

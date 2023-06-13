@@ -1,0 +1,10 @@
+--num_iter 6
+--pool_size 10
+--num_gpus 1
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_multistate_dev.py
+--score_func score_overall
+--af2_preds A,B
+--mpnn_freq 2
+--mpnn_chains A,B
+--mutation_percents 0.4
+--write_pdbs

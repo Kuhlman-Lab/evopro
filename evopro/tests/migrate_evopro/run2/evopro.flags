@@ -1,0 +1,10 @@
+--num_iter 40
+--pool_size 20
+--num_gpus 1
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_multistate.py
+--score_func score_binder
+--af2_preds_extra B
+--define_contact_area A31-A58,A88-A108
+--mpnn_freq 1
+--skip_mpnn 1-10
+--plot_confidences

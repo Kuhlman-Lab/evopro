@@ -1,0 +1,5 @@
+--pdb_dir ./pdbs
+--mut_res 4GYT_dimer:A7-A183,B7-B183;4GYT_monomer:A7-A183
+--constraints 4GYT_dimer:A7-A183:0.5,4GYT_dimer:B7-B183:0.5,4GYT_monomer:A7-A183:1
+--default_mutres_setting all
+--output residue_specs.json

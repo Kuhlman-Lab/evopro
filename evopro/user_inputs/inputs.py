@@ -90,12 +90,6 @@ def getEvoProParser() -> FileArgumentParser:
                         type=str,
                         help='path/filename to pdb to pass to scoring function for RMSD to starting.')
 
-    #not in use
-    parser.add_argument('--vary_length',
-                        default='0',
-                        type=int,
-                        help='How much the length is allowed to vary. Default is 0.')
-
     parser.add_argument('--define_contact_area',
                         default=None,
                         type=str,
@@ -114,14 +108,14 @@ def getEvoProParser() -> FileArgumentParser:
                         'distance cutoff. Default is None and 4A.')
     
     parser.add_argument('--no_repeat_af2',
-                         action='store_false',
+                         action='store_true',
                          help='Use this flag to specify if you want AF2 to be multiple times on the same sequence, and the score averaged.'
                          'This means that all sequences will be rescored every iteration (like FoldDesign protocol) until each sequence has'
                          'been scored 5 times. Default is False.')
 
     parser.add_argument('--dont_write_compressed_data',
-                         action='store_false',
-                         help='Default is True.')
+                         action='store_true',
+                         help='Default is False.')
 
     parser.add_argument('--write_pdbs',
                          action='store_true',
@@ -153,6 +147,12 @@ def getEvoProParser() -> FileArgumentParser:
                         default="s_48_020",
                         type=str,
                         help='Model version used to run MPNN. Default is s_48_020 (soluble).')
+    
+    parser.add_argument('--mpnn_chains',
+                        default=None,
+                        type=str,
+                        help='Chains concatenated into a single pdb for MPNN. Default is None and'
+                        'it will use the first af2 prediction. Example: AB,B')
 
     parser.add_argument('--plot_confidences',
                          action='store_true',
@@ -176,7 +176,10 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Fraction of pool refilled by crossover.'
                         'Default is 0.2.')
 
-    #not in use
+    parser.add_argument('--vary_length',
+                        default='0',
+                        type=int,
+                        help='How much the length is allowed to vary. Default is 0.')
     parser.add_argument('--substitution_insertion_deletion_weights',
                         default=None,
                         type=str,

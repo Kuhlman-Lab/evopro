@@ -1,0 +1,5 @@
+--sequence_file seqfile.txt
+--mut_res A1-A63,B1-B65,C1-C65
+--default_mutres_setting all-C
+--output residue_specs.json
+--symmetric_res B1-B65:C1-C65

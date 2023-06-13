@@ -19,6 +19,7 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
     from alphafold.common import protein
     pdb = protein.to_pdb(results['unrelaxed_protein'])
     chains, residues, resindices = get_coordinates_pdb(pdb)
+    print(contacts)
 
     if not contacts:
         contacts=(None,None,None)
@@ -44,6 +45,7 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
     
     penalties = 0
     penalty_resids = contacts[2]
+    print(penalty_resids)
     if penalty_resids:
         penalty_contacts, penalty_contactscore = score_contacts_pae_weighted(results, pdb, penalty_resids, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[2])
         for contact in penalty_contacts:
@@ -56,14 +58,14 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
         
     penalty = penalties * 3
     
-    num_contacts = len(contacts)
+    num_contacts = len(contact_list)
     pae_per_contact = 0
     if num_contacts > 0:
         pae_per_contact = (70.0-(70.0*contactscore)/num_contacts)/2
     
     score = -contactscore + penalty + bonus
-    print(score, (score, len(contacts), contactscore, pae_per_contact, bonus, penalty))
-    return score, (score, len(contacts), contactscore, pae_per_contact, bonus, penalty), contacts, pdb, results
+    print(score, (score, len(contact_list), contactscore, pae_per_contact, bonus, penalty))
+    return score, (score, len(contact_list), contactscore, pae_per_contact, bonus, penalty), contacts, pdb, results
 
 def score_binder_monomer(results, dsobj):
     from alphafold.common import protein

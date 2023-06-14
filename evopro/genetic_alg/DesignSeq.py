@@ -412,6 +412,13 @@ class DesignSeq:
         newseqobj._check_symmetry()
         return newseqobj
 
+    def _get_designable_positions(self):
+        designable = []
+        for p in self.jsondata['designable']:
+            designable.append(p['chain'] + str(p['resid']))
+            print(p)
+        return designable
+
     def _get_aa_identity(self, index):
         chain = re.split('(\d+)', index)[0]
         aa = int(re.split('(\d+)', index)[1])
@@ -705,25 +712,20 @@ class DesignSeqMSD(DesignSeq):
 
 
 if __name__ == "__main__":
-    dsobj = DesignSeq(jsonfile="/pine/scr/a/m/amritan/kuhlmanlab/run_evopro/tests/test01/residue_specs.json")
+    dsobj = DesignSeq(jsonfile="/work/users/a/m/amritan/evopro_tests/vary_length/run2/residue_specs.json")
+    
+    #dupdsobj = copy.deepcopy(dsobj)
+    newdsobj = dsobj.mutate(var=2, var_weights = [0, 0, 0.1])
+    
     print(dsobj.mutable)
-    dupdsobj = copy.deepcopy(dsobj)
-    seq = "DLLRRMLGMVIRMLGVFTKLLGKILMIPAGIYAPICVTVRYFETVGEALERAGILLRGRDRAGKPRLTPAAREILKEALKAAEEAVDVLTLDITNITTSHQRKMESLNFIRAHTPYINIYNCEPANPSEKNSPLMQYCKALQNLRLAVLNVGLEIAKLAVKLISADLLRRMLGMVIRMLGVFTKLLGKILMIPAGIYAPICVTVRYFETVGEALERAGILLRGRDRAGKPRLTPAAREILKEALKAAEEAVDVLTLDITNITTSHQRKMESLNFIRAHTPYINIYNCEPANPSEKNSPLMQYCKALQNLRLAVLNVGLEIAKLAVKLISA"
-    newdsobj = DesignSeq(seq=seq, sequence=dsobj.sequence, mutable=dsobj.mutable, symmetric=dsobj.symmetric)
-    print(newdsobj.mutable)
-    print(dsobj == newdsobj)
-    print(dsobj == dupdsobj)
-    """
     print(dsobj.sequence)
-    newdsobj = dsobj.mutate(var=5, var_weights = [0.1, 0.8, 0.1])
+    print(dsobj.jsondata)
+    
+    print("After mutation")
+    print(newdsobj.mutable)
     print(newdsobj.sequence)
-    #print(dsobj.sequence, newdsobj.sequence)
-    #print("after", newdsobj.sequence, newdsobj.mutable, newdsobj.symmetric,newdsobj.jsondata)
-    #print(newdsobj.sequence, newdsobj.jsondata["sequence"])
-    newdsobj2 = newdsobj.mutate(var=5, var_weights = [0, 0.8, 0.1])
-    print(newdsobj2.sequence)
-    newdsobj3 = newdsobj2.mutate(var=5, var_weights = [0, 0.8, 0.1])
-    print(newdsobj3.sequence)
-    print(dsobj.jsondata["sequence"], newdsobj.jsondata["sequence"], newdsobj2.jsondata["sequence"], newdsobj3.jsondata["sequence"])
-    #print(dsobj.get_lengths())
-    """
+    print(newdsobj.jsondata)
+    reslist1 = newdsobj._get_designable_positions()
+    
+    print(reslist1)
+    #print(get_rmsd(dsobj.jsondata, newdsobj.jsondata))

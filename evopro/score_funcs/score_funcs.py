@@ -22,10 +22,10 @@ def get_seq_indices(dsobj, reslist, first_only=True):
     if first_only is True, only the first instance of the resid will be returned 
         (insertions at that position are ignored)
     """
-    print("Renumbering...", dsobj, dsobj.numbering, dsobj.jsondata)
+    #print("Renumbering...", dsobj, dsobj.numbering, dsobj.jsondata)
     new_reslist = []
     for resid_orig in reslist:
-        print("Original resid: " + resid_orig)
+        #print("Original resid: " + resid_orig)
         chain = re.split('(\d+)', resid_orig)[0]
         numbering = dsobj.numbering[chain]
         #print("Numbering for chain", chain, numbering)
@@ -34,7 +34,7 @@ def get_seq_indices(dsobj, reslist, first_only=True):
                 new_resind = numbering.index(resid_orig)
                 resid_new = chain + str(new_resind+1)
                 new_reslist.append(resid_new)
-                print("New resid: " + resid_new)
+                #print("New resid: " + resid_new)
             except:
                 print("Error....perhaps", resid_orig, "has been deleted")
         else:

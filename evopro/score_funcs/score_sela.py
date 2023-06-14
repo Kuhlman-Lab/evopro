@@ -46,12 +46,14 @@ def score_binder_1(results, dsobj, contacts=None, orient=None):
     chains, residues, resindices = get_coordinates_pdb(pdb)
     reslist2 = [x for x in residues.keys()]
     confscore2 = score_plddt_confidence(results, reslist2, resindices, dsobj=dsobj, first_only=False)
-    #path_to_starting = "/work/users/a/m/amritan/evopro_tests/vary_length/d1truncated.pdb"
-    path_to_starting = "/nas/longleaf/home/sela/runevopro/d1/tlvary/d1truncated.pdb"
-    rmsd_score = score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=dsobj, resids=contacts)
-    print(confscore2, rmsd_score)
+
+    path_to_starting = "/proj/kuhl_lab/evopro/evopro/data/d1truncated.pdb"
+    reslist_not_designable = [x for x in residues.keys() if x not in dsobj._get_designable_positions()]
+    rmsd_score = score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=dsobj, resids_orig=contacts, resids_new=reslist_not_designable)
+    print("Individual scores", confscore2, rmsd_score)
+    
     score = -confscore2 + rmsd_score
-    print(score)
+    print("Overall score", score)
     return score, (score, confscore2, rmsd_score), pdb, results
 
 def score_binder_2(results, dsobj, contacts=None, orient=None):
@@ -93,7 +95,7 @@ def score_binder_1_d2(results, dsobj, contacts=None, orient=None):
     print(score)
     return score, (score, confscore2, rmsd_score), pdb, results
 
-def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None, resids=None):
+def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None, resids_orig=None, resids_new=None):
     # to keep the designed protein close in structure to the original protein
     # calculates Ca-only RMSD of designed protein vs to original protein applied to a flat-bottom quadratic potential
     spring_constant = 10.0 
@@ -102,19 +104,15 @@ def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None, resids=None
     with open(path_to_starting, 'r') as f:
         pdb_string_starting = f.read()
     chains0, residues0, resindices0 = get_coordinates_pdb(pdb_string_starting)
-    reslist1 = [x for x in residues0.keys() if x in resids]
+    reslist1 = [x for x in residues0.keys() if x in resids_orig]
 
    #  with open("/work/users/a/m/amritan/evopro_tests/vary_length/temp.pdb", 'w') as f:
       #  f.write(pdb)
     chains, residues, resindices = get_coordinates_pdb(pdb)
-    reslist2 = [x for x in residues.keys() if x in resids]
+    reslist2 = [x for x in residues.keys() if x in resids_new]
     
-    print("Residue lists before renumbering:", reslist1, reslist2)
-    """if dsobj:
-        reslist1 = get_seq_indices(dsobj, reslist1, first_only=True)
-        reslist2 = get_seq_indices(dsobj, reslist2, first_only=True)
+    print("Residue lists for RMSD:", reslist1, reslist2)
 
-    print("Residue lists after renumbering:", reslist1, reslist2)"""
     rmsd_to_starting = get_rmsd(reslist1, pdb_string_starting, reslist2, pdb, ca_only=True, translate=True)
 
     # apply flat-bottom quadratic-shaped potential function

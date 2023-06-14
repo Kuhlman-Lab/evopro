@@ -98,7 +98,7 @@ def score_binder_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None):
     reslist2 = [x for x in residues2.keys()]
     rmsd_binder = get_rmsd(reslist1, pdb1, reslist2, pdb2, dsobj=dsobj)
 
-    return rmsd_binder*5
+    return (rmsd_binder*5, rmsd_binder)
 
 def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None):
     # to keep the de novo binder close in structure to the original binder
@@ -121,7 +121,7 @@ def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None):
     if rmsd_to_starting > rmsd_cutoff:
         rmsd_potential = spring_constant*math.pow(rmsd_to_starting - rmsd_cutoff, 2)
 
-    return rmsd_potential*5
+    return (rmsd_potential*5, rmsd_to_starting, rmsd_potential)
 
 if __name__=="__main__":
     print("no main functionality")

@@ -141,7 +141,7 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
         #adding sequences and scores into the dictionary
         for score, seqs, results, dsobj in zip(scores, seqs_packed, results_packed, scoring_pool):
             key_seq = dsobj.get_sequence_string()
-            print(seqs)
+            #print(seqs)
             #if key_seq != ",".join(seqs[0]):
             #        print(key_seq, str(seqs[0]))
             #        raise AssertionError("Sequence does not match DSobj sequence")
@@ -152,21 +152,25 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
             pdbs = score[-2]
             score_all = (overall_scores, score_split)
             print(key_seq, overall_scores, score_split)
+            #print(score_all)
             
             if key_seq in scored_seqs and repeat_af2:
                 scored_seqs[key_seq]["data"].append({"score": score_all, "pdb": pdbs, "result": result})
                 #don't need to sort when using all 5 for average score
                 #scored_seqs[key_seq]["data"].sort(key=lambda x: x["score"][0][0])
-                
+                #print(scored_seqs[key_seq]["data"])
+                #print(overall_scores)
                 sum_score = [0 for _ in overall_scores]
-                print("Before", sum_score)
+                #print("Before", sum_score)
                 for elem in scored_seqs[key_seq]["data"]:
+                    #print("Element", elem, elem["score"])
+                    #print(sum_score, elem["score"][0], elem["score"][1])
                     sum_score = [x+y for x,y in zip(sum_score, elem["score"][0])]
                 avg_score = [x/len(scored_seqs[key_seq]["data"]) for x in sum_score]
-                print("After", sum_score, avg_score)
+                #print("After", sum_score, avg_score)
                 scored_seqs[key_seq]["average"] = avg_score
             else:
-                scored_seqs[key_seq] = {"data": [{"score": score, "pdb": pdbs, "result": result}]}
+                scored_seqs[key_seq] = {"data": [{"score": score_all, "pdb": pdbs, "result": result}]}
                 scored_seqs[key_seq]["dsobj"] =  dsobj
                 
                 #set average score here
@@ -180,17 +184,25 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
         
         #creating sorted list version of sequences and scores in the pool
         sorted_scored_pool = []
+        #print(pool)
         for dsobj, j in zip(pool, range(len(pool))):
             key_seq = dsobj.get_sequence_string()
             print(key_seq, scored_seqs[key_seq]["average"])
             if repeat_af2:
                 if key_seq in repeat_af2_seqs:
                     sorted_scored_pool.append((key_seq, repeat_af2_seqs[key_seq]))
+                    #print(sorted_scored_pool)
+                else:
+                    sorted_scored_pool.append((key_seq, scored_seqs[key_seq]["average"]))
+                    #print(sorted_scored_pool)
             else:
                 sorted_scored_pool.append((key_seq, scored_seqs[key_seq]["average"]))
+                #print(sorted_scored_pool)
             
-            pdbs = scored_seqs[key_seq]["data"][0]["pdb"]
+            
             if write_pdbs:
+                print("Writing pdbs...")
+                pdbs = scored_seqs[key_seq]["data"][0]["pdb"]
                 for pdb, chains in zip(pdbs, af2_preds):
                     with open(pdb_folder + "seq_" + str(j) + "_iter_" + str(curr_iter) + "_model_1_chain"+str(chains)+".pdb", "w") as pdbf:
                                 pdbf.write(str(pdb))
@@ -200,7 +212,6 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
         print("after sorting", sorted_scored_pool)
         seqs_per_iteration.append(sorted_scored_pool)
 
-        #writing log
         with open(output_dir+"runtime_seqs_and_scores.log", "a") as logf:
             logf.write("starting iteration " + str(curr_iter)+ " log\n")
             for elem in sorted_scored_pool:
@@ -241,7 +252,8 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
         if write_compressed_data:
             for r, k in zip(results, range(len(results))):
                 compressed_pickle(os.path.join(output_dir, "seq_" + str(j) + "_result_" + str(k)), r)
-
+        
+    
         if conf_plot:
             # Plot confidence.
             Ls = get_chain_lengths(result)
@@ -264,20 +276,15 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
             plddt_fig.savefig(output_dir + "seq_" + str(j) + "_final_model_1_plddt.png")
         
         for pdb, chains in zip(pdbs, af2_preds):
-            with open(output_dir + "seq_" + str(j) + "_iter_" + str(curr_iter) + "_model_1_chain"+str(chains)+".pdb", "w") as pdbf:
+            with open(output_dir + "seq_" + str(j) + "_final_model_1_chain"+str(chains)+".pdb", "w") as pdbf:
                         pdbf.write(str(pdb))
     
+    print("Number of AlphaFold2 predictions: ", num_af2)
     #plotting
+    dist.spin_down()
+        
     plotting = plot_scores_general_dev(plot, seqs_per_iteration, output_dir)
     print("plots created at", str(plotting))
-    """try:
-        plotting = plot_scores_general_dev(plot, seqs_per_iteration, output_dir)
-        print("plots created at", str(plotting))
-    except:
-        print("plotting failed")"""
-    
-    print("Number of AlphaFold2 predictions: ", num_af2)
-    dist.spin_down()
 
 if __name__ == "__main__":
     parser = getEvoProParser()

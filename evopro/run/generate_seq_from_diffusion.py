@@ -43,7 +43,7 @@ def run_mpnn_on_diff_backbone(pdb_backbone, jsonfile, output_dir, mpnn_temp="0.1
         
     return mpnn_seqs_af2
     
-def run_af2_on_mpnn_seqs(diff_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir,  n_workers=1):
+def run_af2_on_mpnn_seqs(dist, diff_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir,  n_workers=1):
     # mpnn_seqs_list is a list of multi chain sequences
 
     num_af2=0
@@ -53,9 +53,6 @@ def run_af2_on_mpnn_seqs(diff_backbone, mpnn_seqs_list, score_func, af2_flags_fi
     #lengths.append([[x + vary_length for x in startingseqs[0].get_lengths([chain])][0] for chain in c])
 
     print("Compiling AF2 models for lengths:", lengths)
-
-    print("Initializing distributor")
-    dist = Distributor(n_workers, af2_init, af2_flags_file, lengths)
         
     print("work list", mpnn_seqs_list)
     num_af2 += len(mpnn_seqs_list)
@@ -187,6 +184,11 @@ def getFlagParser() -> FileArgumentParser:
                         type=str,
                         help='If more than one PDB input backbone, name of PDB directory to iterate over and generate sequences using MPNN and check RMSD against.')
     
+    parser.add_argument('--max_chains_length',
+                        default=None,
+                        type=str,
+                        help='If more than one PDB input backbone, max length of each chain separated by commas.')
+    
     parser.add_argument('--custom_score',
                         default="/proj/kuhl_lab/evopro/evopro/score_funcs/diff_score_binder.py score_seq_diff",
                         type=str,
@@ -260,6 +262,7 @@ if __name__ == "__main__":
         pdb_dir = os.path.join(input_dir, args.pdb_dir)
         output_dir = os.path.join(input_dir, "outputs/")
         af2_flags_file = os.path.join(input_dir, "af2.flags")
+        
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
         
@@ -287,7 +290,9 @@ if __name__ == "__main__":
             if args.af2_preds_monomers:
                 run_af2_on_mpnn_seqs_withmonomers(pdb_backbone, mpnn_seqs_list, score_func, af2_flags_file, mpnn_dir, n_workers=args.n_workers)
             else:
-                run_af2_on_mpnn_seqs(pdb_backbone, mpnn_seqs_list, score_func, af2_flags_file, mpnn_dir, n_workers=args.n_workers)
+                print("Initializing distributor")
+                dist = Distributor(args.n_workers, af2_init, af2_flags_file, lengths)
+                run_af2_on_mpnn_seqs(dist, pdb_backbone, mpnn_seqs_list, score_func, af2_flags_file, mpnn_dir, n_workers=args.n_workers)
             
             print("Finished running AlphaFold2 on MPNN sequences in", os.getcwd())
             os.chdir(input_dir)

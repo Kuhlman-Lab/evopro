@@ -9,11 +9,11 @@ from typing import Sequence, Union
 
 #SET PATHS HERE
 #set path to evopro here, for example:
-sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
+sys.path.append("/home//evopro/evopro/")
 #set path to alphafold run directory here:
-sys.path.append('/proj/kuhl_lab/alphafold/run')
+sys.path.append('/home/evopro/evopro/alphafold/run')
 #set path to proteinmpnn directory here:
-sys.path.append('/proj/kuhl_lab/proteinmpnn/run')
+sys.path.append('/home/evopro/evopro/proteinmpnn/run')
 
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor

@@ -9,11 +9,17 @@ from typing import Sequence, Union
 
 #SET PATHS HERE
 #set path to evopro here, for example:
-sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
+evopro_env = os.environ.get("EVOPRO")
+assert evopro_env is not None, "No EVOPRO environment variable is not set. Please set to the main evopro directory'"
+alphafold_env = os.environ.get('ALPHAFOLD_RUN')
+assert alphafold_env is not None, "ALPHAFOLD_RUN environment variable is not set. Please set it to the run directory for the evopro version of alphafold"
+proteinmpnn_env = os.environ.get('PROTEIN_MPNN_RUN')
+assert proteinmpnn_env is not None, "PROTEIN_MPNN_RUN environment variable is not set. Please set it to the run directory for the evopro version of proteinmpnn"
+sys.path.append(evopro_env)
 #set path to alphafold run directory here:
-sys.path.append('/proj/kuhl_lab/alphafold/run')
+sys.path.append(alphafold_env)
 #set path to proteinmpnn directory here:
-sys.path.append('/proj/kuhl_lab/proteinmpnn/run')
+sys.path.append(proteinmpnn_env)
 
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor

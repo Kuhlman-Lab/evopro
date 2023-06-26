@@ -12,9 +12,9 @@ from typing import Sequence, Union
 evopro_env = os.environ.get("EVOPRO")
 assert evopro_env is not None, "No EVOPRO environment variable is not set. Please set to the main evopro directory'"
 alphafold_env = os.environ.get('ALPHAFOLD_RUN')
-assert alphafold_env is not None, "ALPHAFOLD_RUN environment variable is not set. Please set it to the main directory for the evopro version of alphafold"
+assert alphafold_env is not None, "ALPHAFOLD_RUN environment variable is not set. Please set it to the run directory for the evopro version of alphafold"
 proteinmpnn_env = os.environ.get('PROTEIN_MPNN_RUN')
-assert proteinmpnn_env is not None, "PROTEIN_MPNN_RUN environment variable is not set. Please set it to the main directory for the evopro version of proteinmpnn"
+assert proteinmpnn_env is not None, "PROTEIN_MPNN_RUN environment variable is not set. Please set it to the run directory for the evopro version of proteinmpnn"
 sys.path.append(evopro_env)
 #set path to alphafold run directory here:
 sys.path.append(alphafold_env)

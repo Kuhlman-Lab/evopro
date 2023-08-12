@@ -191,6 +191,10 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Number of mutations made as a percentage of sequence length.'
                         'Default is 0.125 for every iteration. If more than one value is provided, number of iterations will be split evenly and assigned.')
     
+    parser.add_argument('--force_single_mutation_only',
+                        action='store_true',
+                        help='Default is False.')
+    
     parser.add_argument('--af2_preds',
                         default="AB",
                         type=str,

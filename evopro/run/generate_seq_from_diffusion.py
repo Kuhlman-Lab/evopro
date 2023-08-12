@@ -42,8 +42,8 @@ def run_mpnn_on_diff_backbone(pdb_backbone, jsonfile, output_dir, mpnn_temp="0.1
         f.write("\n".join(mpnn_seqs))
         
     return mpnn_seqs_af2
-    
-def run_af2_on_mpnn_seqs(dist, diff_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir,  n_workers=1):
+
+def run_af2_on_mpnn_seqs(diff_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir,  n_workers=1):
     # mpnn_seqs_list is a list of multi chain sequences
 
     num_af2=0
@@ -53,7 +53,9 @@ def run_af2_on_mpnn_seqs(dist, diff_backbone, mpnn_seqs_list, score_func, af2_fl
     #lengths.append([[x + vary_length for x in startingseqs[0].get_lengths([chain])][0] for chain in c])
 
     print("Compiling AF2 models for lengths:", lengths)
-        
+    print("Initializing distributor")
+    dist = Distributor(args.n_workers, af2_init, af2_flags_file, lengths)
+    
     print("work list", mpnn_seqs_list)
     num_af2 += len(mpnn_seqs_list)
 
@@ -61,6 +63,48 @@ def run_af2_on_mpnn_seqs(dist, diff_backbone, mpnn_seqs_list, score_func, af2_fl
     
     print("done churning")
     dist.spin_down()
+    #print(results)
+    
+    seqs_and_scores = {}
+    data = {}
+    scores = []
+    for seq, result in zip(mpnn_seqs_list, results):
+        s = ",".join(seq[0])
+        score = score_func(result[0], diff_backbone)
+        scores.append(score)
+        
+        seqs_and_scores[s] = (score[0])
+        data[s] = (score[1], score[-1], score[-2])
+        
+        #print(s, score[0])
+    
+    sorted_seqs_and_scores = sorted(seqs_and_scores.items(), key=lambda x:x[1])
+
+    print(sorted_seqs_and_scores)
+    for seq,i in zip(sorted_seqs_and_scores, range(len(sorted_seqs_and_scores))):
+        pdb = data[seq[0]][-1]
+        r = data[seq[0]][-2]
+        with open(os.path.join(output_dir,"seq_" + str(i) + "_model_1.pdb"), "w") as pdbf:
+            pdbf.write(str(pdb))
+        compressed_pickle(os.path.join(output_dir, "seq_" + str(i) + "_result"), r)
+        print(seq[0], data[seq[0]][0])
+    
+    with open(os.path.join(output_dir, "seqs_and_scores.csv"), "w") as opf:
+        for seq,i in zip(sorted_seqs_and_scores, range(len(sorted_seqs_and_scores))):
+            opf.write(str(seq[0]) + "\t" + str(seqs_and_scores[seq[0]]) + "\t" + str(data[seq[0]][0]) + "\n")
+
+    print("Number of AlphaFold2 predictions: ", num_af2)
+    
+    
+def run_af2_on_mpnn_seqs_iter(dist, diff_backbone, mpnn_seqs_list, score_func, output_dir,  n_workers=1):
+    # mpnn_seqs_list is a list of multi chain sequences
+
+    num_af2=0
+        
+    print("work list", mpnn_seqs_list)
+    num_af2 += len(mpnn_seqs_list)
+
+    results = dist.churn(mpnn_seqs_list)
     #print(results)
     
     seqs_and_scores = {}
@@ -179,15 +223,16 @@ def getFlagParser() -> FileArgumentParser:
                         type=str,
                         help='Name of PDB file (if only one) to generate sequences using MPNN and check RMSD against.')
     
+    #BELOW FEATURE STILL HAS BUGS
     parser.add_argument('--pdb_dir',
                         default=None,
                         type=str,
                         help='If more than one PDB input backbone, name of PDB directory to iterate over and generate sequences using MPNN and check RMSD against.')
-    
     parser.add_argument('--max_chains_length',
                         default=None,
                         type=str,
                         help='If more than one PDB input backbone, max length of each chain separated by commas.')
+    
     
     parser.add_argument('--custom_score',
                         default="/proj/kuhl_lab/evopro/evopro/score_funcs/diff_score_binder.py score_seq_diff",
@@ -246,6 +291,9 @@ if __name__ == "__main__":
         output_dir = os.path.join(input_dir, "outputs/")
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
+        else:
+            shutil.rmtree(output_dir)
+            os.makedirs(output_dir)
         pdb_backbone = os.path.join(input_dir, args.pdb_backbone)
         jsonfile = os.path.join(input_dir, "residue_specs.json")
         af2_flags_file = os.path.join(input_dir, "af2.flags")
@@ -263,10 +311,33 @@ if __name__ == "__main__":
         output_dir = os.path.join(input_dir, "outputs/")
         af2_flags_file = os.path.join(input_dir, "af2.flags")
         
+        templates_dir = None
+        if os.path.isdir(os.path.join(input_dir, "templates/")):
+            templates_dir = os.path.join(input_dir, "templates/")
+        
         if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        else:
+            shutil.rmtree(output_dir)
             os.makedirs(output_dir)
         
         pdbs = [os.path.join(pdb_dir, f) for f in os.listdir(pdb_dir) if os.path.isfile(os.path.join(pdb_dir, f)) and f.endswith(".pdb")]
+        
+        lengths = []
+        if args.max_chains_length:
+            l = args.max_chains_length.split(",")
+            l = [int(x) for x in l]
+            lengths.append(l)
+            if args.af2_preds_monomers:
+                for elem in l:
+                    lengths.append([elem])
+        else:
+            raise ValueError("Please provide max_chains_length argument when using --pdb_dir option.")
+
+        print("Compiling AF2 models for lengths:", lengths)
+        print("Initializing distributor")
+        dist = Distributor(args.n_workers, af2_init, af2_flags_file, lengths)
+    
         for pdb in pdbs:
             
             name = pdb.split("/")[-1].split(".")[0]
@@ -281,19 +352,26 @@ if __name__ == "__main__":
             except:
                 raise ValueError("No json.flags file found in input directory. Please provide a json.flags file in the input directory that is generalizable to all input PDBs.")
 
+            """try:
+                shutil.copy(os.path.join(input_dir, "af2.flags"), mpnn_dir)
+            except:
+                raise ValueError("No af2.flags file found in input directory. Please provide a af2.flags file in the input directory that is generalizable to all input PDBs.")
+            """
+            
+            if templates_dir:
+                shutil.copytree(templates_dir, os.path.join(mpnn_dir, "templates/"))
             #input_dir_return = os.getcwd()
             
             os.chdir(mpnn_dir)
-            subprocess.run(["python", "/proj/kuhl_lab/evopro/evopro/run/generate_json.py", "@json.flags"])
+            subprocess.run(["python", "/proj/kuhl_lab/evopro/evopro/run/generate_json_dev.py", "@json.flags"])
             jsonfile = os.path.join(mpnn_dir, "residue_specs.json")
             mpnn_seqs_list = run_mpnn_on_diff_backbone(mpnn_dir, jsonfile, mpnn_dir, mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, num_seqs=args.num_seqs_mpnn)
-            if args.af2_preds_monomers:
-                run_af2_on_mpnn_seqs_withmonomers(pdb_backbone, mpnn_seqs_list, score_func, af2_flags_file, mpnn_dir, n_workers=args.n_workers)
-            else:
-                print("Initializing distributor")
-                dist = Distributor(args.n_workers, af2_init, af2_flags_file, lengths)
-                run_af2_on_mpnn_seqs(dist, pdb_backbone, mpnn_seqs_list, score_func, af2_flags_file, mpnn_dir, n_workers=args.n_workers)
+
+            run_af2_on_mpnn_seqs_iter(dist, pdb_backbone, mpnn_seqs_list, score_func, mpnn_dir, n_workers=args.n_workers)
             
             print("Finished running AlphaFold2 on MPNN sequences in", os.getcwd())
             os.chdir(input_dir)
+        
+        print("done churning")
+        dist.spin_down()
             

@@ -88,11 +88,14 @@ def score_binder_1_d2(results, dsobj, contacts=None, orient=None):
     chains, residues, resindices = get_coordinates_pdb(pdb)
     reslist2 = [x for x in residues.keys()]
     confscore2 = score_plddt_confidence(results, reslist2, resindices, dsobj=dsobj, first_only=False)
+
     path_to_starting = "/nas/longleaf/home/sela/runevopro/d2/tla/d2af.pdb"
-    rmsd_score = score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=dsobj, resids=contacts)
-    print(confscore2, rmsd_score)
+    reslist_not_designable = [x for x in residues.keys() if x not in dsobj._get_designable_positions()]
+    rmsd_score = score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=dsobj, resids_orig=contacts, resids_new=reslist_not_designable)
+    print("Individual scores", confscore2, rmsd_score)
+    
     score = -confscore2 + rmsd_score
-    print(score)
+    print("Overall score",score)
     return score, (score, confscore2, rmsd_score), pdb, results
 
 def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None, resids_orig=None, resids_new=None):

@@ -332,6 +332,75 @@ def write_pairwise_scores(pairs, results, filename):
             res2_id = resindices[pair[1]] 
             opf.write(str(pair[0]) + "\t" + str(pair[1]) + "\t" + str(pae[res1_id][res2_id]) + "\t" + str(pae[res2_id][res1_id]) + "\n")
     
+def score_rmsd_to_starting(pdb, path_to_starting, dsobj=None):
+
+    with open(path_to_starting, 'r') as f:
+        pdb_string_starting = f.read()
+    chains0, residues0, resindices0 = get_coordinates_pdb(pdb_string_starting)
+    reslist1 = [x for x in residues0.keys()]
+
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    reslist2 = [x for x in residues.keys()]
+
+    rmsd_to_starting = get_rmsd(reslist1, pdb_string_starting, reslist2, pdb, ca_only=True, dsobj=dsobj)
+
+    return rmsd_to_starting
+
+
+def threshold_rmsd(pdb, path_to_starting, dsobj=None):
+    # to keep the de novo binder close in structure to the original binder
+    # calculates Ca-only RMSD of de novo binder unbound vs to original scaffold applied to a flat-bottom quadratic potential
+    spring_constant = 10.0 
+    #rmsd_cutoff = 5
+    rmsd_cutoff = 10
+
+    with open(path_to_starting, 'r') as f:
+        pdb_string_starting = f.read()
+    chains0, residues0, resindices0 = get_coordinates_pdb(pdb_string_starting)
+    reslist1 = [x for x in residues0.keys()]
+
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    reslist2 = [x for x in residues.keys()]
+
+
+    rmsd_to_starting = get_rmsd(reslist1, pdb_string_starting, reslist2, pdb, ca_only=True, dsobj=dsobj)
+
+    # apply flat-bottom quadratic-shaped potential function
+    rmsd_potential = 0
+    if rmsd_to_starting > rmsd_cutoff:
+        rmsd_potential = spring_constant*math.pow(rmsd_to_starting - rmsd_cutoff, 2)
+        print("Rmsd has reached the threshold of 5.0. Calculating RMSD potential")
+        print(rmsd_potential)
+    #add this as penalty on top of usual rmsd
+    return rmsd_potential*5
+
+def threshold_rmsd_small(pdb, path_to_starting, dsobj=None):
+    # to keep the de novo binder close in structure to the original binder
+    # calculates Ca-only RMSD of de novo binder unbound vs to original scaffold applied to a flat-bottom quadratic potential
+    spring_constant = 10.0
+    rmsd_cutoff = 5
+    #rmsd_cutoff = 10
+
+    with open(path_to_starting, 'r') as f:
+        pdb_string_starting = f.read()
+    chains0, residues0, resindices0 = get_coordinates_pdb(pdb_string_starting)
+    reslist1 = [x for x in residues0.keys()]
+
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    reslist2 = [x for x in residues.keys()]
+
+
+    rmsd_to_starting = get_rmsd(reslist1, pdb_string_starting, reslist2, pdb, ca_only=True, dsobj=dsobj)
+
+    # apply flat-bottom quadratic-shaped potential function
+    rmsd_potential = 0
+    if rmsd_to_starting > rmsd_cutoff:
+        rmsd_potential = spring_constant*math.pow(rmsd_to_starting - rmsd_cutoff, 2)
+        print("Rmsd has reached the threshold of 5.0. Calculating RMSD potential")
+        print(rmsd_potential)
+    #add this as penalty on top of usual rmsd
+    return rmsd_potential*5    
+
 if __name__ == "__main__":
     #f1 = "/pine/scr/a/m/amritan/kuhlmanlab/folddesign/folddesign/data/A1_CD20_helix_design.pdb"
     

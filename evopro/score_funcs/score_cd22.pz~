@@ -44,9 +44,9 @@ def score_binder_complex_clashpenalty(results, dsobj, contacts, orient=None):
     from alphafold.common import protein
     pdb = protein.to_pdb(results['unrelaxed_protein'])
     chains, residues, resindices = get_coordinates_pdb(pdb)
-    reslist1 = contacts[0]
+    reslist1 = contacts
     reslist2 = [x for x in residues.keys() if x.startswith("B")]
-    contact_list, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False)
+    contacts, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False)
     
     num_clashes = 0
     clash_resids = {37, 38, 71, 76, 128, 129, 130, 131, 133, 134, 156}
@@ -68,14 +68,14 @@ def score_binder_complex_clashpenalty(results, dsobj, contacts, orient=None):
     else:
         orientation_penalty = 0
 
-    num_contacts = len(contact_list)
+    num_contacts = len(contacts)
     pae_per_contact = 0
     if num_contacts > 0:
         pae_per_contact = (70.0-(70.0*contactscore)/num_contacts)/2
 
     score = -contactscore + orientation_penalty + clash_penalty
 
-    return score, (score, len(contact_list), contactscore, orientation_penalty, clash_penalty, pae_per_contact), contact_list, pdb, results
+    return score, (score, len(contacts), contactscore, orientation_penalty, clash_penalty, pae_per_contact), contacts, pdb, results
 
 def score_binder_monomer(results, dsobj):
     from alphafold.common import protein

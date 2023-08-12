@@ -362,7 +362,7 @@ class DesignSeq:
                 else:
                     method = random.choices(["sub", "insert", "del"], var_weights)[0]
 
-            print("mutating by", method, str(var), str(var_weights))
+            #print("mutating by", method, str(var), str(var_weights))
             old_res = new_mut[mut_id][-1]
             new_res = copy.deepcopy(old_res)
             if method == "sub":

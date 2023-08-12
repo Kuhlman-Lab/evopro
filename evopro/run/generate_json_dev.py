@@ -25,39 +25,38 @@ def parse_seqfile(filename):
             ids[resid] = (extended_resid, chain, i+1)
 
     return ids, chains
-            
 
-def generate_json(filename, mut_res, opf, default, symmetric_res, seqfile=False):
+def parse_pdbfile(filename):
+    chains, residues, resindices = get_coordinates_pdb_old(filename, fil=True)
 
-    if seqfile:
-        pdbids, chain_seqs = parse_seqfile(filename)
-    else:
-        chains, residues, resindices = get_coordinates_pdb_old(filename, fil=True)
+    pdbids = {}
+    chain_seqs = {}
 
-        pdbids = {}
-        chain_seqs = {}
+    for chain in chains:
+        chain_seqs[chain]=[]
 
-        for chain in chains:
-            chain_seqs[chain]=[]
+    res_index_chain = 1
+    chain_test = chains[0]
+    for residue in residues:
+        num_id = int(residue.split("_")[-1])
+        chain = residue.split("_")[0]
+        if chain != chain_test:
+            res_index_chain = 1
+            chain_test = chain
+        pdbid = chain+str(num_id)
+        pdbids[pdbid] = (residue, chain, res_index_chain)
 
-        res_index_chain = 1
-        chain_test = chains[0]
-        for residue in residues:
-            num_id = int(residue.split("_")[-1])
-            chain = residue.split("_")[0]
-            if chain != chain_test:
-                res_index_chain = 1
-                chain_test = chain
-            pdbid = chain+str(num_id)
-            pdbids[pdbid] = (residue, chain, res_index_chain)
+        aa = three_to_one(residue.split("_")[1])
+        chain_seqs[chain].append(aa)
+        res_index_chain += 1
 
-            aa = three_to_one(residue.split("_")[1])
-            chain_seqs[chain].append(aa)
-            res_index_chain += 1
+    for chain in chains:
+        chain_seqs[chain] = "".join([x for x in chain_seqs[chain] if x is not None])
+    
+    return pdbids, chain_seqs
 
-        for chain in chains:
-            chain_seqs[chain] = "".join([x for x in chain_seqs[chain] if x is not None])
-        
+def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
+
     mutable = []
     for resind in mut_res:
         if "*" in resind:
@@ -87,7 +86,7 @@ def generate_json(filename, mut_res, opf, default, symmetric_res, seqfile=False)
     symmetric = []
     for symmetry in symmetric_res:
         values = list(symmetry.values())
-
+        print(values)
         for tied_pos in zip(*values):
             skip_tie = False
             sym_res = []
@@ -141,7 +140,7 @@ def getPDBParser() -> FileArgumentParser:
                         help='PDB chain and residue numbers to force symmetry separated by a colon')
     return parser
 
-def parse_mutres_input(mutresstring):
+def parse_mutres_input(mutresstring, pdbids):
     mutres_temp = mutresstring.strip().split(",")
     mutres_temp = [x.strip() for x in mutres_temp if x]
     mutres = []
@@ -165,6 +164,7 @@ def _check_res_validity(res_item):
     return (split_item[0], int(split_item[1]))
 
 def _check_range_validity(range_item):
+    
     split_range = range_item.split('-')
     if len(split_range) != 2:
         raise ValueError(f'Unable to parse residue range: {range_item}')
@@ -185,13 +185,30 @@ def _check_range_validity(range_item):
 
     return res_range
 
-def _check_symmetry_validity(symmetric_item):
+def _check_range_validity_asterisk(range_item, pdbids):
+    res_range = []
+    chain = range_item.split("*")[0]
+    
+    for pdbid in pdbids:
+        chain_id = re.split('(\d+)', pdbid)[0]
+        if chain == chain_id:
+            res_range.append( (chain_id, pdbids[pdbid][2]) )
+    
+    if len(res_range) == 0:
+        raise ValueError(f'Unable to parse residue range: {range_item}')
+
+    return res_range
+
+def _check_symmetry_validity(symmetric_item, pdbids):
     split_item = symmetric_item.split(':')
 
     symmetry_dict = {}
     for subitem in split_item:
         if '-' in subitem:
             res_range = _check_range_validity(subitem)
+            symmetry_dict[subitem] = res_range
+        elif '*' in subitem:
+            res_range = _check_range_validity_asterisk(subitem, pdbids)
             symmetry_dict[subitem] = res_range
         else:
             res_ch, res_idx = _check_res_validity(subitem)
@@ -204,17 +221,19 @@ def _check_symmetry_validity(symmetric_item):
 
     return symmetry_dict
 
-def parse_symmetric_res(symmetric_str):
+def parse_symmetric_res(symmetric_str, pdbids):
 
     symmetric_str = [s for s in symmetric_str.strip().split(",") if s]
+    print(symmetric_str)
 
     symmetric_res = []
     for item in symmetric_str:
         if ":" not in item:
             raise ValueError(f'No colon detected in symmetric res: {item}.')
 
-        symmetry_dict = _check_symmetry_validity(item)
+        symmetry_dict = _check_symmetry_validity(item, pdbids)
         symmetric_res.append(symmetry_dict)
+    #print(symmetric_res)
 
     return symmetric_res
     
@@ -222,9 +241,15 @@ def parse_symmetric_res(symmetric_str):
 if __name__=="__main__":
     parser = getPDBParser()
     args = parser.parse_args(sys.argv[1:])
-    mutres = parse_mutres_input(args.mut_res)
-    symres = parse_symmetric_res(args.symmetric_res)
-    if args.pdb:
-        generate_json(args.pdb, mutres, args.output, args.default_mutres_setting, symres)
-    elif args.sequence_file:
-        generate_json(args.sequence_file, mutres, args.output, args.default_mutres_setting, symres, seqfile=True)
+    
+    if args.sequence_file:
+        pdbids, chain_seqs = parse_seqfile(args.sequence_file)
+        
+    else:
+        pdbids, chain_seqs = parse_pdbfile(args.pdb)
+    
+    symres = parse_symmetric_res(args.symmetric_res, pdbids)
+    print(symres)
+    mutres = parse_mutres_input(args.mut_res, pdbids)
+    #generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res)
+    generate_json(pdbids, chain_seqs, mutres, args.output, args.default_mutres_setting, symres)

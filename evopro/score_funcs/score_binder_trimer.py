@@ -5,77 +5,87 @@ import subprocess
 import shutil
 import math
 
-def score_binder(results, dsobj, contacts=None, orient=None):
+def score_binder(results, dsobj, contacts=None, distance_cutoffs=None):
     from alphafold.common import protein
-    print(results)
+    #print(results)
     pdb = protein.to_pdb(results['unrelaxed_protein'])
     chains, residues, resindices = get_coordinates_pdb(pdb)
     if len(chains)>1:
-        return score_binder_complex(results, dsobj, contacts, orient=orient)
+        return score_binder_complex(results, dsobj, contacts, distance_cutoffs)
     else:
         return score_binder_monomer(results, dsobj)
-
-def score_binder_clashpenalty(results, dsobj, contacts=None, orient=None):
-    from alphafold.common import protein
-    print(results)
-    pdb = protein.to_pdb(results['unrelaxed_protein'])
-    chains, residues, resindices = get_coordinates_pdb(pdb)
-    if len(chains)>1:
-        return score_binder_complex_clashpenalty(results, dsobj, contacts, orient=orient)
-    else:
-        return score_binder_monomer(results, dsobj)
-
-def score_binder_complex(results, dsobj, contacts, orient=None):
-    from alphafold.common import protein
-    pdb = protein.to_pdb(results['unrelaxed_protein'])
-    chains, residues, resindices = get_coordinates_pdb(pdb)
-    reslist1 = contacts
-    reslist2 = [x for x in residues.keys() if x.startswith("B")]
-    contacts, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False)
-    if orient:
-        orientation_penalty = orientation_score(orient, pdb, dsobj=dsobj)
-    else:
-        orientation_penalty = 0
-    score = -contactscore + orientation_penalty
-    print(score, (score, len(contacts), contactscore, orientation_penalty))
-    return score, (score, len(contacts), contactscore, orientation_penalty), contacts, pdb, results
-
-def score_binder_complex_clashpenalty(results, dsobj, contacts, orient=None):
-    from alphafold.common import protein
-    pdb = protein.to_pdb(results['unrelaxed_protein'])
-    chains, residues, resindices = get_coordinates_pdb(pdb)
-    reslist1 = contacts[0]
-    reslist2 = [x for x in residues.keys() if x.startswith("B")]
-    contact_list, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False)
     
-    num_clashes = 0
-    clash_resids = {37, 38, 71, 76, 128, 129, 130, 131, 133, 134, 156}
-    clash_reslist = ["A"+str(x) for x in clash_resids]
-    clash_contacts, clash_contactscore = score_contacts_pae_weighted(results, pdb, clash_reslist, reslist2, dsobj=dsobj, first_only=False, dist=8)    
-    for contact in clash_contacts:
-         if contact[0][0:1] == 'A' and int(contact[0][1:]) in clash_resids:
-            num_clashes += 1
-            print("clash found at: " + str(contact[0])) 
-         if contact[1][0:1] == 'A' and int(contact[1][1:]) in clash_resids:
-            num_clashes += 1
-            print("clash found at: " + str(contact[1])) 
-    # calculate clash penalty
-    clash_penalty = num_clashes*5
-    print("num clashes: " +  str(num_clashes))
-
-    if orient:
-        orientation_penalty = orientation_score(orient, pdb, dsobj=dsobj)
+def score_binder_noconf(results, dsobj, contacts=None, distance_cutoffs=None):
+    from alphafold.common import protein
+    #print(results)
+    pdb = protein.to_pdb(results['unrelaxed_protein'])
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    if len(chains)>1:
+        return score_binder_complex(results, dsobj, contacts, distance_cutoffs)
     else:
-        orientation_penalty = 0
+        return 0, (0, 0), pdb, results
 
+def score_binder_nocontact(results, dsobj, contacts=None, distance_cutoffs=None):
+    from alphafold.common import protein
+    #print(results)
+    pdb = protein.to_pdb(results['unrelaxed_protein'])
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    if len(chains)>1:
+        return 0, (0, 0), pdb, results
+    else:
+        return score_binder_monomer(results, dsobj)
+
+def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
+    from alphafold.common import protein
+    pdb = protein.to_pdb(results['unrelaxed_protein'])
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    print(contacts)
+
+    if not contacts:
+        contacts=(None,None,None)
+    if not distance_cutoffs:
+        distance_cutoffs=(4,4,8)
+    reslist1 = contacts[0]
+    reslist2 = [x for x in residues.keys() if x.startswith("D")]
+    contact_list, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[0])
+    
+    bonuses = 0
+    bonus_resids = contacts[1]
+    if bonus_resids:
+        bonus_contacts, bonus_contactscore = score_contacts_pae_weighted(results, pdb, bonus_resids, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[1])
+        for contact in bonus_contacts:
+            if (contact[0][0:1] == 'A' or contact[0][0:1] == 'B' or contact[0][0:1] == 'C') and int(contact[0][1:]) in bonus_resids:
+                bonuses += 1
+                print("bonus found at: " + str(contact[0]))
+            if (contact[1][0:1] == 'A' or contact[1][0:1] == 'B' or contact[1][0:1] == 'C') and int(contact[1][1:]) in bonus_resids:
+                bonuses += 1
+                print("bonus found at: " + str(contact[1]))
+        
+    bonus = -bonuses * 3
+    
+    penalties = 0
+    penalty_resids = contacts[2]
+    print(penalty_resids)
+    if penalty_resids:
+        penalty_contacts, penalty_contactscore = score_contacts_pae_weighted(results, pdb, penalty_resids, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[2])
+        for contact in penalty_contacts:
+            if contact[0][0:1] == 'A' and int(contact[0][1:]) in penalty_resids:
+                penalties += 1
+                print("penalty found at: " + str(contact[0]))
+            if contact[1][0:1] == 'A' and int(contact[1][1:]) in penalty_resids:
+                penalties += 1
+                print("penalty found at: " + str(contact[1]))
+        
+    penalty = penalties * 3
+    
     num_contacts = len(contact_list)
     pae_per_contact = 0
     if num_contacts > 0:
         pae_per_contact = (70.0-(70.0*contactscore)/num_contacts)/2
-
-    score = -contactscore + orientation_penalty + clash_penalty
-
-    return score, (score, len(contact_list), contactscore, orientation_penalty, clash_penalty, pae_per_contact), contact_list, pdb, results
+    
+    score = -contactscore + penalty + bonus
+    print(score, (score, len(contact_list), contactscore, pae_per_contact, bonus, penalty))
+    return score, (score, len(contact_list), contactscore, pae_per_contact, bonus, penalty), contacts, pdb, results
 
 def score_binder_monomer(results, dsobj):
     from alphafold.common import protein
@@ -87,7 +97,7 @@ def score_binder_monomer(results, dsobj):
     print(score)
     return score, (score, confscore2), pdb, results
 
-def score_binder_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None):
+def score_binder_rmsd(pdb1, pdb2, binder_chain="D", dsobj=None):
     chains1, residues1, resindices1 = get_coordinates_pdb(pdb1)
     chains2, residues2, resindices2 = get_coordinates_pdb(pdb2)
     reslist1 = [x for x in residues1.keys() if x.startswith(binder_chain)]

@@ -18,7 +18,7 @@ sys.path.append('/proj/kuhl_lab/alphafold/run')
 from run_af2 import af2_init
 
 def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], 
-                               num_iter = 50, n_workers=1, mut_percents=None, contacts=None, 
+                               num_iter = 50, n_workers=1, mut_percents=None, contacts=None, distance_cutoffs=None, rmsd_pdb=None,
                                mpnn_temp="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, mpnn_chains=None,
                                repeat_af2=True, af2_preds=[], crossover_percent=0.2, vary_length=0, sid_weights=[0.8,0.1,0.1],
                                write_pdbs=False, plot=[], conf_plot=False, write_compressed_data=True):
@@ -134,8 +134,10 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
         scores = []
         if not contacts:
             contacts=(None, None, None)
+        if not distance_cutoffs:
+            distance_cutoffs=(4, 4, 8)
         for seqs, results, dsobj in zip(seqs_packed, results_packed, scoring_pool):
-            scores.append(score_func(results, dsobj, contacts=contacts))
+            scores.append(score_func(results, dsobj, contacts=contacts, distance_cutoffs=distance_cutoffs, rmsd_pdb=rmsd_pdb))
         
         #adding sequences and scores into the dictionary
         for score, seqs, results, dsobj in zip(scores, seqs_packed, results_packed, scoring_pool):
@@ -394,11 +396,23 @@ if __name__ == "__main__":
             if i % freq == 0:
                 mpnn_iters.append(i)
 
-    contacts=None
+    contacts=[None, None, None]
+    distance_cutoffs = [4, 4, 8]
     if args.define_contact_area:
-        contacts = parse_mutres_input(args.define_contact_area)
-    else:
-        contacts=None
+        c = args.define_contact_area.split(" ")
+        contacts[0] = parse_mutres_input(c[0])
+        if len(c)>1:
+            distance_cutoffs[0] = int(c[1])
+    if args.bonus_contacts:
+        b = args.bonus_contacts.split(" ")
+        contacts[1] = parse_mutres_input(b[0])
+        if len(b)>1:
+            distance_cutoffs[1] = int(b[1])
+    if args.penalize_contacts:
+        p = args.penalize_contacts.split(" ")
+        contacts[2] = parse_mutres_input(p[0])
+        if len(p)>1:
+            distance_cutoffs[2] = int(p[1])
 
     mpnn_skips = []
     if args.skip_mpnn:
@@ -446,7 +460,7 @@ if __name__ == "__main__":
             sid_weights = [float(x) for x in args.substitution_insertion_deletion_weights.split(",")]
                                    
     run_genetic_alg_multistate(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, 
-        num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, 
+        num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, distance_cutoffs=distance_cutoffs, rmsd_pdb=args.path_to_starting,
         mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, mpnn_chains=mpnn_chains,
         repeat_af2=not args.no_repeat_af2, af2_preds = af2_preds, crossover_percent=args.crossover_percent, vary_length=args.vary_length, sid_weights=sid_weights,
         write_pdbs=args.write_pdbs, plot=plot_style, conf_plot=args.plot_confidences, write_compressed_data=not args.dont_write_compressed_data)

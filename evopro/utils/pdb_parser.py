@@ -49,6 +49,26 @@ def get_coordinates_pdb(pdb, fil=False):
 
     return chains, residues, residueindices
 
+def get_ca_coordinates_pdb(pdb_str):
+    residues = {}
+    coords = []
+
+    pdb_split = pdb_str.split("\n")
+    i=0
+    pdb_split = [x for x in pdb_split if x]
+    for lin in pdb_split:
+        x = lin[30:38].strip(' ')
+        y = lin[38:46].strip(' ')
+        z = lin[46:54].strip(' ')
+        l = lin.strip().split()
+        if 'ATOM' in l[0] or 'HETATM' in l[0]:
+            if l[2] == "CA":
+
+                coord = [float(x), float(y), float(z)]
+                coords.append(coord)
+
+    return coords
+
 def change_chainid_pdb(pdb, old_chain="A", new_chain="B"):
     pdb_lines = [x for x in pdb.split("\n") if x]
     #print(pdb_lines)

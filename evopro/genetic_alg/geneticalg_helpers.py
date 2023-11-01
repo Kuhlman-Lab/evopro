@@ -18,6 +18,9 @@ sys.path.append('/proj/kuhl_lab/alphafold/run')
 from functools import partial
 import numpy as np
 
+sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
+from run_protein_mpnn import run_protein_mpnn_func
+
 chain_names = list(string.ascii_uppercase)
 all_aas = ["A", "C",  "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 
@@ -276,16 +279,15 @@ def create_new_seqs_henry(startseqs, num_seqs, crossover_percent = 0.2, vary_len
     return pool
 
 
-def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp, mpnn_version="s_48_020", bidir=False):
-    sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
-    from run_protein_mpnn import run_protein_mpnn_func
-    #print(pdb_dir, dsobj.jsondata, mpnn_temp, mpnn_version, bidir)
-    results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp, model_name=mpnn_version, bidir=bidir)
+def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp, mpnn_version="s_48_020", bidir=False, bias_AA_dict=None, bias_by_res_dict=None):
+    print("===================================MPNN===================================")
+    print(bias_by_res_dict)
+    results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp, model_name=mpnn_version, bidir=bidir, bias_AA_dict=bias_AA_dict, bias_by_res_dict=bias_by_res_dict)
 
     return results
 
 def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = [], af2_preds=["AB", "B"],
-                         mpnn_temp="0.1", mpnn_version="s_48_020", mpnn_chains=None):
+                         mpnn_temp="0.1", mpnn_version="s_48_020", mpnn_chains=None, bias_AA_dict=None, bias_by_res_dict=None):
     pool = startseqs.copy()
     pdb_dirs = []
     #create a directory within running dir to run protein mpnn
@@ -331,7 +333,7 @@ def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, al
     k=0
     inf = 0
     while len(pool) < num_seqs:
-        results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k], mpnn_temp, mpnn_version=mpnn_version)
+        results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k], mpnn_temp, mpnn_version=mpnn_version, bias_AA_dict=bias_AA_dict, bias_by_res_dict=bias_by_res_dict)
         dsobj = startseqs[k]
         for result in results:
             inf +=1

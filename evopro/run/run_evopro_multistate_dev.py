@@ -2,6 +2,7 @@ import multiprocessing as mp
 import importlib
 import math
 import sys, os
+import time
 from typing import Sequence, Union
 sys.path.append("/proj/kuhl_lab/evopro/")
 from evopro.genetic_alg.DesignSeq import DesignSeq
@@ -84,7 +85,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
 
             pool = create_new_seqs_mpnn(pool, 
                                         scored_seqs, 
-                                        poolsizes[curr_iter-1], 
+                                        poolsizes[curr_iter-1], #is this correct?
                                         run_dir, 
                                         curr_iter, 
                                         all_seqs = list(scored_seqs.keys()), 
@@ -117,6 +118,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
         print("work list", work_list_all)
         num_af2 += len(work_list_all)
 
+        start = time.time()
         results = dist.churn(work_list_all)
         results_all = []
         for result in results:
@@ -124,7 +126,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
                 result = result[0]
             results_all.append(result)
             
-        print("done churning")
+        print("done churning, took ", time.time()-start)
         
         seqs_packed = [work_list_all[i:i+num_preds] for i in range(0, len(work_list_all), num_preds)]
         results_packed = [results_all[i:i+num_preds] for i in range(0, len(results_all), num_preds)]
@@ -139,6 +141,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
         for seqs, results, dsobj in zip(seqs_packed, results_packed, scoring_pool):
             scores.append(score_func(results, dsobj, contacts=contacts, distance_cutoffs=distance_cutoffs, rmsd_pdb=rmsd_pdb))
         
+        
         #adding sequences and scores into the dictionary
         for score, seqs, results, dsobj in zip(scores, seqs_packed, results_packed, scoring_pool):
             key_seq = dsobj.get_sequence_string()
@@ -152,6 +155,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
             score_split = score[1]
             pdbs = score[-2]
             score_all = (overall_scores, score_split)
+            print("SCORE", score_all)
             print(key_seq, overall_scores, score_split)
             #print(score_all)
             
@@ -166,6 +170,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
                 for elem in scored_seqs[key_seq]["data"]:
                     #print("Element", elem, elem["score"])
                     #print(sum_score, elem["score"][0], elem["score"][1])
+                    print("elem",elem["score"][0])
                     sum_score = [x+y for x,y in zip(sum_score, elem["score"][0])]
                 avg_score = [x/len(scored_seqs[key_seq]["data"]) for x in sum_score]
                 #print("After", sum_score, avg_score)
@@ -213,14 +218,18 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
         print("after sorting", sorted_scored_pool)
         seqs_per_iteration.append(sorted_scored_pool)
 
+        print("done scoring and sorting, took ", time.time()-start)
+        
+        start = time.time()
         #writing log
         with open(output_dir+"runtime_seqs_and_scores.log", "a") as logf:
             logf.write("starting iteration " + str(curr_iter)+ " log\n")
             for elem in sorted_scored_pool:
                 logf.write(str(elem[0]) + "\t" + str(elem[1]) + "\n")
-        print("done writing runtime results")
+        print("done writing runtime results, took ", time.time()-start)
 
         #create a new pool of only 50% top scoring sequences for the next iteration
+        start = time.time()
         newpool_size = round(len(sorted_scored_pool)/2)
         if curr_iter < len(poolsizes):
             newpool_size = round(poolsizes[curr_iter]/2)
@@ -236,7 +245,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
         for key_seq, j in zip(newpool_seqs, range(len(newpool_seqs))):
             newpool.append(scored_seqs[key_seq]["dsobj"])
             #pdbs = scored_seqs[key_seq]["data"][0]["pdb"]
-
+        print("done creating new pool, took ", time.time()-start)
         curr_iter+=1
 
     with open(output_dir+"seqs_and_scores.log", "w") as logf:

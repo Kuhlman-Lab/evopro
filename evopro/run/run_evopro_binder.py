@@ -18,7 +18,7 @@ from run_af2 import af2_init
 from functools import partial
 import numpy as np
 
-def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], 
+def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], score_func_2=None, score_func_2_iter=30,
                                num_iter = 50, n_workers=1, mut_percents=None, contacts=None, distance_cutoffs=None,
                                rmsd_func=None, rmsd_to_starting_func=None, rmsd_to_starting_pdb=None,
                                mpnn_temp="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, 
@@ -59,6 +59,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
         if not os.path.isdir(pdb_folder):
             os.makedirs(pdb_folder)
 
+    mpnn_counter = 0
     #start genetic algorithm iteration
     while curr_iter <= num_iter:
         all_seqs = []
@@ -72,9 +73,9 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
 
         #using protein mpnn to refill pool when specified
         elif curr_iter in mpnn_iters and curr_iter not in skip_mpnn:
-            print("Iteration " + str(curr_iter) + ": refilling with ProteinMPNN.")
-            pool = create_new_seqs_mpnn(pool, scored_seqs, poolsizes[curr_iter-1], run_dir, curr_iter, all_seqs = list(scored_seqs.keys()), mpnn_temp=mpnn_temp, mpnn_version=mpnn_version)
-
+            print("Iteration " + str(curr_iter) + ": refilling with ProteinMPNN at temperature " + str(mpnn_temps[mpnn_counter]) + ".")
+            pool = create_new_seqs_mpnn(pool, scored_seqs, poolsizes[curr_iter-1], run_dir, curr_iter, all_seqs = list(scored_seqs.keys()), mpnn_temp=mpnn_temps[mpnn_counter], mpnn_version=mpnn_version)
+            mpnn_counter+=1
         #otherwise refilling pool with just mutations and crossovers
         else:
             print("Iteration " + str(curr_iter) + ": refilling with mutation and " + str(crossover_percent*100) + "% crossover.")
@@ -119,9 +120,15 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
             while type(result) is list:
                 result = result[0]
             if contacts is not None:
-                all_scores.append(score_func(result, dsobj, contacts=contacts, distance_cutoffs=distance_cutoffs))
+                if score_func_2 and curr_iter>=score_func_2_iter:
+                    all_scores.append(score_func_2(result, dsobj, contacts=contacts, distance_cutoffs=distance_cutoffs))
+                else:
+                    all_scores.append(score_func(result, dsobj, contacts=contacts, distance_cutoffs=distance_cutoffs))
             else:
-                all_scores.append(score_func(result, dsobj))
+                if score_func_2 and curr_iter>=score_func_2_iter:
+                    all_scores.append(score_func_2(result, dsobj))
+                else:
+                    all_scores.append(score_func(result, dsobj))
 
         #separating complex and binder sequences, if needed
         complex_seqs = []
@@ -443,6 +450,13 @@ if __name__ == "__main__":
                     if "pool" in filename and "size" in filename:
                         poolfile = filename
                         break
+            
+            mpnnfile=None
+            if args.mpnn_temp_variable:
+                for filename in onlyfiles:
+                    if "mpnn" in filename and "temp" in filename:
+                        mpnnfile = filename
+                        break
 
 
     #get score function from flags file
@@ -454,6 +468,10 @@ if __name__ == "__main__":
         sys.path.append(scorepath)
         mod = importlib.import_module(scorefilename)
         scorefunc = getattr(mod, args.score_func)
+        if args.score_func_2:
+            scorefunc2 = getattr(mod, args.score_func_2)
+        else:
+            scorefunc2 = None
     except:
         raise ValueError("Invalid score function")
 
@@ -542,18 +560,27 @@ if __name__ == "__main__":
     else:
         for i in range(args.num_iter):
             pool_sizes.append(args.pool_size)
+            
+    mpnn_temps = []
+    if mpnnfile:
+        with open(mpnnfile, "r") as mpf:
+            for lin in mpf:
+                mpnn_temps.append(lin.strip())
+    else:
+        for i in range(len(mpnn_iters)):
+            mpnn_temps.append(args.mpnn_temp)
+    
+    while len(mpnn_temps) < len(mpnn_iters):
+        mpnn_temps.append(mpnn_temps[-1])
 
     print("Writing compressed data", (not args.dont_write_compressed_data))
     
     if args.af2_preds_extra:
         af2_preds_extra = args.af2_preds_extra.strip().split(",")
                                    
-    run_genetic_alg_multistate(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, 
+    run_genetic_alg_multistate(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, score_func_2=scorefunc2, score_func_2_iter=args.score_func_2_iteration, 
         num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, distance_cutoffs=distance_cutoffs,
         rmsd_func=rmsdfunc, rmsd_to_starting_func=rmsd_to_starting_func, rmsd_to_starting_pdb=path_to_starting,
-        mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, 
+        mpnn_temp=mpnn_temps, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, 
         repeat_af2=not args.no_repeat_af2, af2_preds_extra = af2_preds_extra, crossover_percent=args.crossover_percent, vary_length=args.vary_length, 
         write_pdbs=args.write_pdbs, plot=plot_style, conf_plot=args.plot_confidences, write_compressed_data=not args.dont_write_compressed_data)
-        
-        
-        

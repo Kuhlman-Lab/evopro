@@ -73,6 +73,17 @@ def getEvoProParser() -> FileArgumentParser:
                         type=str,
                         help='Name of the score function in the score file'
                         ' used to evaluate fitness of the alphafold predictions. Required.')
+    
+    parser.add_argument('--score_func_2',
+                        default=None,
+                        type=str,
+                        help='Name of the second score function in the score file'
+                        ' used to evaluate fitness of the alphafold predictions after score_func_2 iterations has been reached. Optional.')
+    
+    parser.add_argument('--score_func_2_iteration',
+                        default=30,
+                        type=int,
+                        help='Number of iterations after which scoring function is switched to score_func_2. Default is 30.')
 
     parser.add_argument('--rmsd_func',
                         default=None,
@@ -143,10 +154,25 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Protein MPNN is used to refill the pool at this sampling temperature.'
                         'Default is 0.1.')
     
+    parser.add_argument('--mpnn_temp_variable',
+                        action='store_true',
+                        help='Specify a file mpnn_temps.txt with temperatures for every call to MPNN (or until temp stops changing). '
+                        'Defaults to False and uses constant MPNN temp.')
+    
     parser.add_argument('--mpnn_version',
                         default="s_48_020",
                         type=str,
                         help='Model version used to run MPNN. Default is s_48_020 (soluble).')
+    
+    parser.add_argument('--mpnn_bias_AA',
+                        default=None,
+                        type=str,
+                        help='Path to json file containing bias dictionary for MPNN. Default is None.')
+    
+    parser.add_argument('--mpnn_bias_by_res',
+                        default=None,
+                        type=str,
+                        help='Path to json file containing per residue bias dictionary for MPNN. Default is None.')
     
     parser.add_argument('--mpnn_chains',
                         default=None,

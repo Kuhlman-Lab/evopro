@@ -2,7 +2,7 @@ import multiprocessing as mp
 import importlib
 import math
 import sys, os
-from typing import Sequence, Union
+import json
 sys.path.append("/proj/kuhl_lab/evopro/")
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor
@@ -12,15 +12,15 @@ from evopro.genetic_alg.geneticalg_helpers import read_starting_seqs, create_new
 from evopro.user_inputs.inputs import getEvoProParser
 from evopro.utils.plots import get_chain_lengths, plot_pae, plot_plddt
 from evopro.utils.utils import compressed_pickle
-from evopro.utils.pdb_parser import change_chainid_pdb, append_pdbs
 
 sys.path.append('/proj/kuhl_lab/alphafold/run')
 from run_af2 import af2_init
 
-def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], 
-                               num_iter = 50, n_workers=1, mut_percents=None, contacts=None, 
-                               mpnn_temp="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, mpnn_chains=None,
-                               repeat_af2=True, af2_preds=[], crossover_percent=0.2, vary_length=0, 
+def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [],
+                               num_iter = 50, n_workers=1, mut_percents=None, contacts=None,
+                               mpnn_temp="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, 
+                               mpnn_chains=None, bias_AA_dict=None, bias_by_res_dict=None,
+                               repeat_af2=True, af2_preds=[], crossover_percent=0.2, vary_length=0,
                                write_pdbs=False, plot=[], conf_plot=False, write_compressed_data=True):
 
     num_af2=0
@@ -90,7 +90,9 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
                                         af2_preds=af2_preds,
                                         mpnn_temp=mpnn_temp, 
                                         mpnn_version=mpnn_version, 
-                                        mpnn_chains=mpnn_chains)
+                                        mpnn_chains=mpnn_chains,
+                                        bias_AA_dict=bias_AA_dict, 
+                                        bias_by_res_dict=bias_by_res_dict)
 
         #otherwise refilling pool with just mutations and crossovers
         else:
@@ -444,12 +446,25 @@ if __name__ == "__main__":
         mpnn_chains = args.mpnn_chains.strip().split(",")
     else:
         mpnn_chains = None
+        
+    bias_AA_dict = None
+    """if os.path.isfile(args.mpnn_bias_AA):
+        with open(args.mpnn_bias_AA, 'r') as json_file:
+            json_list = list(json_file)
+        for json_str in json_list:
+            bias_AA_dict = json.loads(json_str)"""
+        
+    bias_by_res_dict = None
+    if args.mpnn_bias_by_res:
+        if os.path.isfile(args.mpnn_bias_by_res):
+            with open(args.mpnn_bias_by_res, 'r') as json_file:
+                bias_by_res_dict = json.load(json_file)
+                
+    print(bias_by_res_dict)
                                    
     run_genetic_alg_multistate(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, 
         num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, 
-        mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, mpnn_chains=mpnn_chains,
+        mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, 
+        mpnn_chains=mpnn_chains, bias_AA_dict=bias_AA_dict, bias_by_res_dict=bias_by_res_dict, 
         repeat_af2=not args.no_repeat_af2, af2_preds = af2_preds, crossover_percent=args.crossover_percent, vary_length=args.vary_length, 
         write_pdbs=args.write_pdbs, plot=plot_style, conf_plot=args.plot_confidences, write_compressed_data=not args.dont_write_compressed_data)
-        
-        
-        

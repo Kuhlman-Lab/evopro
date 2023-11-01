@@ -67,6 +67,18 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
                         mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
             except:
                 raise ValueError("Invalid specification. Try using the asterisk after the chain ID.")
+            
+        elif "<G" in resind:
+            residue = resind.split("<")[0]
+            chain = re.split('(\d+)', residue)[0]
+            num_id = int(re.split('(\d+)', residue)[1])
+            chain_seq = chain_seqs[chain]
+            for i in range(num_id-1, len(chain_seq)):
+                if chain_seq[i] == "G":
+                    mutable.append({"chain":chain, "resid": i+1, "WTAA": "G", "MutTo": default})
+                else:
+                    break
+            
         elif "<" in resind:
             try:
                 residue = resind.split("<")[0]
@@ -79,14 +91,14 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
                         mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
             except:
                 raise ValueError("Invalid specification. Try using the less than sign after the residue ID.")
-            
+        
         elif resind in pdbids:
             mutable.append({"chain":pdbids[resind][1], "resid": pdbids[resind][2], "WTAA": three_to_one(pdbids[resind][0].split("_")[1]), "MutTo": default})
 
     symmetric = []
     for symmetry in symmetric_res:
         values = list(symmetry.values())
-        print(values)
+        #print(values)
         for tied_pos in zip(*values):
             skip_tie = False
             sym_res = []
@@ -224,7 +236,7 @@ def _check_symmetry_validity(symmetric_item, pdbids):
 def parse_symmetric_res(symmetric_str, pdbids):
 
     symmetric_str = [s for s in symmetric_str.strip().split(",") if s]
-    print(symmetric_str)
+    #print(symmetric_str)
 
     symmetric_res = []
     for item in symmetric_str:
@@ -249,7 +261,7 @@ if __name__=="__main__":
         pdbids, chain_seqs = parse_pdbfile(args.pdb)
     
     symres = parse_symmetric_res(args.symmetric_res, pdbids)
-    print(symres)
+    #print(symres)
     mutres = parse_mutres_input(args.mut_res, pdbids)
     #generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res)
     generate_json(pdbids, chain_seqs, mutres, args.output, args.default_mutres_setting, symres)

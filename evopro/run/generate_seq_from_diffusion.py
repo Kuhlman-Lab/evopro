@@ -2,6 +2,7 @@ import importlib
 import subprocess
 import sys, os
 import shutil
+from functools import partial
 
 sys.path.append("/proj/kuhl_lab/evopro/")
 from evopro.user_inputs.inputs import FileArgumentParser
@@ -27,7 +28,7 @@ def run_mpnn_on_diff_backbone(pdb_backbone, jsonfile, output_dir, mpnn_temp="0.1
         
     while len(mpnn_seqs)<num_seqs:
         new_seq = run_protein_mpnn(pdb_backbone, jsondata, mpnn_temp, mpnn_version=mpnn_version, bidir=False)
-        print(new_seq)
+        #print(new_seq)
         seq = new_seq[0][-1][-1].strip().split("/")
         newseq_sequence = ",".join(seq)
         newseq_sequence = "," + newseq_sequence
@@ -37,7 +38,7 @@ def run_mpnn_on_diff_backbone(pdb_backbone, jsonfile, output_dir, mpnn_temp="0.1
             
             mpnn_seqs.append(newseq_sequence)
 
-    print(mpnn_seqs)
+    #print(mpnn_seqs)
     with open(os.path.join(output_dir, "sequences.csv"), 'w') as f:
         f.write("\n".join(mpnn_seqs))
         
@@ -96,16 +97,22 @@ def run_af2_on_mpnn_seqs(diff_backbone, mpnn_seqs_list, score_func, af2_flags_fi
     print("Number of AlphaFold2 predictions: ", num_af2)
     
     
-def run_af2_on_mpnn_seqs_iter(dist, diff_backbone, mpnn_seqs_list, score_func, output_dir,  n_workers=1):
+#def run_af2_on_mpnn_seqs_iter(dist, diff_backbone, mpnn_seqs_list, score_func, output_dir,  n_workers=1):
+def run_af2_on_mpnn_seqs_iter(dist, af2_flags_file, diff_backbone, mpnn_seqs_list, score_func, output_dir,  n_workers=1):
+
     # mpnn_seqs_list is a list of multi chain sequences
 
     num_af2=0
         
     print("work list", mpnn_seqs_list)
     num_af2 += len(mpnn_seqs_list)
+    
+    print(dist, num_af2)
+    print(os.getcwd())
 
     results = dist.churn(mpnn_seqs_list)
-    #print(results)
+    print("AF2 results:")
+    print(results)
     
     seqs_and_scores = {}
     data = {}
@@ -136,6 +143,7 @@ def run_af2_on_mpnn_seqs_iter(dist, diff_backbone, mpnn_seqs_list, score_func, o
             opf.write(str(seq[0]) + "\t" + str(seqs_and_scores[seq[0]]) + "\t" + str(data[seq[0]][0]) + "\n")
 
     print("Number of AlphaFold2 predictions: ", num_af2)
+    #dist.spin_down()
     
 def run_af2_on_mpnn_seqs_withmonomers(diff_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir,  n_workers=1):
     # mpnn_seqs_list is a list of multi chain sequences
@@ -143,7 +151,6 @@ def run_af2_on_mpnn_seqs_withmonomers(diff_backbone, mpnn_seqs_list, score_func,
     num_af2=0
 
     lengths = []
-    #print(mpnn_seqs_list[0][0])
     lengths.append([len(x) for x in mpnn_seqs_list[0][0]])
     lengths = lengths + [[len(x)] for x in mpnn_seqs_list[0][0]]
     num_preds = len(lengths)
@@ -265,10 +272,16 @@ def getFlagParser() -> FileArgumentParser:
 
     return parser
 
+def change_dir(path):
+    os.chdir(path)
+
 if __name__ == "__main__":
     
+    #print("length of command line args", len(sys.argv), sys.argv)
     parser = getFlagParser()
+    #print(parser)
     args = parser.parse_args(sys.argv[1:])
+    #print(args)
     
     score_func = None
     if args.custom_score:
@@ -333,13 +346,19 @@ if __name__ == "__main__":
                     lengths.append([elem])
         else:
             raise ValueError("Please provide max_chains_length argument when using --pdb_dir option.")
-
+        
+        #print("Finding lengths")
+        #print(mpnn_seqs_list[0][0])
+        #print(mpnn_seqs_list[0])
+        #lengths = []
+        #lengths.append([len(x) for x in mpnn_seqs_list[0][0]])
+        
         print("Compiling AF2 models for lengths:", lengths)
         print("Initializing distributor")
-        dist = Distributor(args.n_workers, af2_init, af2_flags_file, lengths)
+        dist = Distributor(args.n_workers, af2_init, af2_flags_file, lengths, pre_func=True)
     
         for pdb in pdbs:
-            
+            print("Running MPNN on", pdb)
             name = pdb.split("/")[-1].split(".")[0]
             mpnn_dir = os.path.join(output_dir, name)
             if not os.path.isdir(mpnn_dir):
@@ -363,11 +382,17 @@ if __name__ == "__main__":
             #input_dir_return = os.getcwd()
             
             os.chdir(mpnn_dir)
+            print("generating json")
             subprocess.run(["python", "/proj/kuhl_lab/evopro/evopro/run/generate_json_dev.py", "@json.flags"])
             jsonfile = os.path.join(mpnn_dir, "residue_specs.json")
             mpnn_seqs_list = run_mpnn_on_diff_backbone(mpnn_dir, jsonfile, mpnn_dir, mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, num_seqs=args.num_seqs_mpnn)
 
-            run_af2_on_mpnn_seqs_iter(dist, pdb_backbone, mpnn_seqs_list, score_func, mpnn_dir, n_workers=args.n_workers)
+            mod_mpnn_seqs_list = []
+            for element in mpnn_seqs_list:
+                element.append(partial(change_dir, mpnn_dir))
+            #run_af2_on_mpnn_seqs_iter(dist, pdb_backbone, mpnn_seqs_list, score_func, mpnn_dir, n_workers=args.n_workers)
+            #print("running alphafold!!")
+            run_af2_on_mpnn_seqs_iter(dist, af2_flags_file, pdb_backbone, mpnn_seqs_list, score_func, mpnn_dir, n_workers=args.n_workers)
             
             print("Finished running AlphaFold2 on MPNN sequences in", os.getcwd())
             os.chdir(input_dir)

@@ -95,7 +95,8 @@ EvoPro includes a few functions that are prewritten to be called within your sco
 Important to know: the more negative scores are better, so we negate score terms that we want to maximize and keep positive the score terms that we want to minimize.
  
 See below for an example score function with annotated code: 
- 
+
+```sh
 def score_binder(results, dsobj, contacts=None, distance_cutoffs=None):
 #This is the primary scoring function that is called in the main code. The purpose of this
 #function is to determine whether it is the complex prediction (with both binder and
@@ -220,7 +221,7 @@ def score_binder_monomer(results, dsobj):
     score = -confscore2/10
  
     return score, (score, confscore2), pdb, results
- 
+ ```
 
 <!-- CONTACT -->
 ## Contact

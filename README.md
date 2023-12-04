@@ -27,8 +27,8 @@ Now including multistate design, including our current unpublished work for conf
 
 PLEASE MAKE SURE TO USE "STABLE" BRANCH for code used in paper. Current working version is on "dev branch".
 
-[preprint]
-[paper]
+[paper]: [https://www.pnas.org/doi/10.1073/pnas.2307371120)https://www.pnas.org/doi/10.1073/pnas.2307371120]
+[preprint]: [https://www.biorxiv.org/content/10.1101/2023.05.03.539278v1]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -403,5 +403,3 @@ Since I am a grad student, this code may not be perfect. Please email me with an
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [conda-install-link]: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html
-[paper]: [https://www.pnas.org/doi/10.1073/pnas.2307371120)https://www.pnas.org/doi/10.1073/pnas.2307371120]
-[preprint]: [https://www.biorxiv.org/content/10.1101/2023.05.03.539278v1]

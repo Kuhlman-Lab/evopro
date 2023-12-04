@@ -1,0 +1,8 @@
+--msa_mode custom_a3m
+--custom_msa_path msa.a3m
+--use_templates
+--custom_template_pdb template.pdb
+--custom_template_confidence 0.25
+--n_recycles 1
+--n_models 1
+--design_run

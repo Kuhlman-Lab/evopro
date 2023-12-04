@@ -1,12 +1,5 @@
 import multiprocessing as mp
 import collections
-import random
-import time
-import sys, os
-from typing import Sequence, Union
-
-from functools import partial
-import numpy as np
 
 class Distributor:
     """This class will distribute work to sub-processes where
@@ -18,7 +11,7 @@ class Distributor:
     """
 
    
-    def __init__(self, n_workers, f_init, arg_file, lengths):
+    def __init__(self, n_workers, f_init, arg_file, lengths, pre_func=False):
         """
         Construct a Distributor that manages n_workers sub-processes.
         The distributor will give work to its sub-processes in the
@@ -42,12 +35,12 @@ class Distributor:
                     self.lock,
                     self.qs_out[i],
                     self.q_in,
-		    arg_file,
-		    lengths)
-            )
+                    arg_file,
+                    lengths,
+                    pre_func)
+                )
             for i in range(n_workers)
         ]
-   
         for p in self.processes:
             p.start()
 
@@ -118,13 +111,16 @@ class Distributor:
 
            
     @staticmethod
-    def _worker_loop(f_init, proc_id, lock, q_in, q_out, arg_file, lengths):
+    def _worker_loop(f_init, proc_id, lock, q_in, q_out, arg_file, lengths, pre_func=False):
 
         f = f_init(proc_id, arg_file, lengths)
    
         is_job, val = q_in.get()
         while is_job:
-            #print(val)
+
+            if pre_func:
+                val[-1]()
+                val = val[:-1]
             result = f(val)
        
             lock.acquire()

@@ -1,9 +1,4 @@
-import sys
-sys.path.append("/proj/kuhl_lab/evopro/")
-#sys.path.append("/nas/longleaf/home/amritan/Desktop/evopro/")
 from evopro.utils.pdb_parser import get_coordinates_pdb
-from evopro.utils.write_pdb import PDBio
-from evopro.utils.calc_rmsd import RMSDcalculator
 from evopro.score_funcs.calculate_rmsd import kabsch_rmsd
 import math
 import pickle
@@ -240,17 +235,3 @@ def write_pairwise_scores(pairs, results, filename):
             res1_id = resindices[pair[0]] 
             res2_id = resindices[pair[1]] 
             opf.write(str(pair[0]) + "\t" + str(pair[1]) + "\t" + str(pae[res1_id][res2_id]) + "\t" + str(pae[res2_id][res1_id]) + "\n")
-    
-if __name__ == "__main__":
-    #f1 = "/pine/scr/a/m/amritan/kuhlmanlab/folddesign/folddesign/data/A1_CD20_helix_design.pdb"
-    path = "/nas/longleaf/home/amritan/Desktop/evopro/evopro/user_inputs/"
-    pdb1 = path + "bad_model.pdb"
-    with open(pdb1, "r") as f:
-        pdb_string = f.read()
-
-    chains, residues, resindices = get_coordinates_pdb(pdb1, fil=True)
-    reslist1 = [x for x in residues.keys() if x.startswith("A")]
-    reslist2 = [x for x in residues.keys() if x.startswith("B")]
-    print(score_contacts(pdb_string, reslist1, reslist2))
-    #rmsd = get_rmsd(reslist1, pdb1, reslist2, pdb2, ca_only=True)
-    #print(rmsd)

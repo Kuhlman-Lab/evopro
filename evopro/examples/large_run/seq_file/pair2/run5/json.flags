@@ -1,0 +1,5 @@
+--sequence_file seqfile.txt
+--mut_res D*,E*,F*
+--default_mutres_setting all-C
+--symmetric D*:E*:F*
+--output residue_specs.json

@@ -1,6 +1,5 @@
 import bz2
 import os
-import pickle
 import _pickle as cPickle
 from typing import Any, Dict
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import multiprocessing as mp
 import importlib
 import collections
@@ -21,16 +22,36 @@ sys.path.append(alphafold_env)
 #set path to proteinmpnn directory here:
 sys.path.append(proteinmpnn_env)
 
+=======
+import sys
+#SET PATH TO YOUR EVOPRO INSTALLATION HERE
+#sys.path.append("/proj/kuhl_lab/evopro/")
+sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
+#SET PATH TO YOUR ALPHAFOLD INSTALLATION HERE
+sys.path.append('/proj/kuhl_lab/alphafold/run')
+#SET PATH TO YOUR PROTEINMPNN INSTALLATION HERE
+sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
+>>>>>>> backup-stable
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor
 from evopro.utils.plot_scores import plot_scores_stabilize_monomer_top_old, plot_scores_stabilize_monomer_avg_old, plot_scores_stabilize_monomer_median_old
 from evopro.run.generate_json import parse_mutres_input
+<<<<<<< HEAD
 from evopro.genetic_alg.geneticalg_helpers import read_starting_seqs, create_new_seqs, create_new_seqs_mpnn_old, create_new_seqs_mpnn
+=======
+from evopro.genetic_alg.geneticalg_helpers import read_starting_seqs, create_new_seqs, create_new_seqs_mpnn_old
+>>>>>>> backup-stable
 from evopro.user_inputs.inputs import getEvoProParser
-from evopro.score_funcs.score_funcs import write_raw_plddt, write_pairwise_scores
 
+<<<<<<< HEAD
 from functools import partial
 import numpy as np
+=======
+import importlib
+import math
+import sys, os
+
+>>>>>>> backup-stable
 
 def run_genetic_alg_gpus(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], num_iter = 50, 
     n_workers=2, rmsd_func=None, rmsd_to_starting_func=None, rmsd_to_starting_pdb=None,

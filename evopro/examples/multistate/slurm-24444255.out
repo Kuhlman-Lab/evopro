@@ -1,0 +1,36 @@
+No starting sequences file provided. Random sequences will be generated.
+Writing compressed data: True
+Writing pdb files every iteration: False
+Varying protein length: False
+Repeating AF2: True
+Compiling AF2 models for lengths: [[100, 100], [100], [100]]
+Initializing distributor
+Process Process-1:
+Traceback (most recent call last):
+  File "/proj/kuhl_lab/alphafold/setup/conda_env/af2_mpnn/lib/python3.9/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/proj/kuhl_lab/alphafold/setup/conda_env/af2_mpnn/lib/python3.9/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/evopro/utils/distributor.py", line 124, in _worker_loop
+  File "/proj/kuhl_lab/alphafold/run/run_af2.py", line 452, in af2
+    compressed_pickle(timing_path, timings)
+  File "/proj/kuhl_lab/alphafold/run/utils/utils.py", line 37, in compressed_pickle
+    with bz2.BZ2File(title + '.pbz2', 'w') as f:
+  File "/proj/kuhl_lab/alphafold/setup/conda_env/af2_mpnn/lib/python3.9/bz2.py", line 85, in __init__
+    self._fp = _builtin_open(filename, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs/predictions/timing.pbz2'
+initialization of process 0
+Model model_1_ptm took 133.40488266944885 sec on GPU 0.
+Model model_1_ptm took 13.287993907928467 sec on GPU 0.
+Model model_1_multimer_v3 took 76.63997793197632 sec on GPU 0.
+Model model_1_multimer_v3 took 11.206703424453735 sec on GPU 0.
+Model model_1_ptm took 13.346163749694824 sec on GPU 0.
+Model model_1_ptm took 13.520468711853027 sec on GPU 0.
+Model model_1_multimer_v3 took 11.18649697303772 sec on GPU 0.
+Model model_1_ptm took 13.345838069915771 sec on GPU 0.
+Model model_1_ptm took 13.282578706741333 sec on GPU 0.
+Model model_1_multimer_v3 took 11.201555967330933 sec on GPU 0.
+Model model_1_ptm took 13.310755014419556 sec on GPU 0.
+Model model_1_ptm took 13.274699211120605 sec on GPU 0.
+Model model_1_multimer_v3 took 11.177542924880981 sec on GPU 0.
+Model model_1_ptm took 13.70817494392395 sec on GPU 0.

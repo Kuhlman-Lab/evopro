@@ -83,12 +83,8 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs, binder_chai
         pae_per_contact = (70.0-(70.0*contactscore)/num_contacts)/2
     
     score = -contactscore + penalty + bonus
-<<<<<<< HEAD
-    return score, (score, len(contacts), contactscore, pae_per_contact, bonus, penalty), contacts, pdb, results
-=======
     print(score, (score, len(contact_list), contactscore, pae_per_contact, bonus, penalty))
     return score, (score, len(contact_list), contactscore, pae_per_contact, bonus, penalty), contacts, pdb, results
->>>>>>> backup-stable
 
 def score_binder_monomer(results, dsobj):
     from alphafold.common import protein

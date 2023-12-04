@@ -1,26 +1,15 @@
-<<<<<<< HEAD
-=======
 import sys
 #SET PATH TO YOUR EVOPRO INSTALLATION HERE
 #sys.path.append("/proj/kuhl_lab/evopro/")
 sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
 from evopro.user_inputs.inputs import FileArgumentParser
->>>>>>> backup-stable
 import os
 import sys
 import shutil
 import itertools
 import string
-<<<<<<< HEAD
-sys.path.append("/proj/kuhl_lab/evopro/")
-from evopro.user_inputs.inputs import FileArgumentParser
 
 alphabet = list(string.ascii_uppercase)
-array_job_file = "/proj/kuhl_lab/evopro/evopro/data/submit_array.sh"
-=======
-
-alphabet = list(string.ascii_uppercase)
->>>>>>> backup-stable
 
 def getFlagsParser() -> FileArgumentParser:
     """Gets an FileArgumentParser with necessary arguments to run script for large scale EvoPro runs"""
@@ -28,13 +17,6 @@ def getFlagsParser() -> FileArgumentParser:
     parser = FileArgumentParser(description='get arguments to run script for large scale EvoPro runs',
                                 fromfile_prefix_chars='@')
 
-<<<<<<< HEAD
-    #provide text files with options for each chain eg.--sequence_files chainA.txt chainB.txt etc.
-    parser.add_argument('--sequence_files',
-                        default='chainA.txt chainB.txt',
-                        type=str,
-                        help='Path to and name of sequence files in order of chains, separated by spaces.')
-=======
     parser.add_argument('--sequence_file',
                         default='chains.txt',
                         type=str,
@@ -45,7 +27,6 @@ def getFlagsParser() -> FileArgumentParser:
                         default=None,
                         type=str,
                         help='Path to and name of sequence files in order of chains, separated by spaces. Provide here text files with options for each chain eg.--sequence_files chainA.txt chainB.txt etc')
->>>>>>> backup-stable
     
     #provide af2.flags, evopro.flags, json.flags, run_evopro.sh, templates folder(optional), other pdbs(optional) in this directory
     parser.add_argument('--representative_directory',
@@ -57,8 +38,6 @@ def getFlagsParser() -> FileArgumentParser:
                         default=3,
                         type=int,
                         help='number of independent trajectories to set up per sequence combination')
-<<<<<<< HEAD
-=======
     
     parser.add_argument('--custom_pdb_dir',
                         default=None,
@@ -68,7 +47,6 @@ def getFlagsParser() -> FileArgumentParser:
                         default="scaffold",
                         type=str,
                         help='prefix of unique pdb files to use in each directory, numbered to match number of pairs')
->>>>>>> backup-stable
     return parser
 
 def parse_sequences(filename):
@@ -80,8 +58,6 @@ def parse_sequences(filename):
 
     return sequences
 
-<<<<<<< HEAD
-=======
 def parse_multimer_sequences(filename):
     sequences = []
     with open(filename, "r") as fil:
@@ -91,26 +67,11 @@ def parse_multimer_sequences(filename):
 
     return sequences
 
->>>>>>> backup-stable
 if __name__=="__main__":
     parser = getFlagsParser()
     args = parser.parse_args(sys.argv[1:])
 
     main_dir = os.getcwd()
-<<<<<<< HEAD
-
-    ip_files = args.sequence_files.strip().split(" ")
-    seqs = []
-    for fil in ip_files:
-        seqs.append(parse_sequences(fil))
-    
-    seq_permutations = list(itertools.product(*seqs))
-
-    num_pairs = len(seq_permutations)
-    num_jobs =  num_pairs * args.num_replicates
-
-    for perm, i in zip(seq_permutations, range(len(seq_permutations))):
-=======
     
     if args.sequence_files:
 
@@ -145,7 +106,6 @@ if __name__=="__main__":
         print(custom_pdbs_list)
 
     for perm, i in zip(seqs, range(num_pairs)):
->>>>>>> backup-stable
         #create a directory for each combination of sequences
         dir_name = "pair" + str(i+1)
         if not os.path.exists(dir_name):
@@ -158,11 +118,7 @@ if __name__=="__main__":
         for j in range(args.num_replicates):
             run_name = "run" + str(j+1)
             os.mkdir(os.path.join(dir_name, run_name))
-<<<<<<< HEAD
-
-=======
             
->>>>>>> backup-stable
             #write a seqfile to use to generate the json file
             with open(os.path.join(dir_name, run_name, "seqfile.txt"), "w") as seqf:
                 for elem, chain in zip(perm, alphabet[:len(perm)]):
@@ -176,39 +132,13 @@ if __name__=="__main__":
                 shutil.copy(os.path.join(args.representative_directory, f), os.path.join(dir_name, run_name))
             for d in onlydirs:
                 shutil.copytree(os.path.join(args.representative_directory, d), os.path.join(dir_name, run_name, d))
-<<<<<<< HEAD
-=======
             if custom_pdbs:
                 shutil.copy(custom_pdbs_list[i], os.path.join(dir_name, run_name, args.custom_pdb_prefix + ".pdb"))
->>>>>>> backup-stable
 
             #generate json for each dir
             os.chdir(os.path.join(main_dir, dir_name, run_name))
             os.system("python /proj/kuhl_lab/evopro/evopro/run/generate_json.py @json.flags")
             os.chdir(main_dir)
-<<<<<<< HEAD
-            
-    #generate bash script to create array job of all dirs that is run manually
-    l = []
-    with open(array_job_file, "r") as jobf:
-        for lin in jobf:
-            if "--array" in lin:
-                l.append("#SBATCH --array=1-" + str(num_jobs) +"\n")
-            elif lin.startswith("$N_PAIRS"):
-                l.append("$N_PAIRS=" + str(num_pairs) + "\n")
-            elif lin.startswith("$N_REPS"):
-                l.append("$N_REPS=" + str(args.num_replicates) + "\n")
-            else:
-                l.append(lin)
-    
-    print("writing job file at:", main_dir + "/submit_array.sh")
-    with open(main_dir + "/submit_array.sh", "w") as jobf:
-        for lin in l:
-            jobf.write(lin)
-
-    
-=======
 
     print("Use script at run_largerun.py to run jobs.")
 
->>>>>>> backup-stable

@@ -27,7 +27,8 @@ Now including multistate design, including our current unpublished work for conf
 
 PLEASE MAKE SURE TO USE "STABLE" BRANCH for code used in paper. Current working version is on "dev branch".
 
-[paper]: [https://www.pnas.org/doi/10.1073/pnas.2307371120)https://www.pnas.org/doi/10.1073/pnas.2307371120]
+[paper]: [https://www.pnas.org/doi/10.1073/pnas.2307371120]
+
 [preprint]: [https://www.biorxiv.org/content/10.1101/2023.05.03.539278v1]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -94,143 +95,181 @@ python /path/to/evopro/run/run_evopro_binder.py @evopro.flags
 ## EvoPro flag options
 
 --input_dir
-Default = current directory, type=str
+
+Default = current directory, type=str,
 Path to directory that contains input files.
     
 --num_iter
-default=50, type=int
+
+default=50, type=int,
 Number of iterations of genetic algorithm. Default is 50.
 
 --pool_size
-Default=20, type=int
+
+Default=20, type=int,
 Size of "genetic pool", or the number of sequences evaluated per iteration. Default is 20.
 
 --pool_size_variable
+
 Specify a file pool_sizes.txt with pool sizes for every iteration (or until pool size stops changing). 
 Defaults to False and uses constant pool size.
 
 --num_gpus
-default=1, type=int
+
+default=1, type=int,
 Number of gpus available. Default is 1.
 
 --score_file
-type=str
+
+type=str,
 Path and file name of python script containing the score function used to evaluate fitness of the alphafold predictions. Required.
 
 --score_func
-type=str
+
+type=str,
 Name of the score function in the score file used to evaluate fitness of the alphafold predictions. Required.
     
 --score_func_2
-default=None, type=str
+
+default=None, type=str,
 Name of the second score function in the score file used to evaluate fitness of the alphafold predictions after score_func_2 number of iterations (below) has been reached. Optional.
     
 --score_func_2_iteration
-default=30, type=int
+
+default=30, type=int,
 Number of iterations after which scoring function is switched to score_func_2. Default is 30 if score_func_2 is provided..
 
 --define_contact_area
+
 default=None, type=str,
 User can specify residues on target interface to be targeted for contacts, passed to score function for parsing. Default is None.
     
-'--bonus_contacts
- default=None, type=str
+--bonus_contacts
+
+default=None, type=str,
 User can define residues on target interface to be given a bonus for making contacts, followed by the distance cutoff. Default is None and 4A.    
 
 --penalize_contacts
-default=None, type=str
+
+default=None, type=str,
 User can define residues on target interface to be given a penalty for making contacts, followed by the distance cutoff. Default is None and 8A.
     
 --no_repeat_af2
+
 Use this flag to specify if you DO NOT want AF2 to be run multiple times on the same sequence, and the score averaged. By default (without this flag) all sequences will be rescored every iteration until each sequence has been scored 5 times. Default is False.
 
 --dont_write_compressed_data
+
 Default is False.
 
 --write_pdbs
+
 Default is False.
 
 --mpnn_freq
-default=10, type=int
+
+default=10, type=int,
 Protein MPNN is used to refill the pool once every _ iterations. Default is 10.
 
 --mpnn_iters
-default=None, type=str
+
+default=None, type=str,
 Iteration numbers at which MPNN is used to refill the pool. Defaults to mpnn_freq if not provided.        
 
 --skip_mpnn
+
 default=None, type=str,
 Skip MPNN refilling in these iterations.     
 
 --mpnn_temp
-default='0.1',  type=str
+
+default='0.1',  type=str,
 Protein MPNN is used to refill the pool at this sampling temperature. Default is 0.1.
 
 --mpnn_temp_variable
+
 Specify a file mpnn_temps.txt with temperatures for every call to MPNN (or until temp stops changing). Defaults to False and uses constant MPNN temp.
     
 --mpnn_version
-default="s_48_020", type=str
+
+default="s_48_020", type=str,
 Model version used to run MPNN. Default is s_48_020 (soluble).
     
 --mpnn_bias_AA
-default=None, type=str
+
+default=None, type=str,
 DOES NOT WORK YET. Path to json file containing bias dictionary for MPNN. Default is None.
     
 --mpnn_bias_by_res
-default=None, type=str
+
+default=None, type=str,
 Path to json file containing per residue bias dictionary for MPNN. Default is None.
     
 --mpnn_chains
-default=None, type=str
+
+default=None, type=str,
 Chains concatenated into a single pdb for MPNN. Default is None and it will use the first af2 prediction. Example: AB,B
     
 --plot_confidences
+
 Makes PAE and pLDDT plots for each output PDB. Default is False.    
 
 --plot_scores_avg
+
 Plots average score value of pool over iterations. Default is False.
     
 --plot_scores_median
+
 Plots median score value of pool over iterations. Default is False.
 
 --plot_scores_top
+
 Plots highest score value of pool over iterations. Default is False.
 
 --crossover_percent
-default=0.2, type=float
+
+default=0.2, type=float,
 Fraction of pool refilled by crossover. Default is 0.2 (20% crossover.
 
 --vary_length
-default=0, type=int
+
+default=0, type=int,
 How much the length of mutable regions is allowed to vary. Default is 0.  
 
 --substitution_insertion_deletion_weights'
-default=None, type=str
+
+default=None, type=str,
 Specify probability of substitutions, insertions, and deletions (in that order) during mutation. Default is 0.8,0.1,0.1.
 
 '--mutation_percents
-default=0.125, type=str
+
+default=0.125, type=str,
 Number of mutations made as a percentage of sequence length during random mutation only.
 Default is 0.125 (12.5% of mutable sequence length) for every iteration. If more than one value is provided, number of iterations will be split evenly and assigned.    
 
 --af2_preds
-default="AB", type=str
+
+default="AB", type=str,
 Chain ID permutations to run through individual AF2 runs, separated by commas. Only used for multistate design. Default is just the complex AB.
 
 --af2_preds_extra
-default="AB", type=str
+
+default="AB", type=str,
 DEPRECATED. Chain ID permutations to run through individual AF2 runs, separated by commas, in addition to the complex.
+
 --rmsd_func
-default=None, type=str
+
+default=None, type=str,
 DEPRECATED. Name of the rmsd function in the score file used to evaluate fitness of the alphafold predictions. Optional, requires stabilize_binder=True.
 
 --rmsd_to_starting
-default=None, type=str
+
+default=None, type=str,
 DEPRECATED. Name of the rmsd function in the score file and the path/filename to pdb for RMSD used to evaluate rmsd to the starting scaffold using a U-shaped potential.
 
 --path_to_starting
-default=None, type=str
+
+default=None, type=str,
 DEPRECATED. path/filename to pdb to pass to the scoring function for RMSD to starting.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

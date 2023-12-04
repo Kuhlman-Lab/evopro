@@ -27,7 +27,7 @@ Now including multistate design, including our current unpublished work for conf
 
 PLEASE MAKE SURE TO USE "STABLE" BRANCH for code used in paper. Current working version is on "dev branch".
 
-[paper]
+[paper]  
 [preprint]
 
 
@@ -74,7 +74,7 @@ Installation of Anaconda is required to load dependencies.
 ## Usage
 
 Usage of EvoPro requires GPUs.
-The running directory should contain a sequence file with input sequences, and flags files for EvoPro specifications and AF2 specifications. See below for flag options and evopro/examples/ for examples of directory setups.
+The running directory should contain a sequence file with input sequences, and flags files for EvoPro specifications and AF2 specifications. See below for flag options and evopro/examples/ for examples of directory setups. pd1_binder and pd1_binder_nochainB are old examples using deprecated script - see examples/binder for updated version.
 
 The residue_specs.json file should be generated from the sequence file.
 Specify sequence file and which residues to mutate in json.flags. (Include symmetry here if needed)

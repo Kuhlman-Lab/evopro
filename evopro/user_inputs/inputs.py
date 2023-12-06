@@ -119,15 +119,10 @@ def getEvoProParser() -> FileArgumentParser:
                         'distance cutoff. Default is None and 4A.')
     
     parser.add_argument('--no_repeat_af2',
-<<<<<<< HEAD
-                         action='store_false',
-                         help='Use this flag to specify if you do not want AF2 to be run multiple times on the same sequence. Default is False.')
-=======
                          action='store_true',
                          help='Use this flag to specify if you want AF2 to be multiple times on the same sequence, and the score averaged.'
                          'This means that all sequences will be rescored every iteration (like FoldDesign protocol) until each sequence has'
                          'been scored 5 times. Default is False.')
->>>>>>> backup-stable
 
     parser.add_argument('--dont_write_compressed_data',
                          action='store_true',
@@ -207,8 +202,6 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Fraction of pool refilled by crossover.'
                         'Default is 0.2.')
 
-<<<<<<< HEAD
-=======
     parser.add_argument('--vary_length',
                         default='0',
                         type=int,
@@ -218,15 +211,12 @@ def getEvoProParser() -> FileArgumentParser:
                         type=str,
                         help='Specify probability of substitutions, insertions, and deletions (in that order) during mutation. Default is 0.8,0.1,0.1')
 
->>>>>>> backup-stable
     parser.add_argument('--mutation_percents',
                         default='0.125',
                         type=str,
                         help='Number of mutations made as a percentage of sequence length.'
                         'Default is 0.125 for every iteration. If more than one value is provided, number of iterations will be split evenly and assigned.')
     
-<<<<<<< HEAD
-=======
     parser.add_argument('--force_single_mutation_only',
                         action='store_true',
                         help='Default is False.')
@@ -236,7 +226,6 @@ def getEvoProParser() -> FileArgumentParser:
                         type=str,
                         help='Chain ID permutations to run through individual AF2 runs, separated by commas. Only used for multistate design. Default is None.')
     
->>>>>>> backup-stable
     parser.add_argument('--af2_preds_extra',
                         default=None,
                         type=str,

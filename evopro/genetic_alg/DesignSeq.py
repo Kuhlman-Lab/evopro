@@ -288,10 +288,7 @@ class DesignSeq:
                         if res1["resid"][2] != res2["resid"][2]:
                             #print("Before symmetric update", res1["resid"], res2["resid"])
                             res2["resid"][2] = res1["resid"][2]
-<<<<<<< HEAD
-=======
                             #print("After symmetric update", res1["resid"], res2["resid"])
->>>>>>> backup-stable
 
     def _check_symmetry(self):
         """checks symmetry"""
@@ -702,14 +699,6 @@ if __name__ == "__main__":
     newdsobj = dsobj.mutate(var=2, var_weights = [0, 0, 0.1])
     
     print(dsobj.mutable)
-<<<<<<< HEAD
-    dupdsobj = copy.deepcopy(dsobj)
-    seq = "DLLRRMLGMVIRMLGVFTKLLGKILMIPAGIYAPICVTVRYFETVGEALERAGILLRGRDRAGKPRLTPAAREILKEALKAAEEAVDVLTLDITNITTSHQRKMESLNFIRAHTPYINIYNCEPANPSEKNSPLMQYCKALQNLRLAVLNVGLEIAKLAVKLISADLLRRMLGMVIRMLGVFTKLLGKILMIPAGIYAPICVTVRYFETVGEALERAGILLRGRDRAGKPRLTPAAREILKEALKAAEEAVDVLTLDITNITTSHQRKMESLNFIRAHTPYINIYNCEPANPSEKNSPLMQYCKALQNLRLAVLNVGLEIAKLAVKLISA"
-    newdsobj = DesignSeq(seq=seq, sequence=dsobj.sequence, mutable=dsobj.mutable, symmetric=dsobj.symmetric)
-    print(newdsobj.mutable)
-    print(dsobj == newdsobj)
-    print(dsobj == dupdsobj)
-=======
     print(dsobj.sequence)
     print(dsobj.jsondata)
     
@@ -720,4 +709,3 @@ if __name__ == "__main__":
     reslist1 = newdsobj._get_designable_positions()
     
     print(reslist1)
->>>>>>> backup-stable

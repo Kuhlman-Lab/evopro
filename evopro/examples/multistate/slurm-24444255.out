@@ -34,3 +34,4 @@ Model model_1_ptm took 13.310755014419556 sec on GPU 0.
 Model model_1_ptm took 13.274699211120605 sec on GPU 0.
 Model model_1_multimer_v3 took 11.177542924880981 sec on GPU 0.
 Model model_1_ptm took 13.70817494392395 sec on GPU 0.
+slurmstepd: error: *** JOB 24444255 ON dgx02 CANCELLED AT 2023-12-05T10:07:51 DUE TO TIME LIMIT ***

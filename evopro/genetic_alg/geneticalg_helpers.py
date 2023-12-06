@@ -10,11 +10,6 @@ from typing import Sequence, Union
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.pdb_parser import get_coordinates_pdb, change_chainid_pdb, append_pdbs
 
-<<<<<<< HEAD
-#sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
-#sys.path.append('/proj/kuhl_lab/alphafold/run')
-=======
->>>>>>> backup-stable
 from functools import partial
 
 from run_protein_mpnn import run_protein_mpnn_func
@@ -197,15 +192,9 @@ def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0,
 
     return pool
 
-<<<<<<< HEAD
-def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp, mpnn_version="s_48_020"):
-    from run_protein_mpnn import run_protein_mpnn_func
-    results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp, model_name=mpnn_version)
-=======
 def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp, mpnn_version="s_48_020", bidir=False, bias_AA_dict=None, bias_by_res_dict=None):
     print("===================================MPNN===================================")
     results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp, model_name=mpnn_version, bidir=bidir, bias_AA_dict=bias_AA_dict, bias_by_res_dict=bias_by_res_dict)
->>>>>>> backup-stable
 
     return results
 
@@ -323,7 +312,3 @@ def write_outputs(seqs, scores, opfilename):
             opf.write(str(seq) + "\t" + str(score) + "\n")
 
     print("done writing ", opfilename)
-<<<<<<< HEAD
-
-=======
->>>>>>> backup-stable

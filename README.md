@@ -92,6 +92,53 @@ python /path/to/evopro/run/run_evopro_binder.py @evopro.flags
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Generating the JSON file
+
+Specify your flag options in json.flags, and provide either a PDB or sequence file to extract starting sequences from. All flag options are listed below:  
+--pdb  
+default=None, type=str,  
+Path to and name of PDB file to extract chains and sequences. Alternatively use sequence file (below).
+
+--sequence_file  
+default=None, type=str,  
+Path to and name of text file to extract chains and sequences. Only provide if there is no PDB file.
+
+--mut_res  
+default=''”, type=str,  
+PDB chain and residue numbers to mutate, separated by commas. (Make sure there are no extraneous spaces between commas)  
+Here, you can use "\*" to specify the whole chain (eg. A\*), or "<" to specify all residues in a chain after a specific residue (eg B17<).
+
+--default_mutres_setting  
+default='all', type=str,  
+Default setting for residues to mutate. Individual residues can be changed manually after generation of the file. Default is all. Other examples are “all-PC” (allow any mutation except proline and cysteine), “AVILMFYW” (specify which amino acids are allowed).  
+
+--output  
+default='', type=str,  
+path and name of output json file
+
+--symmetric_res  
+default='', type=str,  
+PDB chain and residue numbers to force symmetry separated by a colon
+
+## Specifying the AlphaFold2 options
+
+Specify your AF2 options in af2.flags.  
+Notably, we suggest turning off MSA generation or providing pre-computed MSA and templates so that the AF2 runner will not have to query MMseqs server for every prediction (this will make runtime much longer and may cause errors).  
+
+To turn off MSA generation:  
+--msa_mode single_sequence  
+
+To use precomputed MSA:  
+--msa_mode single_sequence  
+--custom_msa_path /path/to/directory/with/a3m/files/
+
+To use custom templates:  
+--use_templates  
+--custom_template_path templates  
+
+Since we have modified the original AF2 code to allow for custom template databases, you will have to make sure each .pdb file within the templates folder has a name consisting of 4 letters and numbers, essentially mimicking a file from the PDB database with a PDB code (although the file name does not actually have to be a real PDB code). Some examples could be “temp.pdb”, “1uzg.pdb”, “PPPP.pdb”, etc.
+
+
 ## EvoPro flag options
 
 --input_dir  
@@ -237,7 +284,9 @@ DEPRECATED. path/filename to pdb to pass to the scoring function for RMSD to sta
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+
 ## HOW TO WRITE AN EVOPRO SCORING FUNCTION
+
 The score functions are a way to generate a “score” from the AlphaFold2 result for each sequence of the optimization pool – and this score is used for ranking and filtering the sequences (so it is only the relative value of the score that matters). Each score function therefore takes in the list of results dictionaries (one for each AF2 prediction made for the sequence) and parses the different components such as the predicted structures in PDB form, pLDDT, PAE, etc. The score function should then return a final overall score for the sequence that can contain different weighted score components.  
  
 EvoPro includes a few functions that are prewritten to be called within your score function, that calculate different score metrics which may then be used as weighted components in the final overall score that is returned from your score function. For example, a function to calculate the average pLDDT over a predicted PDB (score_plddt_confidence) or to calculate the contacts at an interface, where each contact is weighted by the PAE of the interaction (score_contacts_pae_weighted). You can import these from evopro.score_funcs.score_funcs, as is done at the top of score_binder.py, or use your own functions instead.

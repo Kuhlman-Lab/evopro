@@ -1,0 +1,11 @@
+--num_iter 5
+--pool_size 4
+--num_gpus 1
+--score_file /nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/evopro/score_funcs/score_multistate.py
+--score_func score_overall
+--af2_preds AB,B,A
+--mpnn_freq 1
+--mpnn_chains AB,B,A
+--mpnn_bias_by_res bias.json
+--plot_confidences
+--define_contact_area A1-A100

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/evopro/run/run_evopro_multistate.py", line 10, in <module>
+    from evopro.genetic_alg.DesignSeq import DesignSeq
+  File "/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/evopro/genetic_alg/DesignSeq.py", line 291
+    <<<<<<< HEAD
+    ^
+SyntaxError: invalid syntax

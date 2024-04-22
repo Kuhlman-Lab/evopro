@@ -17,17 +17,19 @@ sys.path.append(alphafold_env)
 #set path to proteinmpnn directory here:
 sys.path.append(proteinmpnn_env)
 
+
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor
 from evopro.utils.plot_scores import plot_scores_general_dev
 from evopro.run.generate_json import parse_mutres_input
-from evopro.genetic_alg.geneticalg_helpers import read_starting_seqs, create_new_seqs, create_new_seqs_mpnn
-from evopro.user_inputs.inputs import getEvoProParser
-from evopro.utils.plots import get_chain_lengths, plot_pae, plot_plddt
-from evopro.utils.utils import compressed_pickle
 
-sys.path.append('/proj/kuhl_lab/alphafold/run')
-from run_af2 import af2_init
+from evopro.genetic_alg.geneticalg_helpers import read_starting_seqs, create_new_seqs, create_new_seqs_mpnn_old
+from evopro.user_inputs.inputs import getEvoProParser
+
+import importlib
+import math
+import sys, os
+
 
 def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [],
                                num_iter = 50, n_workers=1, mut_percents=None, single_mut_only=False, contacts=None, distance_cutoffs=None,

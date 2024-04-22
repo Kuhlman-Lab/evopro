@@ -302,9 +302,6 @@ class DesignSeq:
                             res2["resid"][2] = res1["resid"][2]
                             #print("After symmetric update", res1["resid"], res2["resid"])
 
-    def _check_length_constraints(self):
-        print("not working")
-
     def _check_symmetry(self):
         """checks symmetry"""
         for mut_id in self.mutable:
@@ -418,7 +415,9 @@ class DesignSeq:
         designable = []
         for p in self.jsondata['designable']:
             designable.append(p['chain'] + str(p['resid']))
+
             #print(p)
+
         return designable
 
     def _get_aa_identity(self, index):
@@ -459,6 +458,7 @@ class DesignSeq:
         newseqobj._update_sequence()
         newseqobj._create_jsondata()
         newseqobj._check_symmetry()
+
         return newseqobj
 
 
@@ -631,6 +631,7 @@ class DesignSeqMSD(DesignSeq):
         #newseqobj._check_symmetry()
         return newseqobj
 
+
     def mutate(self, mut_percent = 0.125, num_mut_choice = [-1, 0, 1], var=0, var_weights = [0.8, 0.1, 0.1]):
         all_aas = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 
@@ -707,16 +708,16 @@ class DesignSeqMSD(DesignSeq):
 
         newseqobj = DesignSeqMSD(sequence=self.sequence, mutable=new_mut, symmetric=self.symmetric, jdata=self.jsondata)
         newseqobj._update_symmetric_positions(mutated)
-        #newseqobj._check_symmetry()
+
         newseqobj._update_sequence()
         newseqobj._create_jsondata()
         return newseqobj
 
 
 if __name__ == "__main__":
+
     dsobj = DesignSeq(jsonfile="/work/users/a/m/amritan/evopro_tests/vary_length/run2/residue_specs.json")
-    
-    #dupdsobj = copy.deepcopy(dsobj)
+
     newdsobj = dsobj.mutate(var=2, var_weights = [0, 0, 0.1])
     
     print(dsobj.mutable)
@@ -730,4 +731,4 @@ if __name__ == "__main__":
     reslist1 = newdsobj._get_designable_positions()
     
     print(reslist1)
-    #print(get_rmsd(dsobj.jsondata, newdsobj.jsondata))
+

@@ -1,7 +1,7 @@
-import sys
-#sys.path.append("/nas/longleaf/home/amritan/Desktop/evopro/")
+
 from evopro.utils.pdb_parser import get_coordinates_pdb
-from evopro.score_funcs.calculate_rmsd import kabsch_rmsd, kabsch_rmsd_superimposeall
+from evopro.score_funcs.calculate_rmsd import kabsch_rmsd
+
 import math
 import pickle
 import numpy as np
@@ -410,6 +410,7 @@ def write_pairwise_scores(pairs, results, filename):
             res1_id = resindices[pair[0]] 
             res2_id = resindices[pair[1]] 
             opf.write(str(pair[0]) + "\t" + str(pair[1]) + "\t" + str(pae[res1_id][res2_id]) + "\t" + str(pae[res2_id][res1_id]) + "\n")
+
     
 def score_rmsd_to_starting(pdb, path_to_starting, dsobj=None):
 
@@ -518,3 +519,4 @@ if __name__ == "__main__":
         reslist2_2 = [x for x in residues2.keys() if x.startswith("B")]
         #print(reslist1, reslist2, reslist1_2, reslist2_2)
         print(i, get_rmsd_superimposeall(reslist1, reslist1_2, pdb1_string, reslist2, reslist2_2, pdb2_string, ca_only=True, translate=True))"""
+

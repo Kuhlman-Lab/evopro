@@ -1,3 +1,4 @@
+
 import json
 import re
 import sys, os
@@ -5,10 +6,13 @@ import sys, os
 evopro_env = os.environ.get("EVOPRO")
 assert evopro_env is not None, "No EVOPRO environment variable is not set. Please set to the main evopro directory'"
 sys.path.append(evopro_env)
+
 from evopro.user_inputs.inputs import FileArgumentParser
 from evopro.utils.aa_utils import three_to_one, one_to_three
 from evopro.utils.pdb_parser import get_coordinates_pdb_old
 import math
+import json
+import re
 
 def find_all(a_str, sub):
     start = 0
@@ -68,6 +72,7 @@ def parse_pdbfile(filename):
 def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
 
     mutable = []
+
     if "~" in "".join(mut_res):
         try:
             fixed_res = []
@@ -127,6 +132,7 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
                 
             elif resind in pdbids:
                 mutable.append({"chain":pdbids[resind][1], "resid": pdbids[resind][2], "WTAA": three_to_one(pdbids[resind][0].split("_")[1]), "MutTo": default})
+
 
     symmetric = []
     for symmetry in symmetric_res:
@@ -297,4 +303,6 @@ if __name__=="__main__":
     #print(symres)
     mutres = parse_mutres_input(args.mut_res)
     #generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res)
+
     generate_json(pdbids, chain_seqs, mutres, args.output, args.default_mutres_setting, symres)
+

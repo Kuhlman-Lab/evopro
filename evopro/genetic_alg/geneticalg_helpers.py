@@ -6,6 +6,7 @@ import sys, os
 import json
 from typing import Sequence, Union
 #import custom packages
+
 evopro_env = os.environ.get("EVOPRO")
 assert evopro_env is not None, "No EVOPRO environment variable is not set. Please set to the main evopro directory'"
 alphafold_env = os.environ.get('ALPHAFOLD_RUN')
@@ -19,6 +20,7 @@ sys.path.append(alphafold_env)
 sys.path.append(proteinmpnn_env)
 
 from evopro.genetic_alg.DesignSeq import DesignSeq, DesignSeqMSD
+
 from evopro.utils.pdb_parser import get_coordinates_pdb, change_chainid_pdb, append_pdbs
 
 from functools import partial
@@ -41,7 +43,6 @@ def af2_init(proc_id: int, arg_file: str, lengths: Sequence[Union[str, Sequence[
     from features import (getRawInputs, getChainFeatures, getInputFeatures)
     from run.setup import (getAF2Parser, QueryManager, getOutputDir)
     from model import (getModelNames, getModelRunner, predictStructure, getRandomSeeds)
-    from utils.query_utils import generate_random_sequences
 
     parser = getAF2Parser()
     args = parser.parse_args([f'@{arg_file}'])
@@ -165,7 +166,9 @@ def read_starting_seqs(seqfile, dsobj):
 
     return newseqs
 
+
 def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0, sid_weights=[0.8, 0.1, 0.1], mut_percent=0.125, all_seqs = [], single_mut_only=False):
+
     """takes starting sequences and creates a pool of size num_seqs by mutation and crossover"""
 
     if not all_seqs:
@@ -178,7 +181,9 @@ def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0,
     #filling pool by mutation
     while len(pool)<num_seqs*(1-crossover_percent):
         obj = random.choice(startseqs)
+
         newseq = obj.mutate(var=vary_length, var_weights = sid_weights, mut_percent=mut_percent, single_mut_only=single_mut_only)
+
         len_new = len("".join([newseq.jsondata["sequence"][chain] for chain in newseq.jsondata["sequence"]]))
         newseq_sequence = ",".join([newseq.jsondata["sequence"][chain] for chain in newseq.jsondata["sequence"]])
         if len_new<=max_allowed_length and len_new >= min_allowed_length:
@@ -204,6 +209,7 @@ def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0,
             pool.append(newseq)
 
     return pool
+
 
 def create_new_seqs_henry(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0, sid_weights=[0.8, 0.1, 0.1], mut_percent=0.125, all_seqs = []):
     """takes starting sequences and creates a pool of size num_seqs by mutation and crossover"""
@@ -260,7 +266,7 @@ def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, al
                          ):
     
     pool = startseqs.copy()
-    
+
     pdb_dirs = []
     #create a directory within running dir to run protein mpnn
     output_folder = run_dir + "MPNN_" + str(iter_num) + "/"
@@ -268,19 +274,23 @@ def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, al
         os.makedirs(output_folder)
     for dsobj, j in zip(startseqs, range(len(startseqs))):
         key_seq = dsobj.get_sequence_string()
+
         
         if mpnn_chains:
             pdb = None
             print(af2_preds, mpnn_chains)
             for i, pred in zip(range(len(af2_preds)), af2_preds):
                 print(pred)
+
                 if pred in mpnn_chains:
                     if not pdb:
                         pdb = scored_seqs[key_seq]["data"][0]["pdb"][i]
                     else:
+
                         chains, _, _ = get_coordinates_pdb(pdb)
                         new_pdb = scored_seqs[key_seq]["data"][0]["pdb"][i]
                         chains_new, _, _ = get_coordinates_pdb(new_pdb)
+
                         chains_mod = []
                         chain_ind = 0
                         while len(chains_mod)<len(chains_new):
@@ -383,7 +393,9 @@ def create_new_seqs_mpnn_henry(startseqs, scored_seqs, num_seqs, run_dir, iter_n
         results = mutate_by_protein_mpnn(pdb_dirs[k], startseqs[k], mpnn_temp, mpnn_version=mpnn_version, bidir=bidir)
         dsobj = startseqs[k]
         for result in results:
+
             inf +=1
+
             print(pool, num_seqs)
             seq = result[-1][-1].strip().split("/")
             newseq_sequence = "".join(seq)
@@ -402,3 +414,11 @@ def create_new_seqs_mpnn_henry(startseqs, scored_seqs, num_seqs, run_dir, iter_n
             k=0
 
     return pool
+
+def write_outputs(seqs, scores, opfilename):
+    with open(opfilename, "w") as opf:
+        for seq, score in zip(seqs, scores):
+            opf.write(str(seq) + "\t" + str(score) + "\n")
+
+    print("done writing ", opfilename)
+

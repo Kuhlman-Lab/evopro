@@ -1,10 +1,12 @@
-import os
+import os, sys
 from argparse import ArgumentParser
 import numpy as np
 from string import ascii_uppercase, ascii_lowercase
 import matplotlib.pyplot as plt
 
-from utils import utils
+sys.path.append("/proj/kuhl_lab/evopro/")
+from evopro.utils.pdb_parser import get_coordinates_pdb
+#from utils import utils
 
 
 alphabet_list = list(ascii_uppercase+ascii_lowercase)
@@ -102,4 +104,22 @@ def get_chain_lengths(results_dict):
             if remainder >= 0:
                 Ls.append(remainder)
 
+    return Ls
+
+def get_chain_lengths_rf2(results_dict):
+    pdb = results_dict['pdb']
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    #chain_index = protein.chain_index
+    #residue_index = protein.residue_index
+
+    Ls = []
+
+    for chain in chains:
+        num_res = 0
+        for residue in residues:
+            if residue.startswith(chain):
+                num_res+=1
+        Ls.append(num_res)
+
+    print(Ls)
     return Ls

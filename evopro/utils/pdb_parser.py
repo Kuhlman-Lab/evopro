@@ -71,6 +71,7 @@ def get_ca_coordinates_pdb(pdb_str):
 
     return coords
 
+
 def get_seq_from_pdb(pdb_str):
     seqs = []
     chains = []
@@ -250,6 +251,7 @@ def get_coordinates_pdb_old(pdb, fil = False):
 
     return chains, residues, residueindices
 
+
 if __name__ == "__main__":
     pdb1_name = "/work/users/a/m/amritan/evopro_tests/rmsd/temp1.pdb"
     #pdb2_name = "/proj/kuhl_lab/evopro/evopro/tests/pdb_parsing/test2.pdb"
@@ -261,3 +263,4 @@ if __name__ == "__main__":
     print(get_seq_from_pdb(pdb1))
     #chains, residues, resindices = get_coordinates_pdb(pdb1)
     #print(chains)
+

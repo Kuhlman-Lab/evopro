@@ -2,13 +2,20 @@ from evopro.utils.pdb_parser import get_coordinates_pdb
 from evopro.score_funcs.score_funcs import score_contacts_pae_weighted, score_plddt_confidence, get_rmsd, Rg
 import math
 
+from evopro.score_funcs.score_funcs import score_contacts_pae_weighted, score_plddt_confidence, get_rmsd
+from evopro.score_funcs.score_funcs_efficient import score_contacts_pae_weighted_efficient
+import math
 
-def score_overall_3(results, dsobj, contacts=None, distance_cutoffs=None, rmsd_pdb=None):
+def score_overall(results, dsobj, contacts=None, distance_cutoffs=None,):
     from alphafold.common import protein
+    #The results here are a list of results dictionaries
+    #one for each AF2 prediction generated for the same design sequence
+    #so this number should match the number of items in af2_preds
     print("Number of predictions being scored:", len(results))
 
     score=[]
     pdbs = []
+
     for result in results:
         #print(len(result))
         #print(result)
@@ -40,6 +47,7 @@ def score_overall_2(results, dsobj, contacts=None):
     score=[]
     pdbs = []
     for result in results:
+
         #print(len(result))
         #print(result)
         pdb = protein.to_pdb(result['unrelaxed_protein'])
@@ -55,6 +63,7 @@ def score_overall_2(results, dsobj, contacts=None):
     score.append(score_potential_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None))
     overall_score = sum([x[0] for x in score])
     return overall_score, score, pdbs, results
+
 
 def score_binder_complex(results, dsobj, contacts):
     from alphafold.common import protein
@@ -113,12 +122,15 @@ def score_binder_complex_2(results, dsobj, contacts):
     print(score, (score, len(contacts), contactscoreBC))
     return score, (score, len(contacts), contactscoreBC)
 
+
 def score_complex_confidence(results, dsobj):
     from alphafold.common import protein
     spring_constant = 10.0
     plddt_cutoff = 80.0
     pdb = protein.to_pdb(results['unrelaxed_protein'])
-    chains, residues, resindices = get_coordinates_pdb(pdb)
+
+    _, residues, resindices = get_coordinates_pdb(pdb)
+
     reslist = [x for x in residues.keys()]
     confscore2 = score_plddt_confidence(results, reslist, resindices, dsobj=dsobj, first_only=False)
     plddt_potential = 0
@@ -135,7 +147,9 @@ def score_binder_monomer(results, dsobj):
     spring_constant = 10.0
     plddt_cutoff = 80.0
     pdb = protein.to_pdb(results['unrelaxed_protein'])
-    chains, residues, resindices = get_coordinates_pdb(pdb)
+
+    _, residues, resindices = get_coordinates_pdb(pdb)
+
     reslist2 = [x for x in residues.keys()]
     confscore2 = score_plddt_confidence(results, reslist2, resindices, dsobj=dsobj, first_only=False)
     plddt_potential = 0
@@ -158,6 +172,7 @@ def score_binder_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None):
         print("Trying to calculate RMSD between proteins of different length. Setting RMSD to 0.")
         rmsd_binder = 0
 
+
     return [-rmsd_binder*25]
 
 def score_binder_rmsd_BC(pdb2, pdb4, binder_chain="B", dsobj=None):
@@ -172,6 +187,7 @@ def score_binder_rmsd_BC(pdb2, pdb4, binder_chain="B", dsobj=None):
         rmsd_binder = 0
 
     return [rmsd_binder*25]
+
 
 def score_potential_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None):
     chains1, residues1, resindices1 = get_coordinates_pdb(pdb1)
@@ -218,6 +234,7 @@ def threshold_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None):
     #add this as penalty on top of usual rmsd
     return [rmsd_potential*5]
 
+
 def gyration_score(pdb2, dsobj=None):
     gyration = Rg(pdb2, chnid="A")
     gyration_limit = 15
@@ -229,3 +246,4 @@ def gyration_score(pdb2, dsobj=None):
 
 if __name__=="__main__":
     print("no main functionality")
+

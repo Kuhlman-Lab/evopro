@@ -1,19 +1,30 @@
 from evopro.utils.pdb_parser import get_coordinates_pdb
-from evopro.score_funcs.score_funcs import score_contacts, score_contacts_pae_weighted, score_pae_confidence_pairs, score_pae_confidence_lists, score_plddt_confidence, get_rmsd, orientation_score
-import os
-import subprocess
-import shutil
+from evopro.score_funcs.score_funcs import score_contacts_pae_weighted, score_plddt_confidence, get_rmsd
 import math
 
-def score_binder(results, dsobj, contacts=None, distance_cutoffs=None):
+def score_overall(results, dsobj, contacts=None, distance_cutoffs=None, starting_pdb=None):
     from alphafold.common import protein
-    #print(results)
-    pdb = protein.to_pdb(results['unrelaxed_protein'])
-    chains, residues, resindices = get_coordinates_pdb(pdb)
-    if len(chains)>1:
-        return score_binder_complex(results, dsobj, contacts, distance_cutoffs)
-    else:
-        return score_binder_monomer(results, dsobj)
+    print("Number of predictions being scored:", len(results))
+
+    score=[]
+    pdbs = []
+    for result in results:
+
+        pdb = protein.to_pdb(result['unrelaxed_protein'])
+        pdbs.append(pdb)
+        chains, _, _ = get_coordinates_pdb(pdb)
+        if len(chains)>1:
+            score.append(score_binder_complex(result, dsobj, contacts, distance_cutoffs))
+        else:
+            score.append(score_binder_monomer(result, dsobj))
+            if starting_pdb:
+                score.append(score_binder_rmsd_to_starting(pdb, starting_pdb, dsobj=dsobj))
+    
+    #print(score)
+    score.append(score_binder_rmsd(pdbs[0], pdbs[1], dsobj=dsobj))
+    print([x[0] for x in score])
+    overall_score = sum([x[0] for x in score])
+    return overall_score, score, pdbs, results
 
 def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
     from alphafold.common import protein
@@ -25,7 +36,8 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
     if not distance_cutoffs:
         distance_cutoffs=(4,4,8)
     reslist1 = contacts[0]
-    reslist2 = [x for x in residues.keys() if x.startswith("B")]
+    reslist2 = [x for x in residues.keys() if x.startswith("A")]
+    print(reslist1, reslist2)
     contact_list, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[0])
     
     bonuses = 0
@@ -33,10 +45,10 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
     if bonus_resids:
         bonus_contacts, bonus_contactscore = score_contacts_pae_weighted(results, pdb, bonus_resids, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[1])
         for contact in bonus_contacts:
-            if contact[0][0:1] == 'A' and int(contact[0][1:]) in bonus_resids:
+            if contact[0][0:1] == 'B' and int(contact[0][1:]) in bonus_resids:
                 bonuses += 1
                 print("bonus found at: " + str(contact[0]))
-            if contact[1][0:1] == 'A' and int(contact[1][1:]) in bonus_resids:
+            if contact[1][0:1] == 'B' and int(contact[1][1:]) in bonus_resids:
                 bonuses += 1
                 print("bonus found at: " + str(contact[1]))
         
@@ -47,22 +59,23 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs):
     if penalty_resids:
         penalty_contacts, penalty_contactscore = score_contacts_pae_weighted(results, pdb, penalty_resids, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[2])
         for contact in penalty_contacts:
-            if contact[0][0:1] == 'A' and int(contact[0][1:]) in penalty_resids:
+            if contact[0][0:1] == 'B' and int(contact[0][1:]) in penalty_resids:
                 penalties += 1
                 print("penalty found at: " + str(contact[0]))
-            if contact[1][0:1] == 'A' and int(contact[1][1:]) in penalty_resids:
+            if contact[1][0:1] == 'B' and int(contact[1][1:]) in penalty_resids:
                 penalties += 1
                 print("penalty found at: " + str(contact[1]))
         
     penalty = penalties * 3
     
-    num_contacts = len(contacts)
+    num_contacts = len(contact_list)
     pae_per_contact = 0
     if num_contacts > 0:
         pae_per_contact = (70.0-(70.0*contactscore)/num_contacts)/2
     
     score = -contactscore + penalty + bonus
-    return score, (score, len(contacts), contactscore, pae_per_contact, bonus, penalty), contacts, pdb, results
+    print(score, (score, len(contact_list), contactscore, pae_per_contact, bonus, penalty))
+    return score, (score, len(contact_list), contactscore, pae_per_contact, bonus, penalty), contacts, pdb, results
 
 def score_binder_monomer(results, dsobj):
     from alphafold.common import protein
@@ -71,16 +84,17 @@ def score_binder_monomer(results, dsobj):
     reslist2 = [x for x in residues.keys()]
     confscore2 = score_plddt_confidence(results, reslist2, resindices, dsobj=dsobj, first_only=False)
     score = -confscore2/10
+    print(score)
     return score, (score, confscore2), pdb, results
 
-def score_binder_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None):
+def score_binder_rmsd(pdb1, pdb2, binder_chain="A", dsobj=None):
     chains1, residues1, resindices1 = get_coordinates_pdb(pdb1)
     chains2, residues2, resindices2 = get_coordinates_pdb(pdb2)
     reslist1 = [x for x in residues1.keys() if x.startswith(binder_chain)]
     reslist2 = [x for x in residues2.keys()]
     rmsd_binder = get_rmsd(reslist1, pdb1, reslist2, pdb2, dsobj=dsobj)
 
-    return rmsd_binder*5
+    return (rmsd_binder*5, rmsd_binder)
 
 def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None):
     # to keep the de novo binder close in structure to the original binder
@@ -91,7 +105,7 @@ def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None):
     with open(path_to_starting, 'r') as f:
         pdb_string_starting = f.read()
     chains0, residues0, resindices0 = get_coordinates_pdb(pdb_string_starting)
-    reslist1 = [x for x in residues0.keys()]
+    reslist1 = [x for x in residues0.keys() if x.startswith("A")]
 
     chains, residues, resindices = get_coordinates_pdb(pdb)
     reslist2 = [x for x in residues.keys()]
@@ -103,30 +117,7 @@ def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None):
     if rmsd_to_starting > rmsd_cutoff:
         rmsd_potential = spring_constant*math.pow(rmsd_to_starting - rmsd_cutoff, 2)
 
-    return rmsd_potential*5
+    return (rmsd_potential*5, rmsd_to_starting, rmsd_potential)
 
-def score_binder_old(results, dsobj, contacts):
-    from alphafold.common import protein
-    pdb = protein.to_pdb(results['unrelaxed_protein'])
-    chains, residues, resindices = get_coordinates_pdb(pdb)
-    if len(chains)>1:
-        return score_binder_complex_old(results, dsobj, contacts)
-    else:
-        return score_binder_monomer(results, dsobj)
-
-def score_binder_complex_old(results, dsobj, contacts, orient=None):
-    from alphafold.common import protein
-    pdb = protein.to_pdb(results['unrelaxed_protein'])
-    chains, residues, resindices = get_coordinates_pdb(pdb)
-    reslist1 = contacts
-    reslist2 = [x for x in residues.keys() if x.startswith("B")]
-    contacts, contactscore = score_contacts(pdb, reslist1, reslist2, dsobj=dsobj, first_only=False)
-    pae_score = score_pae_confidence_pairs(results, contacts, resindices, dsobj=dsobj)
-    pae_score = pae_score/(len(contacts)*10)
-    if orient:
-        orientation_penalty = orientation_score(orient, pdb, dsobj=dsobj)
-    else:
-        orientation_penalty = 0
-    score = -contactscore + pae_score + orientation_penalty
-    return score, (score, contactscore, pae_score, orientation_penalty), contacts, pdb, results
-
+if __name__=="__main__":
+    print("no main functionality")

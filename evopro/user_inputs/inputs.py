@@ -1,6 +1,6 @@
 import argparse
 import sys
-from typing import Optional, Sequence, Tuple, Dict
+from typing import Optional, Sequence
 
 class FileArgumentParser(argparse.ArgumentParser):
     """Overwrites default ArgumentParser to better handle flag files."""
@@ -73,6 +73,17 @@ def getEvoProParser() -> FileArgumentParser:
                         type=str,
                         help='Name of the score function in the score file'
                         ' used to evaluate fitness of the alphafold predictions. Required.')
+    
+    parser.add_argument('--score_func_2',
+                        default=None,
+                        type=str,
+                        help='Name of the second score function in the score file'
+                        ' used to evaluate fitness of the alphafold predictions after score_func_2 iterations has been reached. Optional.')
+    
+    parser.add_argument('--score_func_2_iteration',
+                        default=30,
+                        type=int,
+                        help='Number of iterations after which scoring function is switched to score_func_2. Default is 30.')
 
     parser.add_argument('--rmsd_func',
                         default=None,
@@ -93,27 +104,29 @@ def getEvoProParser() -> FileArgumentParser:
     parser.add_argument('--define_contact_area',
                         default=None,
                         type=str,
-                        help='Defining residues on target interface to be targeted for contacts. Default is None.')
-
+                        help='File defining residues on target interface to be targeted for contacts. Default is None.')
+    
     parser.add_argument('--bonus_contacts',
                         default=None,
                         type=str,
                         help='File defining residues on target interface to be given a bonus for making contacts, followed by the'
                         'distance cutoff. Default is None and 4A.')
-
+    
     parser.add_argument('--penalize_contacts',
                         default=None,
                         type=str,
                         help='File defining residues on target interface to be given a penalty for making contacts, followed by the'
-                        'distance cutoff. Default is None and 4A.')
+                        'distance cutoff. Default is None and 8A.')
     
     parser.add_argument('--no_repeat_af2',
-                         action='store_false',
-                         help='Use this flag to specify if you do not want AF2 to be run multiple times on the same sequence. Default is False.')
+                         action='store_true',
+                         help='Use this flag to specify if you want AF2 to be multiple times on the same sequence, and the score averaged.'
+                         'This means that all sequences will be rescored every iteration (like FoldDesign protocol) until each sequence has'
+                         'been scored 5 times. Default is False.')
 
     parser.add_argument('--dont_write_compressed_data',
-                         action='store_false',
-                         help='Default is True.')
+                         action='store_true',
+                         help='Default is False.')
 
     parser.add_argument('--write_pdbs',
                          action='store_true',
@@ -141,10 +154,31 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Protein MPNN is used to refill the pool at this sampling temperature.'
                         'Default is 0.1.')
     
+    parser.add_argument('--mpnn_temp_variable',
+                        action='store_true',
+                        help='Specify a file mpnn_temps.txt with temperatures for every call to MPNN (or until temp stops changing). '
+                        'Defaults to False and uses constant MPNN temp.')
+    
     parser.add_argument('--mpnn_version',
                         default="s_48_020",
                         type=str,
                         help='Model version used to run MPNN. Default is s_48_020 (soluble).')
+    
+    parser.add_argument('--mpnn_bias_AA',
+                        default=None,
+                        type=str,
+                        help='Path to json file containing bias dictionary for MPNN. Default is None.')
+    
+    parser.add_argument('--mpnn_bias_by_res',
+                        default=None,
+                        type=str,
+                        help='Path to json file containing per residue bias dictionary for MPNN. Default is None.')
+    
+    parser.add_argument('--mpnn_chains',
+                        default=None,
+                        type=str,
+                        help='Chains concatenated into a single pdb for MPNN. Default is None and'
+                        'it will use the first af2 prediction. Example: AB,B')
 
     parser.add_argument('--plot_confidences',
                          action='store_true',
@@ -168,17 +202,54 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Fraction of pool refilled by crossover.'
                         'Default is 0.2.')
 
+    parser.add_argument('--vary_length',
+                        default='0',
+                        type=int,
+                        help='How much the length is allowed to vary. Default is 0.')
+    parser.add_argument('--substitution_insertion_deletion_weights',
+                        default=None,
+                        type=str,
+                        help='Specify probability of substitutions, insertions, and deletions (in that order) during mutation. Default is 0.8,0.1,0.1')
+
     parser.add_argument('--mutation_percents',
                         default='0.125',
                         type=str,
                         help='Number of mutations made as a percentage of sequence length.'
                         'Default is 0.125 for every iteration. If more than one value is provided, number of iterations will be split evenly and assigned.')
     
+    parser.add_argument('--single_mut_only',
+                        action='store_true',
+                        help='Default is False.')
+    
+    parser.add_argument('--af2_preds',
+                        default="AB",
+                        type=str,
+                        help='Chain ID permutations to run through individual AF2 runs, separated by commas. Only used for multistate design. Default is None.')
+    
     parser.add_argument('--af2_preds_extra',
                         default=None,
                         type=str,
                         help='Chain ID permutations to run through individual AF2 runs, separated by commas. Default is None.')
-
+    
+    parser.add_argument('--diffusion_config_path',
+                        default=None,
+                        type=str,
+                        help='path to config file for partial diffusion. Default is None.') 
+    
+    parser.add_argument('--diffusion_contigs',
+                        default=None,
+                        type=str,
+                        help='contigs to be used for partial diffusion. Default is None.')
+    
+    parser.add_argument('--provide_seq',
+                        default=None,
+                        type=str,
+                        help='provide_seq argument to be used for partial diffusion. Default is None.')
+    
+    parser.add_argument('--diff_random_translate',
+                         action='store_true',
+                         help='Default is False.')
+    
     return parser
 
 if __name__ == "__main__":

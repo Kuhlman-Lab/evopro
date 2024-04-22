@@ -25,7 +25,7 @@
 EvoPro is a genetic algorithm-based protein binder optimization pipeline, used in published work for in silico evolution of highly accurate, tight protein binders.  
 Now including multistate design, including our current unpublished work for conformational switch design!
 
-PLEASE MAKE SURE TO USE "STABLE" BRANCH for code used in paper. Current working version is on "dev branch".
+PLEASE MAKE SURE TO USE "MAIN" BRANCH for code used in paper. Current working version is on "dev branch". Beta dockerized version is on "dockerized" branch.
 
 [paper]  
 [preprint]

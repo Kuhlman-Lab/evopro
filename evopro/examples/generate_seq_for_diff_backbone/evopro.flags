@@ -1,0 +1,14 @@
+--num_iter 100
+--pool_size 20
+--num_gpus 1
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_optim_diffbackbone.py
+--score_func score_seq_diff_7
+--path_to_starting design.pdb 
+--plot_scores_top
+--mpnn_freq 5
+--plot_confidences
+--plot_scores_avg
+--plot_scores_median
+--af2_preds ABC
+--mpnn_chains ABC
+--write_pdbs

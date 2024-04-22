@@ -1,0 +1,2035 @@
+{
+    "sequence": {
+        "A": "SMLAVDLSSLPDGERRELVVEVTLPDGTVVTVTAVFEGYGDNVIVTEVEASGTPEQGFLGVLQVATRLTPHVGTSLVAAYLFKLTLEY",
+        "B": "SMLAVDLSSLPDGERRELVVEVTLPDGTVVTVTAVFEGYGDNVIVTEVEASGTPEQGFLGVLQVATRLTPHVGTSLVAAYLFKLTLEY",
+        "C": "SMLAVDLSSLPDGERRELVVEVTLPDGTVVTVTAVFEGYGDNVIVTEVEASGTPEQGFLGVLQVATRLTPHVGTSLVAAYLFKLTLEY"
+    },
+    "designable": [
+        {
+            "chain": "A",
+            "resid": 1,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 2,
+            "WTAA": "M",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 3,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 4,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 5,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 6,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 7,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 8,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 9,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 10,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 11,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 12,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 13,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 14,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 15,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 16,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 17,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 18,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 19,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 20,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 21,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 22,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 23,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 24,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 25,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 26,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 27,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 28,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 29,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 30,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 31,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 32,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 33,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 34,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 35,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 36,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 37,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 38,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 39,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 40,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 41,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 42,
+            "WTAA": "N",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 43,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 44,
+            "WTAA": "I",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 45,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 46,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 47,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 48,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 49,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 50,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 51,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 52,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 53,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 54,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 55,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 56,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 57,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 58,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 59,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 60,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 61,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 62,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 63,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 64,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 65,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 66,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 67,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 68,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 69,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 70,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 71,
+            "WTAA": "H",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 72,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 73,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 74,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 75,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 76,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 77,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 78,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 79,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 80,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 81,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 82,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 83,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 84,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 85,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 86,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 87,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "A",
+            "resid": 88,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 1,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 2,
+            "WTAA": "M",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 3,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 4,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 5,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 6,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 7,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 8,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 9,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 10,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 11,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 12,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 13,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 14,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 15,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 16,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 17,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 18,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 19,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 20,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 21,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 22,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 23,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 24,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 25,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 26,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 27,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 28,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 29,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 30,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 31,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 32,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 33,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 34,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 35,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 36,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 37,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 38,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 39,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 40,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 41,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 42,
+            "WTAA": "N",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 43,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 44,
+            "WTAA": "I",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 45,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 46,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 47,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 48,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 49,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 50,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 51,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 52,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 53,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 54,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 55,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 56,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 57,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 58,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 59,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 60,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 61,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 62,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 63,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 64,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 65,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 66,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 67,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 68,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 69,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 70,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 71,
+            "WTAA": "H",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 72,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 73,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 74,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 75,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 76,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 77,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 78,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 79,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 80,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 81,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 82,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 83,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 84,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 85,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 86,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 87,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "B",
+            "resid": 88,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 1,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 2,
+            "WTAA": "M",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 3,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 4,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 5,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 6,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 7,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 8,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 9,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 10,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 11,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 12,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 13,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 14,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 15,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 16,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 17,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 18,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 19,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 20,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 21,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 22,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 23,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 24,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 25,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 26,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 27,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 28,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 29,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 30,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 31,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 32,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 33,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 34,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 35,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 36,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 37,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 38,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 39,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 40,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 41,
+            "WTAA": "D",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 42,
+            "WTAA": "N",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 43,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 44,
+            "WTAA": "I",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 45,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 46,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 47,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 48,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 49,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 50,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 51,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 52,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 53,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 54,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 55,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 56,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 57,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 58,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 59,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 60,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 61,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 62,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 63,
+            "WTAA": "Q",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 64,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 65,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 66,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 67,
+            "WTAA": "R",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 68,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 69,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 70,
+            "WTAA": "P",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 71,
+            "WTAA": "H",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 72,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 73,
+            "WTAA": "G",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 74,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 75,
+            "WTAA": "S",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 76,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 77,
+            "WTAA": "V",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 78,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 79,
+            "WTAA": "A",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 80,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 81,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 82,
+            "WTAA": "F",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 83,
+            "WTAA": "K",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 84,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 85,
+            "WTAA": "T",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 86,
+            "WTAA": "L",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 87,
+            "WTAA": "E",
+            "MutTo": "all-C"
+        },
+        {
+            "chain": "C",
+            "resid": 88,
+            "WTAA": "Y",
+            "MutTo": "all-C"
+        }
+    ],
+    "symmetric": [
+        [
+            "A1",
+            "B1",
+            "C1"
+        ],
+        [
+            "A2",
+            "B2",
+            "C2"
+        ],
+        [
+            "A3",
+            "B3",
+            "C3"
+        ],
+        [
+            "A4",
+            "B4",
+            "C4"
+        ],
+        [
+            "A5",
+            "B5",
+            "C5"
+        ],
+        [
+            "A6",
+            "B6",
+            "C6"
+        ],
+        [
+            "A7",
+            "B7",
+            "C7"
+        ],
+        [
+            "A8",
+            "B8",
+            "C8"
+        ],
+        [
+            "A9",
+            "B9",
+            "C9"
+        ],
+        [
+            "A10",
+            "B10",
+            "C10"
+        ],
+        [
+            "A11",
+            "B11",
+            "C11"
+        ],
+        [
+            "A12",
+            "B12",
+            "C12"
+        ],
+        [
+            "A13",
+            "B13",
+            "C13"
+        ],
+        [
+            "A14",
+            "B14",
+            "C14"
+        ],
+        [
+            "A15",
+            "B15",
+            "C15"
+        ],
+        [
+            "A16",
+            "B16",
+            "C16"
+        ],
+        [
+            "A17",
+            "B17",
+            "C17"
+        ],
+        [
+            "A18",
+            "B18",
+            "C18"
+        ],
+        [
+            "A19",
+            "B19",
+            "C19"
+        ],
+        [
+            "A20",
+            "B20",
+            "C20"
+        ],
+        [
+            "A21",
+            "B21",
+            "C21"
+        ],
+        [
+            "A22",
+            "B22",
+            "C22"
+        ],
+        [
+            "A23",
+            "B23",
+            "C23"
+        ],
+        [
+            "A24",
+            "B24",
+            "C24"
+        ],
+        [
+            "A25",
+            "B25",
+            "C25"
+        ],
+        [
+            "A26",
+            "B26",
+            "C26"
+        ],
+        [
+            "A27",
+            "B27",
+            "C27"
+        ],
+        [
+            "A28",
+            "B28",
+            "C28"
+        ],
+        [
+            "A29",
+            "B29",
+            "C29"
+        ],
+        [
+            "A30",
+            "B30",
+            "C30"
+        ],
+        [
+            "A31",
+            "B31",
+            "C31"
+        ],
+        [
+            "A32",
+            "B32",
+            "C32"
+        ],
+        [
+            "A33",
+            "B33",
+            "C33"
+        ],
+        [
+            "A34",
+            "B34",
+            "C34"
+        ],
+        [
+            "A35",
+            "B35",
+            "C35"
+        ],
+        [
+            "A36",
+            "B36",
+            "C36"
+        ],
+        [
+            "A37",
+            "B37",
+            "C37"
+        ],
+        [
+            "A38",
+            "B38",
+            "C38"
+        ],
+        [
+            "A39",
+            "B39",
+            "C39"
+        ],
+        [
+            "A40",
+            "B40",
+            "C40"
+        ],
+        [
+            "A41",
+            "B41",
+            "C41"
+        ],
+        [
+            "A42",
+            "B42",
+            "C42"
+        ],
+        [
+            "A43",
+            "B43",
+            "C43"
+        ],
+        [
+            "A44",
+            "B44",
+            "C44"
+        ],
+        [
+            "A45",
+            "B45",
+            "C45"
+        ],
+        [
+            "A46",
+            "B46",
+            "C46"
+        ],
+        [
+            "A47",
+            "B47",
+            "C47"
+        ],
+        [
+            "A48",
+            "B48",
+            "C48"
+        ],
+        [
+            "A49",
+            "B49",
+            "C49"
+        ],
+        [
+            "A50",
+            "B50",
+            "C50"
+        ],
+        [
+            "A51",
+            "B51",
+            "C51"
+        ],
+        [
+            "A52",
+            "B52",
+            "C52"
+        ],
+        [
+            "A53",
+            "B53",
+            "C53"
+        ],
+        [
+            "A54",
+            "B54",
+            "C54"
+        ],
+        [
+            "A55",
+            "B55",
+            "C55"
+        ],
+        [
+            "A56",
+            "B56",
+            "C56"
+        ],
+        [
+            "A57",
+            "B57",
+            "C57"
+        ],
+        [
+            "A58",
+            "B58",
+            "C58"
+        ],
+        [
+            "A59",
+            "B59",
+            "C59"
+        ],
+        [
+            "A60",
+            "B60",
+            "C60"
+        ],
+        [
+            "A61",
+            "B61",
+            "C61"
+        ],
+        [
+            "A62",
+            "B62",
+            "C62"
+        ],
+        [
+            "A63",
+            "B63",
+            "C63"
+        ],
+        [
+            "A64",
+            "B64",
+            "C64"
+        ],
+        [
+            "A65",
+            "B65",
+            "C65"
+        ],
+        [
+            "A66",
+            "B66",
+            "C66"
+        ],
+        [
+            "A67",
+            "B67",
+            "C67"
+        ],
+        [
+            "A68",
+            "B68",
+            "C68"
+        ],
+        [
+            "A69",
+            "B69",
+            "C69"
+        ],
+        [
+            "A70",
+            "B70",
+            "C70"
+        ],
+        [
+            "A71",
+            "B71",
+            "C71"
+        ],
+        [
+            "A72",
+            "B72",
+            "C72"
+        ],
+        [
+            "A73",
+            "B73",
+            "C73"
+        ],
+        [
+            "A74",
+            "B74",
+            "C74"
+        ],
+        [
+            "A75",
+            "B75",
+            "C75"
+        ],
+        [
+            "A76",
+            "B76",
+            "C76"
+        ],
+        [
+            "A77",
+            "B77",
+            "C77"
+        ],
+        [
+            "A78",
+            "B78",
+            "C78"
+        ],
+        [
+            "A79",
+            "B79",
+            "C79"
+        ],
+        [
+            "A80",
+            "B80",
+            "C80"
+        ],
+        [
+            "A81",
+            "B81",
+            "C81"
+        ],
+        [
+            "A82",
+            "B82",
+            "C82"
+        ],
+        [
+            "A83",
+            "B83",
+            "C83"
+        ],
+        [
+            "A84",
+            "B84",
+            "C84"
+        ],
+        [
+            "A85",
+            "B85",
+            "C85"
+        ],
+        [
+            "A86",
+            "B86",
+            "C86"
+        ],
+        [
+            "A87",
+            "B87",
+            "C87"
+        ],
+        [
+            "A88",
+            "B88",
+            "C88"
+        ]
+    ]
+}

@@ -1,8 +1,10 @@
 --num_iter 3
 --pool_size 6
 --num_gpus 1
---score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_binder.py
---score_func score_binder
+--score_file /path/to/evopro/score_funcs/score_binder.py
+--score_func score_overall
+--af2_preds AB
+--mpnn_chains AB
 --define_contact_area A31-A58,A88-A108
 --mpnn_freq 2
 --plot_scores_avg

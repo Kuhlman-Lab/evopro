@@ -77,6 +77,17 @@ class DesignSeq:
                 else:
                     weighted_aas.append(w[i])
 
+            """
+            #code for handling custom weights...needs rewrite for new rep
+            #maybe have a separate file for specifying custom weights?
+            if "custom" in res["MutTo"]:
+                try:
+                    weighted_aas = [float(x) for x in str(res["aalist"]).strip("[]").split(",")]
+                except:
+                    print("Custom weights not specified. Defaulting to all")
+                    weighted_aas = [1 for x in range(20)]
+            """
+
             if not weighted_aas:
                 weighted_aas = [1 for x in range(20)]
                 print("User did not specify valid residue substitution options for residue " + res["chain"]+str(res["resid"]) + ". Defaulting to all")
@@ -123,6 +134,7 @@ class DesignSeq:
         seq = self._load_sequence(jdata["sequence"])
         mut = self._load_mutable(jdata["designable"])
         sym = self._load_symmetry(jdata["symmetric"])
+
 
         return seq, mut, sym, jdata
 
@@ -314,7 +326,7 @@ class DesignSeq:
     def get_sequence_string(self, divide=","):
         return divide.join([self.jsondata["sequence"][chain] for chain in self.jsondata["sequence"]])
 
-    def mutate(self, mut_percent = 0.125, num_mut_choice = [-1, 0, 1], var=0, var_weights = [0.8, 0.1, 0.1]):
+    def mutate(self, mut_percent = 0.125, num_mut_choice = [-1, 0, 1], var=0, var_weights = [0.8, 0.1, 0.1], single_mut_only=False):
         all_aas = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 
         #calculating number of mutants from mut_percent and maybe adding or subtracting one mutant for stochasticity
@@ -322,6 +334,8 @@ class DesignSeq:
         num_mut=round(mut_percent*len(self.mutable.keys()))+random.choice(num_mut_choice)
         if num_mut<1:
             num_mut=1
+        if single_mut_only:
+            num_mut = 1
 
         new_mut = copy.deepcopy(self.mutable) 
 
@@ -401,7 +415,9 @@ class DesignSeq:
         designable = []
         for p in self.jsondata['designable']:
             designable.append(p['chain'] + str(p['resid']))
-            print(p)
+
+            #print(p)
+
         return designable
 
     def _get_aa_identity(self, index):
@@ -442,7 +458,9 @@ class DesignSeq:
         newseqobj._update_sequence()
         newseqobj._create_jsondata()
         newseqobj._check_symmetry()
+
         return newseqobj
+
 
 class DesignSeqMSD(DesignSeq):
     def __init__(self, jsonfile=None, sequence=None, mutable=None, symmetric=[], jdata=None, seq=None):
@@ -516,6 +534,7 @@ class DesignSeqMSD(DesignSeq):
             else:
                 numbering[chain].append(resid) 
                 i+=1
+
 
         json_dict["designable"] = new_des
 
@@ -609,7 +628,9 @@ class DesignSeqMSD(DesignSeq):
         newseqobj._update_symmetric_positions(mutated)
         newseqobj._update_sequence()
         newseqobj._create_jsondata()
+        #newseqobj._check_symmetry()
         return newseqobj
+
 
     def mutate(self, mut_percent = 0.125, num_mut_choice = [-1, 0, 1], var=0, var_weights = [0.8, 0.1, 0.1]):
         all_aas = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
@@ -687,15 +708,16 @@ class DesignSeqMSD(DesignSeq):
 
         newseqobj = DesignSeqMSD(sequence=self.sequence, mutable=new_mut, symmetric=self.symmetric, jdata=self.jsondata)
         newseqobj._update_symmetric_positions(mutated)
+
         newseqobj._update_sequence()
         newseqobj._create_jsondata()
         return newseqobj
 
 
 if __name__ == "__main__":
-    #testing
+
     dsobj = DesignSeq(jsonfile="/work/users/a/m/amritan/evopro_tests/vary_length/run2/residue_specs.json")
-    
+
     newdsobj = dsobj.mutate(var=2, var_weights = [0, 0, 0.1])
     
     print(dsobj.mutable)
@@ -709,3 +731,4 @@ if __name__ == "__main__":
     reslist1 = newdsobj._get_designable_positions()
     
     print(reslist1)
+

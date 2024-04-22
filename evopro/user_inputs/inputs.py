@@ -1,6 +1,6 @@
 import argparse
 import sys
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple, Dict
 
 class FileArgumentParser(argparse.ArgumentParser):
     """Overwrites default ArgumentParser to better handle flag files."""
@@ -104,19 +104,19 @@ def getEvoProParser() -> FileArgumentParser:
     parser.add_argument('--define_contact_area',
                         default=None,
                         type=str,
-                        help='File defining residues on target interface to be targeted for contacts. Default is None.')
-    
+                        help='Defining residues on target interface to be targeted for contacts. Default is None.')
+
     parser.add_argument('--bonus_contacts',
                         default=None,
                         type=str,
                         help='File defining residues on target interface to be given a bonus for making contacts, followed by the'
                         'distance cutoff. Default is None and 4A.')
-    
+
     parser.add_argument('--penalize_contacts',
                         default=None,
                         type=str,
                         help='File defining residues on target interface to be given a penalty for making contacts, followed by the'
-                        'distance cutoff. Default is None and 8A.')
+                        'distance cutoff. Default is None and 4A.')
     
     parser.add_argument('--no_repeat_af2',
                          action='store_true',
@@ -217,7 +217,7 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Number of mutations made as a percentage of sequence length.'
                         'Default is 0.125 for every iteration. If more than one value is provided, number of iterations will be split evenly and assigned.')
     
-    parser.add_argument('--single_mut_only',
+    parser.add_argument('--force_single_mutation_only',
                         action='store_true',
                         help='Default is False.')
     
@@ -230,26 +230,7 @@ def getEvoProParser() -> FileArgumentParser:
                         default=None,
                         type=str,
                         help='Chain ID permutations to run through individual AF2 runs, separated by commas. Default is None.')
-    
-    parser.add_argument('--diffusion_config_path',
-                        default=None,
-                        type=str,
-                        help='path to config file for partial diffusion. Default is None.') 
-    
-    parser.add_argument('--diffusion_contigs',
-                        default=None,
-                        type=str,
-                        help='contigs to be used for partial diffusion. Default is None.')
-    
-    parser.add_argument('--provide_seq',
-                        default=None,
-                        type=str,
-                        help='provide_seq argument to be used for partial diffusion. Default is None.')
-    
-    parser.add_argument('--diff_random_translate',
-                         action='store_true',
-                         help='Default is False.')
-    
+
     return parser
 
 if __name__ == "__main__":

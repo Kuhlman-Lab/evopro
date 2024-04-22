@@ -1,5 +1,3 @@
-from evopro.utils.aa_utils import three_to_one
-
 def get_coordinates_pdb(pdb, fil=False):
     lines = []
     chains = []
@@ -70,29 +68,6 @@ def get_ca_coordinates_pdb(pdb_str):
                 coords.append(coord)
 
     return coords
-
-
-def get_seq_from_pdb(pdb_str):
-    seqs = []
-    chains = []
-
-    seq = []
-    pdb_split = pdb_str.split("\n")
-    pdb_split = [x for x in pdb_split if x]
-    for lin in pdb_split:
-        l = lin.strip().split()
-        if 'ATOM' in l[0] or 'HETATM' in l[0]:
-            if l[2] == "CA":
-                if l[4] not in chains:
-                    chains.append(l[4])
-                    seqs.append("".join(seq))
-                    seq = []
-                
-                seq.append(three_to_one(l[3]))
-    seqs.append("".join(seq))
-    
-    seqs = [x for x in seqs if x]
-    return seqs
 
 def change_chainid_pdb(pdb, old_chain="A", new_chain="B"):
     pdb_lines = [x for x in pdb.split("\n") if x]
@@ -250,17 +225,3 @@ def get_coordinates_pdb_old(pdb, fil = False):
                     i = i+1
 
     return chains, residues, residueindices
-
-
-if __name__ == "__main__":
-    pdb1_name = "/work/users/a/m/amritan/evopro_tests/rmsd/temp1.pdb"
-    #pdb2_name = "/proj/kuhl_lab/evopro/evopro/tests/pdb_parsing/test2.pdb"
-    
-    #test get_coordinates_pdb
-    with open(pdb1_name, "r") as pdbf:
-        pdb1 = pdbf.read()
-    
-    print(get_seq_from_pdb(pdb1))
-    #chains, residues, resindices = get_coordinates_pdb(pdb1)
-    #print(chains)
-

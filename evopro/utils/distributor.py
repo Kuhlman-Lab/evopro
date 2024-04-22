@@ -1,12 +1,6 @@
 import multiprocessing as mp
 import collections
 
-from typing import Sequence, Union
-
-from functools import partial
-import numpy as np
-
-
 class Distributor:
     """This class will distribute work to sub-processes where
     the same function is run repeatedly with different inputs.

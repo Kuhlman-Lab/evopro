@@ -20,7 +20,6 @@ def score_overall(results, dsobj, contacts=None, distance_cutoffs=None):
     #parsing through each dictionary and scoring them based on which prediction it is
     for result in results:
 
-
         pdb = protein.to_pdb(result['unrelaxed_protein'])
         pdbs.append(pdb)
         chains, _, _ = get_coordinates_pdb(pdb)
@@ -46,21 +45,19 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs, binder_chai
     if not distance_cutoffs:
         distance_cutoffs=(4,4,8)
     reslist1 = contacts[0]
-
     reslist2 = [x for x in residues.keys() if x.startswith(binder_chain)]
     print(reslist1, reslist2)
     contact_list, contactscore = score_contacts_pae_weighted_efficient(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[0])
-
     
     bonuses = 0
     bonus_resids = contacts[1]
     if bonus_resids:
         bonus_contacts, _ = score_contacts_pae_weighted_efficient(results, pdb, bonus_resids, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[1])
         for contact in bonus_contacts:
-            if contact[0][0:1] == 'B' and int(contact[0][1:]) in bonus_resids:
+            if contact[0][0:1] == 'A' and int(contact[0][1:]) in bonus_resids:
                 bonuses += 1
                 print("bonus found at: " + str(contact[0]))
-            if contact[1][0:1] == 'B' and int(contact[1][1:]) in bonus_resids:
+            if contact[1][0:1] == 'A' and int(contact[1][1:]) in bonus_resids:
                 bonuses += 1
                 print("bonus found at: " + str(contact[1]))
         
@@ -71,10 +68,10 @@ def score_binder_complex(results, dsobj, contacts, distance_cutoffs, binder_chai
     if penalty_resids:
         penalty_contacts, _ = score_contacts_pae_weighted_efficient(results, pdb, penalty_resids, reslist2, dsobj=dsobj, first_only=False, dist=distance_cutoffs[2])
         for contact in penalty_contacts:
-            if contact[0][0:1] == 'B' and int(contact[0][1:]) in penalty_resids:
+            if contact[0][0:1] == 'A' and int(contact[0][1:]) in penalty_resids:
                 penalties += 1
                 print("penalty found at: " + str(contact[0]))
-            if contact[1][0:1] == 'B' and int(contact[1][1:]) in penalty_resids:
+            if contact[1][0:1] == 'A' and int(contact[1][1:]) in penalty_resids:
                 penalties += 1
                 print("penalty found at: " + str(contact[1]))
         
@@ -96,10 +93,9 @@ def score_binder_monomer(results, dsobj):
     reslist2 = [x for x in residues.keys()]
     confscore2 = score_plddt_confidence(results, reslist2, resindices, dsobj=dsobj, first_only=False)
     score = -confscore2/10
-    print(score)
     return score, (score, confscore2), pdb, results
 
-def score_binder_rmsd(pdb1, pdb2, binder_chain="A", dsobj=None):
+def score_binder_rmsd(pdb1, pdb2, binder_chain="B", dsobj=None):
     chains1, residues1, resindices1 = get_coordinates_pdb(pdb1)
     chains2, residues2, resindices2 = get_coordinates_pdb(pdb2)
     reslist1 = [x for x in residues1.keys() if x.startswith(binder_chain)]
@@ -116,10 +112,8 @@ def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None, binder_chai
 
     with open(path_to_starting, 'r') as f:
         pdb_string_starting = f.read()
-
     _, residues0, _ = get_coordinates_pdb(pdb_string_starting)
     reslist1 = [x for x in residues0.keys() if x.startswith(binder_chain)]
-
 
     chains, residues, resindices = get_coordinates_pdb(pdb)
     reslist2 = [x for x in residues.keys()]
@@ -133,5 +127,3 @@ def score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=None, binder_chai
 
     return (rmsd_potential*5, rmsd_to_starting, rmsd_potential)
 
-if __name__=="__main__":
-    print("no main functionality")

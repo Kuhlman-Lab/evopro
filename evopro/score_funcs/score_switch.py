@@ -2,7 +2,7 @@ from evopro.utils.pdb_parser import get_coordinates_pdb
 from evopro.score_funcs.score_funcs import score_contacts_pae_weighted, score_plddt_confidence, get_rmsd
 import math
 
-def score_overall(results, dsobj, contacts=None):
+def score_overall(results, dsobj, contacts=None, distance_cutoffs=None, rmsd_pdb=None):
     from alphafold.common import protein
     print("Number of predictions being scored:", len(results))
 
@@ -55,7 +55,7 @@ def score_binder_complex(results, dsobj, contacts):
     chains, residues, resindices = get_coordinates_pdb(pdb)
     reslist1 = contacts
     reslist2 = [x for x in residues.keys() if x.startswith("B")]
-    contacts, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False)
+    contacts, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False, contact_cap=36)
 
     score = -contactscore
     print(score, (score, len(contacts), contactscore))

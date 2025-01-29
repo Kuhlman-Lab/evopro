@@ -116,7 +116,13 @@ def getEvoProParser() -> FileArgumentParser:
                         default=None,
                         type=str,
                         help='File defining residues on target interface to be given a penalty for making contacts, followed by the'
-                        'distance cutoff. Default is None and 4A.')
+                        'distance cutoff. Default is None and 8A.')
+    
+    parser.add_argument('--contact_cap',
+                        default=36,
+                        type=int,
+                        help='Cap on the number of contacts that contribute to the contact score. Used to prevent unwinding of the protein to maximize contacts.'
+                        'Depends on the size of the binder. Default is 36.')
     
     parser.add_argument('--no_repeat_af2',
                          action='store_true',
@@ -217,9 +223,14 @@ def getEvoProParser() -> FileArgumentParser:
                         help='Number of mutations made as a percentage of sequence length.'
                         'Default is 0.125 for every iteration. If more than one value is provided, number of iterations will be split evenly and assigned.')
     
-    parser.add_argument('--force_single_mutation_only',
+    parser.add_argument('--single_mut_only',
                         action='store_true',
                         help='Default is False.')
+    
+    parser.add_argument('--binder_chain',
+                        default="B",
+                        type=str,
+                        help='Chain ID of designable binder. Default is B.')
     
     parser.add_argument('--af2_preds',
                         default="AB",
@@ -230,7 +241,26 @@ def getEvoProParser() -> FileArgumentParser:
                         default=None,
                         type=str,
                         help='Chain ID permutations to run through individual AF2 runs, separated by commas. Default is None.')
-
+    
+    parser.add_argument('--diffusion_config_path',
+                        default=None,
+                        type=str,
+                        help='path to config file for partial diffusion. Default is None.') 
+    
+    parser.add_argument('--diffusion_contigs',
+                        default=None,
+                        type=str,
+                        help='contigs to be used for partial diffusion. Default is None.')
+    
+    parser.add_argument('--provide_seq',
+                        default=None,
+                        type=str,
+                        help='provide_seq argument to be used for partial diffusion. Default is None.')
+    
+    parser.add_argument('--diff_random_translate',
+                         action='store_true',
+                         help='Default is False.')
+    
     return parser
 
 if __name__ == "__main__":

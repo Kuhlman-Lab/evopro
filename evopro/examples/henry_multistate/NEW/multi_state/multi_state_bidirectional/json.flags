@@ -1,0 +1,6 @@
+--pdb_dir ./
+--mut_res proteinA:A1-A60;proteinB:B1-B60
+--default_mutres_setting all-C
+--output residue_specs.json
+--constraints proteinA:A1-A60:1,proteinB:B1-B60:1
+--bidirectional

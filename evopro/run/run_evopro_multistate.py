@@ -2,6 +2,7 @@ import multiprocessing as mp
 import importlib
 import math
 import sys, os
+import pickle
 import json
 sys.path.append("/proj/kuhl_lab/evopro/")
 from evopro.genetic_alg.DesignSeq import DesignSeq
@@ -17,10 +18,10 @@ sys.path.append('/proj/kuhl_lab/alphafold/run')
 from run_af2 import af2_init
 
 def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [],
-                               num_iter = 50, n_workers=1, mut_percents=None, contacts=None,
+                               num_iter = 50, n_workers=1, mut_percents=None, single_mut_only=False, contacts=None, distance_cutoffs=None,
                                mpnn_temp="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, 
-                               mpnn_chains=None, bias_AA_dict=None, bias_by_res_dict=None,
-                               repeat_af2=True, af2_preds=[], crossover_percent=0.2, vary_length=0,
+                               mpnn_chains=None, bias_AA_dict=None, bias_by_res_dict=None, rmsd_pdb=None,
+                               repeat_af2=True, af2_preds=[], crossover_percent=0.2, vary_length=0, sid_weights=[0.8,0.1,0.1],
                                write_pdbs=False, plot=[], conf_plot=False, write_compressed_data=True):
 
     num_af2=0
@@ -43,11 +44,9 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
     curr_iter = 1
     seqs_per_iteration = []
     newpool = startingseqs
-    all_results = {}
 
     while len(poolsizes) < num_iter:
         poolsizes.append(poolsizes[-1])
-    #print(len(poolsizes))
 
     output_dir = run_dir + "outputs/"
     if not os.path.isdir(output_dir):
@@ -63,8 +62,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
 
     #start genetic algorithm iteration
     while curr_iter <= num_iter:
-        all_seqs = []
-        all_scores = []
+
         pool = newpool
         print("Current pool", pool)
 
@@ -74,8 +72,11 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
             pool = create_new_seqs(pool, 
                                    poolsizes[curr_iter-1], 
                                    crossover_percent=0, 
+                                   mut_percent=mut_percents[curr_iter-1], 
                                    all_seqs = list(scored_seqs.keys()), 
-                                   vary_length=vary_length)
+                                   vary_length=vary_length,
+                                   sid_weights=sid_weights,
+                                   single_mut_only=single_mut_only)
 
         #using protein mpnn to refill pool when specified
         elif curr_iter in mpnn_iters and curr_iter not in skip_mpnn:
@@ -102,7 +103,9 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
                                    crossover_percent=crossover_percent, 
                                    mut_percent=mut_percents[curr_iter-1], 
                                    all_seqs = list(scored_seqs.keys()), 
-                                   vary_length=vary_length)
+                                   vary_length=vary_length,
+                                   sid_weights=sid_weights,
+                                   single_mut_only=single_mut_only)
 
         if repeat_af2:
             scoring_pool = [p for p in pool if p.get_sequence_string() not in repeat_af2_seqs]
@@ -126,7 +129,6 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
             
         print("done churning")
         
-        seqs_packed = [work_list_all[i:i+num_preds] for i in range(0, len(work_list_all), num_preds)]
         results_packed = [results_all[i:i+num_preds] for i in range(0, len(results_all), num_preds)]
 
         print("These should be equal", len(work_list_all), len(results_all), num_preds*len(results_packed))
@@ -134,46 +136,43 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
         scores = []
         if not contacts:
             contacts=(None, None, None)
-        for seqs, results, dsobj in zip(seqs_packed, results_packed, scoring_pool):
-            scores.append(score_func(results, dsobj, contacts=contacts))
+        if not distance_cutoffs:
+            distance_cutoffs=(4, 4, 8)
+        for results, dsobj in zip(results_packed, scoring_pool):
+            if rmsd_pdb:
+                scores.append(score_func(results, dsobj, contacts=contacts, distance_cutoffs=distance_cutoffs, rmsd_pdb=rmsd_pdb))
+            else:
+                scores.append(score_func(results, dsobj, contacts=contacts, distance_cutoffs=distance_cutoffs))
         
         #adding sequences and scores into the dictionary
-        for score, seqs, results, dsobj in zip(scores, seqs_packed, results_packed, scoring_pool):
+        for score, results, dsobj in zip(scores, results_packed, scoring_pool):
             key_seq = dsobj.get_sequence_string()
-            #print(seqs)
-            #if key_seq != ",".join(seqs[0]):
-            #        print(key_seq, str(seqs[0]))
-            #        raise AssertionError("Sequence does not match DSobj sequence")
-            
+
             overall_scores = [score[0]]
             overall_scores = overall_scores + [x[0] for x in score[1]]
             score_split = score[1]
             pdbs = score[-2]
             score_all = (overall_scores, score_split)
             print(key_seq, overall_scores, score_split)
-            #print(score_all)
             
             if key_seq in scored_seqs and repeat_af2:
-                scored_seqs[key_seq]["data"].append({"score": score_all, "pdb": pdbs, "result": result})
-                #don't need to sort when using all 5 for average score
-                #scored_seqs[key_seq]["data"].sort(key=lambda x: x["score"][0][0])
-                #print(scored_seqs[key_seq]["data"])
-                #print(overall_scores)
+                scored_seqs[key_seq]["data"].append({"score": score_all, "pdb": pdbs, "result": results})
+
                 sum_score = [0 for _ in overall_scores]
-                #print("Before", sum_score)
                 for elem in scored_seqs[key_seq]["data"]:
-                    #print("Element", elem, elem["score"])
-                    #print(sum_score, elem["score"][0], elem["score"][1])
                     sum_score = [x+y for x,y in zip(sum_score, elem["score"][0])]
+                
                 avg_score = [x/len(scored_seqs[key_seq]["data"]) for x in sum_score]
-                #print("After", sum_score, avg_score)
                 scored_seqs[key_seq]["average"] = avg_score
+            
             else:
-                scored_seqs[key_seq] = {"data": [{"score": score_all, "pdb": pdbs, "result": result}]}
+                scored_seqs[key_seq] = {"data": [{"score": score_all, "pdb": pdbs, "result": results}]}
                 scored_seqs[key_seq]["dsobj"] =  dsobj
                 
                 #set average score here
                 scored_seqs[key_seq]["average"] = overall_scores
+            
+            #print(scored_seqs[key_seq]["average"], len(scored_seqs[key_seq]["data"]), scored_seqs[key_seq]["data"][-1])
        
         if repeat_af2:
             for key_seq in scored_seqs:
@@ -195,13 +194,13 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
                     sorted_scored_pool.append((key_seq, scored_seqs[key_seq]["average"]))
                     #print(sorted_scored_pool)
             else:
-                sorted_scored_pool.append((key_seq, scored_seqs[key_seq]["average"]))
-                #print(sorted_scored_pool)
-            
+                sorted_scored_pool.append((key_seq, scored_seqs[key_seq]["average"]))            
             
             if write_pdbs:
                 print("Writing pdbs...")
                 pdbs = scored_seqs[key_seq]["data"][0]["pdb"]
+                if type(pdbs) == str:
+                    pdbs = [pdbs]
                 for pdb, chains in zip(pdbs, af2_preds):
                     with open(pdb_folder + "seq_" + str(j) + "_iter_" + str(curr_iter) + "_model_1_chain"+str(chains)+".pdb", "w") as pdbf:
                                 pdbf.write(str(pdb))
@@ -246,8 +245,10 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
     for key_seq, j in zip(newpool_seqs, range(len(newpool_seqs))):
         seq = key_seq.split(" ")
         pdbs = scored_seqs[key_seq]["data"][0]["pdb"]
-        result = scored_seqs[key_seq]["data"][0]["result"]
-        results = [scored_seqs[key_seq]["data"][x]["result"] for x in range(len(scored_seqs[key_seq]["data"]))]
+        if type(pdbs) == str:
+            pdbs = [pdbs]
+        result = scored_seqs[key_seq]["data"][0]["result"][0]
+        results = [scored_seqs[key_seq]["data"][0]["result"][x] for x in range(len(scored_seqs[key_seq]["data"][0]["result"]))]
         
         if write_compressed_data:
             for r, k in zip(results, range(len(results))):
@@ -279,10 +280,6 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
                         pdbf.write(str(pdb))
     
     print("Number of AlphaFold2 predictions: ", num_af2)
-    #plotting
-    
-    #plotting = plot_scores_general_dev(plot, seqs_per_iteration, output_dir)
-    #print("plots created at", str(plotting))
 
     try:
         plotting = plot_scores_general_dev(plot, seqs_per_iteration, output_dir)
@@ -401,11 +398,23 @@ if __name__ == "__main__":
             if i % freq == 0:
                 mpnn_iters.append(i)
 
-    contacts=None
+    contacts=[None, None, None]
+    distance_cutoffs = [4, 4, 8]
     if args.define_contact_area:
-        contacts = parse_mutres_input(args.define_contact_area)
-    else:
-        contacts=None
+        c = args.define_contact_area.split(" ")
+        contacts[0] = parse_mutres_input(c[0])
+        if len(c)>1:
+            distance_cutoffs[0] = int(c[1])
+    if args.bonus_contacts:
+        b = args.bonus_contacts.split(" ")
+        contacts[1] = parse_mutres_input(b[0])
+        if len(b)>1:
+            distance_cutoffs[1] = int(b[1])
+    if args.penalize_contacts:
+        p = args.penalize_contacts.split(" ")
+        contacts[2] = parse_mutres_input(p[0])
+        if len(p)>1:
+            distance_cutoffs[2] = int(p[1])
 
     mpnn_skips = []
     if args.skip_mpnn:
@@ -447,6 +456,12 @@ if __name__ == "__main__":
     else:
         mpnn_chains = None
         
+    sid_weights = [0.8, 0.1, 0.1]
+    if args.vary_length>0:
+        if args.substitution_insertion_deletion_weights:
+            sid_weights = [float(x) for x in args.substitution_insertion_deletion_weights.split(",")]
+        
+    #TODO
     bias_AA_dict = None
     """if os.path.isfile(args.mpnn_bias_AA):
         with open(args.mpnn_bias_AA, 'r') as json_file:
@@ -460,11 +475,11 @@ if __name__ == "__main__":
             with open(args.mpnn_bias_by_res, 'r') as json_file:
                 bias_by_res_dict = json.load(json_file)
                 
-    print(bias_by_res_dict)
+    #print(bias_by_res_dict)
                                    
     run_genetic_alg_multistate(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, 
-        num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, 
+        num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, single_mut_only=args.single_mut_only, contacts=contacts, distance_cutoffs=distance_cutoffs,
         mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, 
-        mpnn_chains=mpnn_chains, bias_AA_dict=bias_AA_dict, bias_by_res_dict=bias_by_res_dict, 
-        repeat_af2=not args.no_repeat_af2, af2_preds = af2_preds, crossover_percent=args.crossover_percent, vary_length=args.vary_length, 
+        mpnn_chains=mpnn_chains, bias_AA_dict=bias_AA_dict, bias_by_res_dict=bias_by_res_dict, rmsd_pdb=args.path_to_starting,
+        repeat_af2=not args.no_repeat_af2, af2_preds = af2_preds, crossover_percent=args.crossover_percent, vary_length=args.vary_length, sid_weights=sid_weights,
         write_pdbs=args.write_pdbs, plot=plot_style, conf_plot=args.plot_confidences, write_compressed_data=not args.dont_write_compressed_data)

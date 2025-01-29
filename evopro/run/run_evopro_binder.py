@@ -21,7 +21,7 @@ import numpy as np
 def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], score_func_2=None, score_func_2_iter=30,
                                num_iter = 50, n_workers=1, mut_percents=None, contacts=None, distance_cutoffs=None,
                                rmsd_func=None, rmsd_to_starting_func=None, rmsd_to_starting_pdb=None,
-                               mpnn_temp="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, 
+                               mpnn_temps="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, 
                                repeat_af2=True, af2_preds_extra=[], crossover_percent=0.2, vary_length=0, 
                                write_pdbs=False, plot=[], conf_plot=False, write_compressed_data=True):
 
@@ -356,10 +356,17 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
         seq = key_seq.split(" ")
         pdbs = scored_seqs[key_seq]["data"][0]["pdb"]
         result = scored_seqs[key_seq]["data"][0]["result"][0]
-
+        #added new line
+        results = [scored_seqs[key_seq]["data"][0]["result"][x] for x in range(len(scored_seqs[key_seq]["data"][0]["result"]))]
+        
         if write_compressed_data:
             print("writing compressed data")
-            compressed_pickle(os.path.join(output_dir, "seq_" + str(j) + "_result"), result)
+            for r, k in zip(results, range(len(results))):
+                compressed_pickle(os.path.join(output_dir, "seq_" + str(j) + "_result_" + str(k)), r)
+
+        # if write_compressed_data:
+        #     print("writing compressed data")
+        #     compressed_pickle(os.path.join(output_dir, "seq_" + str(j) + "_result"), result)
 
         if conf_plot:
             # Plot confidence.
@@ -581,6 +588,6 @@ if __name__ == "__main__":
     run_genetic_alg_multistate(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, score_func_2=scorefunc2, score_func_2_iter=args.score_func_2_iteration, 
         num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, distance_cutoffs=distance_cutoffs,
         rmsd_func=rmsdfunc, rmsd_to_starting_func=rmsd_to_starting_func, rmsd_to_starting_pdb=path_to_starting,
-        mpnn_temp=mpnn_temps, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, 
+        mpnn_temps=mpnn_temps, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, 
         repeat_af2=not args.no_repeat_af2, af2_preds_extra = af2_preds_extra, crossover_percent=args.crossover_percent, vary_length=args.vary_length, 
         write_pdbs=args.write_pdbs, plot=plot_style, conf_plot=args.plot_confidences, write_compressed_data=not args.dont_write_compressed_data)

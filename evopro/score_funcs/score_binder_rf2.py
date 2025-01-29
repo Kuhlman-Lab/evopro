@@ -1,11 +1,8 @@
 import sys
 sys.path.append("/proj/kuhl_lab/evopro/")
 from evopro.utils.pdb_parser import get_coordinates_pdb
-from evopro.score_funcs.score_funcs import score_contacts, score_contacts_pae_weighted, score_pae_confidence_pairs, score_pae_confidence_lists, score_plddt_confidence, get_rmsd, orientation_score, Rg
+from evopro.score_funcs.score_funcs import score_contacts_pae_weighted, score_plddt_confidence, get_rmsd, Rg
 from evopro.score_funcs.score_funcs_efficient import score_contacts_pae_weighted_efficient
-import os
-import subprocess
-import shutil
 import math
 import time
 

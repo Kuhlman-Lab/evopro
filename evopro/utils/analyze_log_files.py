@@ -1,7 +1,4 @@
-# script located in: /Users/tiger/TIGER/Medicine/UNC/Kuhlman_Lab/scripts/plot_scores_evopro_general_clean.py
-# and in: /nas/longleaf/home/tigerz/kuhlmanlab/scripts/plot_scores_evopro_general_clean.py
-# run using: py /Users/tiger/TIGER/Medicine/UNC/Kuhlman_Lab/scripts/plot_scores_evopro_general_clean.py
-#        or: python /nas/longleaf/home/tigerz/kuhlmanlab/scripts/plot_scores_evopro_general_clean.py
+#  run using: python analyze_log_files.py
 
 # INPUTS: path to an evopro output directory
 #   ex. .../run8/outputs/, which contains the file .../run8/outputs/runtime_seqs_and_scores.log
@@ -11,11 +8,12 @@
 
 import numpy as np 
 import pandas as pd
+import argparse, os
 
-def analyze_log(path_to_file, filename, prefix): 
+def analyze_log(filename, prefix): 
     iters = []
     i=-1
-    with open(path_to_file+filename,"r") as f:
+    with open(filename,"r") as f:
         for lin in f:
             if "iter" in lin:
                 i+=1
@@ -34,11 +32,11 @@ def analyze_log(path_to_file, filename, prefix):
         for seq in l:
             vals_seq = seq[1:] # strip out sequences from each line
             vals.append([float(x.strip('(),[]')) for x in vals_seq if x.strip('(),[]')]) # lists of list
-            print(vals)
+            print("vals", vals)
 
         cutoff = int(len(vals)/2) # num seqs per iter/2 
 
-        num_vals = int(len(vals[0])/2)
+        num_vals = int(len(vals[0]))
         # create list of average values for that iter
         avg_vals = [0] * num_vals 
         # create list of lists, each list stores scores over iterations
@@ -72,20 +70,19 @@ def analyze_log(path_to_file, filename, prefix):
     df = pd.DataFrame(data = d)
 
     # can customize column names
-    index = path_to_file.index("/")
+    #path_to_file = os.path.abspath(os.getcwd())
+    #index = path_to_file.index("/")
     df.to_csv(prefix  + "_parsed.csv")
     print(df)
 # end function
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--log_filename", type=str, default='./runtime_seqs_and_scores.log')
+    parser.add_argument("--prefix", type=str, default='output')
+
+    args = parser.parse_args()
     # analyze evopro runs
-    path = ""
-    jobid = ""
-    analyze_log(path)
 
-    #for i in range(1, 9):
-    #    print("Analyzing run: " + str(i))
-    #    path = "run" + str(i) + "/outputs/"
-    #    analyze_log(path)
-
-    #print()
+    analyze_log(args.log_filename, args.prefix)

@@ -1,0 +1,15 @@
+# outline for method to do bidirectional design with a frame shift
+
+# premise: current bidirectional code (EvoPro, ProteinMPNN, etc) assumes perfect sense/antisense alignment
+# what if we want to offset the bidirectional codons by an arbitrary number of nucleotide positions?
+# this is not trivial to do with the current setup
+
+1. run both designs through ProteinMPNN and calculate an initial fitness based on wildtype sequence
+
+2. obtain the nucleotide sequences of each wildtype amino acid sequence 
+
+3. implement a markov chain monte carlo (MCMC) model of nucleotide mutation
+  4A. based on the arbitrary offset value, select pairs of nucleotides and randomly mutate them together
+    - only allow mutations that follow bidirectional complementarity rules
+  4B. after each nucleotide mutation, convert back to amino acid sequences and score both sequences again
+  4C. if the mutation improves the ProteinMPNN fitness, keep it; also need to encourage bidirectionality

@@ -1,22 +1,17 @@
 #import standard packages
-import multiprocessing as mp
-import collections
 import random
 import string
 import time
 import sys, os
-import re
 import json
 from typing import Sequence, Union
-
+sys.path.append("/proj/kuhl_lab/evopro/")
 #import custom packages
-from evopro.utils.distributor import Distributor
 from evopro.genetic_alg.DesignSeq import DesignSeq, DesignSeqMSD
 from evopro.utils.pdb_parser import get_coordinates_pdb, change_chainid_pdb, append_pdbs
 
 sys.path.append('/proj/kuhl_lab/alphafold/run')
 from functools import partial
-import numpy as np
 
 sys.path.append('/proj/kuhl_lab/proteinmpnn/run/')
 from run_protein_mpnn import run_protein_mpnn_func
@@ -194,7 +189,7 @@ def read_starting_seqs(seqfile, dsobj):
 
     return newseqs
 
-def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0, sid_weights=[0.8, 0.1, 0.1], mut_percent=0.125, all_seqs = []):
+def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0, sid_weights=[0.8, 0.1, 0.1], mut_percent=0.125, all_seqs = [], single_mut_only=False):
     """takes starting sequences and creates a pool of size num_seqs by mutation and crossover"""
 
     if not all_seqs:
@@ -207,7 +202,7 @@ def create_new_seqs(startseqs, num_seqs, crossover_percent = 0.2, vary_length=0,
     #filling pool by mutation
     while len(pool)<num_seqs*(1-crossover_percent):
         obj = random.choice(startseqs)
-        newseq = obj.mutate(var=vary_length, var_weights = sid_weights, mut_percent=mut_percent)
+        newseq = obj.mutate(var=vary_length, var_weights = sid_weights, mut_percent=mut_percent, single_mut_only=single_mut_only)
         len_new = len("".join([newseq.jsondata["sequence"][chain] for chain in newseq.jsondata["sequence"]]))
         newseq_sequence = ",".join([newseq.jsondata["sequence"][chain] for chain in newseq.jsondata["sequence"]])
         if len_new<=max_allowed_length and len_new >= min_allowed_length:
@@ -278,17 +273,21 @@ def create_new_seqs_henry(startseqs, num_seqs, crossover_percent = 0.2, vary_len
 
     return pool
 
-
 def mutate_by_protein_mpnn(pdb_dir, dsobj, mpnn_temp, mpnn_version="s_48_020", bidir=False, bias_AA_dict=None, bias_by_res_dict=None):
     print("===================================MPNN===================================")
-    print(bias_by_res_dict)
+    #print("running MPNN on ", pdb_dir)
+    #print(json.dumps(dsobj.jsondata))
+    #print(mpnn_temp, mpnn_version, bidir, bias_AA_dict, bias_by_res_dict)
     results = run_protein_mpnn_func(pdb_dir, json.dumps(dsobj.jsondata), sampling_temp=mpnn_temp, model_name=mpnn_version, bidir=bidir, bias_AA_dict=bias_AA_dict, bias_by_res_dict=bias_by_res_dict)
 
     return results
 
 def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = [], af2_preds=["AB", "B"],
-                         mpnn_temp="0.1", mpnn_version="s_48_020", mpnn_chains=None, bias_AA_dict=None, bias_by_res_dict=None):
+                         mpnn_temp="0.1", mpnn_version="s_48_020", mpnn_chains=None, bias_AA_dict=None, bias_by_res_dict=None
+                         ):
+    
     pool = startseqs.copy()
+    
     pdb_dirs = []
     #create a directory within running dir to run protein mpnn
     output_folder = run_dir + "MPNN_" + str(iter_num) + "/"
@@ -296,17 +295,22 @@ def create_new_seqs_mpnn(startseqs, scored_seqs, num_seqs, run_dir, iter_num, al
         os.makedirs(output_folder)
     for dsobj, j in zip(startseqs, range(len(startseqs))):
         key_seq = dsobj.get_sequence_string()
-        #print(key_seq)
+        
         if mpnn_chains:
             pdb = None
+            #print(af2_preds, mpnn_chains)
             for i, pred in zip(range(len(af2_preds)), af2_preds):
+                #print(pred)
                 if pred in mpnn_chains:
-                    if not pdb:
-                        pdb = scored_seqs[key_seq]["data"][0]["pdb"][i]
+                    if pdb is None:
+                        if type(scored_seqs[key_seq]["data"][0]["pdb"]) is str:
+                            pdb = scored_seqs[key_seq]["data"][0]["pdb"]
+                        else:
+                            pdb = scored_seqs[key_seq]["data"][0]["pdb"][i]
                     else:
-                        chains, residues, resindices = get_coordinates_pdb(pdb)
+                        chains, _, _ = get_coordinates_pdb(pdb)
                         new_pdb = scored_seqs[key_seq]["data"][0]["pdb"][i]
-                        chains_new, residues_new, resindices_new = get_coordinates_pdb(new_pdb)
+                        chains_new, _, _ = get_coordinates_pdb(new_pdb)
                         chains_mod = []
                         chain_ind = 0
                         while len(chains_mod)<len(chains_new):
@@ -430,7 +434,7 @@ def create_new_seqs_mpnn_henry(startseqs, scored_seqs, num_seqs, run_dir, iter_n
     return pool
 
 
-def create_new_seqs_mpnn_old(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = [], mpnn_temp="0.1", mpnn_version="s_48_020"):
+"""def create_new_seqs_mpnn_old(startseqs, scored_seqs, num_seqs, run_dir, iter_num, all_seqs = [], mpnn_temp="0.1", mpnn_version="s_48_020"):
     pool = startseqs.copy()
     exampleds = None
     pdb_dirs = []
@@ -473,12 +477,4 @@ def write_outputs(seqs, scores, opfilename):
         for seq, score in zip(seqs, scores):
             opf.write(str(seq) + "\t" + str(score) + "\n")
 
-    print("done writing ", opfilename)
-
-
-if __name__ == "__main__":
-    rand_seqs = generate_random_seqs(20, [59])
-    #print(rand_seqs)
-    #path = "/pine/scr/a/m/amritan/kuhlmanlab/fdd/fdd/tests/pd1_threehelix_test/"
-    #dsobj = DesignSeq(jsonfile=path+"resfile.json")
-    #print(read_starting_seqs(path+"starting_seqs.txt", dsobj))
+    print("done writing ", opfilename)"""

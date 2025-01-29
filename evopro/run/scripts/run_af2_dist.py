@@ -1,3 +1,6 @@
+"""Script that runs AF2 (distributor, runtime-optimized) on a list of sequences and returns the scores and PDB files.
+By default, the PDBs are scored for average plDDT score and sorted by that score. A custom scoring function can be provided instead."""
+
 import sys, os
 import importlib
 
@@ -9,6 +12,45 @@ from evopro.score_funcs.score_funcs import score_plddt_confidence_overall
 
 sys.path.append('/proj/kuhl_lab/alphafold/run')
 from run_af2 import af2_init
+
+def getFlagParser() -> FileArgumentParser:
+    """Gets an FileArgumentParser with necessary arguments to run script."""
+
+    parser = FileArgumentParser(description='Parser that can take flag options for script.',
+                                fromfile_prefix_chars='@')
+
+    parser.add_argument('--af2_flags_file',
+                        default='./af2.flags',
+                        type=str,
+                        help='Path to and name of af2.flags file.')
+    
+    parser.add_argument('--sequence_file',
+                        default="sequences.csv",
+                        type=str,
+                        help='Path to and name of csv file containing sequences.')
+    
+    parser.add_argument('--output_dir',
+                        default="outputs",
+                        type=str,
+                        help='Path to and name of csv file containing sequences.')
+    
+    parser.add_argument('--max_chains_length',
+                        default=None,
+                        type=str,
+                        help='If more than one PDB input backbone, overall max length of each chain separated by commas.')
+    
+    parser.add_argument('--custom_score',
+                        default=None,
+                        type=str,
+                        help='Score function to use to generate scores for each prediction (optional).')
+
+    parser.add_argument('--n_workers',
+                        default=1,
+                        type=int,
+                        help='Number of GPUs available for AlphaFold2. Default is 1.')
+
+    return parser
+
 
 def run_af2_dist(args, score_func=None):
     
@@ -70,44 +112,7 @@ def run_af2_dist(args, score_func=None):
         for seq,i in zip(sorted_seqs_and_scores, range(len(sorted_seqs_and_scores))):
             opf.write(str(seq[0]) + "\t" + str(seqs_and_scores[seq[0]]) + "\t" + str(data[seq[0]][0]) + "\n")
             
-def getFlagParser() -> FileArgumentParser:
-    """Gets an FileArgumentParser with necessary arguments to run script."""
-
-    parser = FileArgumentParser(description='Parser that can take flag options for script.',
-                                fromfile_prefix_chars='@')
-
-    parser.add_argument('--af2_flags_file',
-                        default='./af2.flags',
-                        type=str,
-                        help='Path to and name of af2.flags file.')
-    
-    parser.add_argument('--sequence_file',
-                        default="sequences.csv",
-                        type=str,
-                        help='Path to and name of csv file containing sequences.')
-    
-    parser.add_argument('--output_dir',
-                        default="outputs",
-                        type=str,
-                        help='Path to and name of csv file containing sequences.')
-    
-    parser.add_argument('--max_chains_length',
-                        default=None,
-                        type=str,
-                        help='If more than one PDB input backbone, overall max length of each chain separated by commas.')
-    
-    parser.add_argument('--custom_score',
-                        default=None,
-                        type=str,
-                        help='Score function to use to generate scores for each prediction (optional).')
-
-    parser.add_argument('--n_workers',
-                        default=1,
-                        type=int,
-                        help='Number of GPUs available for AlphaFold2. Default is 1.')
-
-    return parser
-            
+               
 if __name__ == "__main__":
     parser = getFlagParser()
     args = parser.parse_args(sys.argv[1:])

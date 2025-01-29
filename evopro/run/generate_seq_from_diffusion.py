@@ -28,7 +28,6 @@ def run_mpnn_on_diff_backbone(pdb_backbone, jsonfile, output_dir, mpnn_temp="0.1
         
     while len(mpnn_seqs)<num_seqs:
         new_seq = run_protein_mpnn(pdb_backbone, jsondata, mpnn_temp, mpnn_version=mpnn_version, bidir=False)
-        #print(new_seq)
         seq = new_seq[0][-1][-1].strip().split("/")
         newseq_sequence = ",".join(seq)
         newseq_sequence = "," + newseq_sequence
@@ -42,6 +41,7 @@ def run_mpnn_on_diff_backbone(pdb_backbone, jsonfile, output_dir, mpnn_temp="0.1
     with open(os.path.join(output_dir, "sequences.csv"), 'w') as f:
         f.write("\n".join(mpnn_seqs))
         
+    #print(mpnn_seqs_af2)
     return mpnn_seqs_af2
 
 def run_af2_on_mpnn_seqs(diff_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir,  n_workers=1):
@@ -97,8 +97,7 @@ def run_af2_on_mpnn_seqs(diff_backbone, mpnn_seqs_list, score_func, af2_flags_fi
     print("Number of AlphaFold2 predictions: ", num_af2)
     
     
-#def run_af2_on_mpnn_seqs_iter(dist, diff_backbone, mpnn_seqs_list, score_func, output_dir,  n_workers=1):
-def run_af2_on_mpnn_seqs_iter(dist, af2_flags_file, diff_backbone, mpnn_seqs_list, score_func, output_dir,  n_workers=1):
+def run_af2_on_mpnn_seqs_iter(dist, diff_backbone, mpnn_seqs_list, score_func, output_dir):
 
     # mpnn_seqs_list is a list of multi chain sequences
 
@@ -114,6 +113,7 @@ def run_af2_on_mpnn_seqs_iter(dist, af2_flags_file, diff_backbone, mpnn_seqs_lis
     print("AF2 results:")
     print(results)
     
+    results_list = []
     seqs_and_scores = {}
     data = {}
     scores = []
@@ -123,57 +123,46 @@ def run_af2_on_mpnn_seqs_iter(dist, af2_flags_file, diff_backbone, mpnn_seqs_lis
         scores.append(score)
         
         seqs_and_scores[s] = (score[0])
-        data[s] = (score[1], score[-1], score[-2])
+        data[s] = [score[1], score[-1], score[-2], None]
         
         #print(s, score[0])
     
     sorted_seqs_and_scores = sorted(seqs_and_scores.items(), key=lambda x:x[1])
 
-    print(sorted_seqs_and_scores)
+    #print(sorted_seqs_and_scores)
     for seq,i in zip(sorted_seqs_and_scores, range(len(sorted_seqs_and_scores))):
-        pdb = data[seq[0]][-1]
-        r = data[seq[0]][-2]
-        with open(os.path.join(output_dir,"seq_" + str(i) + "_model_1.pdb"), "w") as pdbf:
+        pdb = data[seq[0]][-2]
+        r = data[seq[0]][-3]
+        if not os.path.isdir(os.path.join(output_dir, "seq_" + str(i) + "_af2/")):
+            os.makedirs(os.path.join(output_dir, "seq_" + str(i) + "_af2/"))
+        with open(os.path.join(output_dir, "seq_" + str(i) + "_af2/" + "seq_" + str(i) + "_model_1.pdb"), "w") as pdbf:
             pdbf.write(str(pdb))
         compressed_pickle(os.path.join(output_dir, "seq_" + str(i) + "_result"), r)
-        print(seq[0], data[seq[0]][0])
+        #print(seq[0], data[seq[0]][0])
+        data[seq[0]][-1] = str(os.path.join(output_dir, "seq_" + str(i) + "_af2/" + "seq_" + str(i) + "_model_1.pdb"))
     
     with open(os.path.join(output_dir, "seqs_and_scores.csv"), "w") as opf:
         for seq,i in zip(sorted_seqs_and_scores, range(len(sorted_seqs_and_scores))):
-            opf.write(str(seq[0]) + "\t" + str(seqs_and_scores[seq[0]]) + "\t" + str(data[seq[0]][0]) + "\n")
+            opf.write(str(seq[0]) + "\t" + str(seqs_and_scores[seq[0]]) + "\t" + str(data[seq[0]][0]) + "\t" + str(data[seq[0]][-1]) + "\n")
+            results_list.append((seq[0], seqs_and_scores[seq[0]], data[seq[0]][0], data[seq[0]][-1]))
 
     print("Number of AlphaFold2 predictions: ", num_af2)
-    #dist.spin_down()
+    return results_list
     
-def run_af2_on_mpnn_seqs_withmonomers(diff_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir,  n_workers=1):
+def run_af2_on_mpnn_seqs_withmonomers(dist, diff_backbone, work_list, score_func, num_preds, output_dir):
     # mpnn_seqs_list is a list of multi chain sequences
 
     num_af2=0
-
-    lengths = []
-    lengths.append([len(x) for x in mpnn_seqs_list[0][0]])
-    lengths = lengths + [[len(x)] for x in mpnn_seqs_list[0][0]]
-    num_preds = len(lengths)
-
-    print("Number of AF2 predictions per sequence:", num_preds)
-    print("Compiling AF2 models for lengths:", lengths)
-        
-    work_list = []
-    for seq in mpnn_seqs_list:
-        #print(seq[0])
-        work_list.append(seq)
-        work_list = work_list + [[[x]] for x in seq[0]]
-        
+   
     print("work list", work_list)
     num_af2 += len(work_list)
 
-    print("Initializing distributor")
-    dist = Distributor(n_workers, af2_init, af2_flags_file, lengths)
     results = dist.churn(work_list)
     
-    print("done churning")
-    dist.spin_down()
+    #print("done churning")
+    #dist.spin_down()
 
+    results_list = []
     results_parsed = []
     for result in results:
         while type(result) == list:
@@ -210,9 +199,10 @@ def run_af2_on_mpnn_seqs_withmonomers(diff_backbone, mpnn_seqs_list, score_func,
     with open(os.path.join(output_dir, "seqs_and_scores.csv"), "w") as opf:
         for seq,i in zip(sorted_seqs_and_scores, range(len(sorted_seqs_and_scores))):
             opf.write(str(seq[0]) + "\t" + str(seqs_and_scores[seq[0]]) + "\t" + str(data[seq[0]][0]) + "\n")
+            results_list.append((seq[0], seqs_and_scores[seq[0]], data[seq[0]][0]))
 
     print("Number of AlphaFold2 predictions: ", num_af2)
-
+    return results_list
 
 def getFlagParser() -> FileArgumentParser:
     """Gets an FileArgumentParser with necessary arguments to run script."""
@@ -266,6 +256,12 @@ def getFlagParser() -> FileArgumentParser:
                         type=str,
                         help='MPNN version to use for sequence generation. Default is s_48_020.')
     
+    parser.add_argument('--target_oligomer_state',
+                        default=1,
+                        type=int,
+                        help='Number of oligomeric chains to predict for the target. Default is 1.\
+                        WARNING: assumes binder chain is first chain in the sequence.')
+    
     parser.add_argument('--af2_preds_monomers',
                          action='store_true',
                          help='Default is False.')
@@ -312,13 +308,13 @@ if __name__ == "__main__":
         af2_flags_file = os.path.join(input_dir, "af2.flags")
         mpnn_seqs_list = run_mpnn_on_diff_backbone(input_dir, jsonfile, output_dir, mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, num_seqs=args.num_seqs_mpnn)
         if args.af2_preds_monomers:
-            run_af2_on_mpnn_seqs_withmonomers(pdb_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir, n_workers=args.n_workers)
+            run_af2_on_mpnn_seqs_withmonomers(pdb_backbone, mpnn_seqs_list, score_func, output_dir)
         else:
-            run_af2_on_mpnn_seqs(pdb_backbone, mpnn_seqs_list, score_func, af2_flags_file, output_dir, n_workers=args.n_workers)
+            run_af2_on_mpnn_seqs(pdb_backbone, mpnn_seqs_list, score_func, output_dir)
     
     elif args.pdb_dir:
         input_dir = args.input_dir
-        if input_dir == "./":
+        if input_dir == "./" or input_dir == ".":
             input_dir = os.getcwd()
         pdb_dir = os.path.join(input_dir, args.pdb_dir)
         output_dir = os.path.join(input_dir, "outputs/")
@@ -334,6 +330,7 @@ if __name__ == "__main__":
             shutil.rmtree(output_dir)
             os.makedirs(output_dir)
         
+        print(pdb_dir)
         pdbs = [os.path.join(pdb_dir, f) for f in os.listdir(pdb_dir) if os.path.isfile(os.path.join(pdb_dir, f)) and f.endswith(".pdb")]
         
         lengths = []
@@ -346,17 +343,15 @@ if __name__ == "__main__":
                     lengths.append([elem])
         else:
             raise ValueError("Please provide max_chains_length argument when using --pdb_dir option.")
-        
-        #print("Finding lengths")
-        #print(mpnn_seqs_list[0][0])
-        #print(mpnn_seqs_list[0])
-        #lengths = []
-        #lengths.append([len(x) for x in mpnn_seqs_list[0][0]])
+        num_preds = len(lengths)
         
         print("Compiling AF2 models for lengths:", lengths)
         print("Initializing distributor")
         dist = Distributor(args.n_workers, af2_init, af2_flags_file, lengths, pre_func=True)
-    
+
+        print(pdbs)
+        
+        all_results = []
         for pdb in pdbs:
             print("Running MPNN on", pdb)
             name = pdb.split("/")[-1].split(".")[0]
@@ -371,15 +366,8 @@ if __name__ == "__main__":
             except:
                 raise ValueError("No json.flags file found in input directory. Please provide a json.flags file in the input directory that is generalizable to all input PDBs.")
 
-            """try:
-                shutil.copy(os.path.join(input_dir, "af2.flags"), mpnn_dir)
-            except:
-                raise ValueError("No af2.flags file found in input directory. Please provide a af2.flags file in the input directory that is generalizable to all input PDBs.")
-            """
-            
             if templates_dir:
                 shutil.copytree(templates_dir, os.path.join(mpnn_dir, "templates/"))
-            #input_dir_return = os.getcwd()
             
             os.chdir(mpnn_dir)
             print("generating json")
@@ -387,16 +375,49 @@ if __name__ == "__main__":
             jsonfile = os.path.join(mpnn_dir, "residue_specs.json")
             mpnn_seqs_list = run_mpnn_on_diff_backbone(mpnn_dir, jsonfile, mpnn_dir, mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, num_seqs=args.num_seqs_mpnn)
 
-            mod_mpnn_seqs_list = []
-            for element in mpnn_seqs_list:
+            work_list = []
+            if args.af2_preds_monomers:
+
+                print("Number of AF2 predictions per sequence:", num_preds)
+                print("Compiling AF2 models for lengths:", lengths)
+                
+                work_list = []
+                for seq in mpnn_seqs_list:
+                    #print(seq[0])
+                    work_list.append(seq)
+                    work_list = work_list + [[[x]] for x in seq[0]]
+            
+            elif args.target_oligomer_state>1:
+                work_list = []
+                for seq in mpnn_seqs_list:
+                    #print(seq)
+                    new_seq = [seq[0][0]]
+                    for i in range(args.target_oligomer_state):
+                        new_seq.append(seq[0][-1])
+                    
+                    new_seq = [new_seq]
+                    #print(seq, new_seq)
+                    work_list.append(new_seq)
+            
+            else:
+                work_list = mpnn_seqs_list
+            
+            for element in work_list:
                 element.append(partial(change_dir, mpnn_dir))
-            #run_af2_on_mpnn_seqs_iter(dist, pdb_backbone, mpnn_seqs_list, score_func, mpnn_dir, n_workers=args.n_workers)
-            #print("running alphafold!!")
-            run_af2_on_mpnn_seqs_iter(dist, af2_flags_file, pdb_backbone, mpnn_seqs_list, score_func, mpnn_dir, n_workers=args.n_workers)
+
+            if args.af2_preds_monomers:
+                all_results.extend(run_af2_on_mpnn_seqs_withmonomers(dist, pdb_backbone, work_list, score_func, num_preds, mpnn_dir))
+            else:
+                all_results.extend(run_af2_on_mpnn_seqs_iter(dist, pdb_backbone, work_list, score_func, mpnn_dir))
             
             print("Finished running AlphaFold2 on MPNN sequences in", os.getcwd())
             os.chdir(input_dir)
         
         print("done churning")
         dist.spin_down()
-            
+        
+        if len(all_results)>0:
+            sorted_results = sorted(all_results, key=lambda x:x[1])
+            with open(os.path.join(output_dir, "all_seqs_and_scores.csv"), "w") as opf:
+                for seq,i in zip(sorted_results, range(len(sorted_results))):
+                    opf.write(str(seq[0]) + "\t" + str(seq[1]) + "\t" + str(seq[2]) + "\t" + str(seq[3]) + "\n")

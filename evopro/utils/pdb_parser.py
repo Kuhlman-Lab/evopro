@@ -1,3 +1,5 @@
+from evopro.utils.aa_utils import three_to_one
+
 def get_coordinates_pdb(pdb, fil=False):
     lines = []
     chains = []
@@ -13,10 +15,12 @@ def get_coordinates_pdb(pdb, fil=False):
                 l = lin.strip().split()
                 if l:
                     if 'ATOM' in l[0] or 'HETATM' in l[0]:
-                        resid = l[4]+l[5]
+                        resid = lin[21] + lin[22:26].strip()
+                        #resid = l[4]+l[5]
                         atominfo = (l[1], l[2], (x, y, z))
-                        if l[4] not in chains:
-                            chains.append(l[4])
+                        if lin[21] not in chains:
+                            print(lin, lin[21])
+                            chains.append(lin[21])
                         if resid not in residues:
                             residues[resid] = [atominfo]
                         else:
@@ -68,6 +72,28 @@ def get_ca_coordinates_pdb(pdb_str):
                 coords.append(coord)
 
     return coords
+
+def get_seq_from_pdb(pdb_str):
+    seqs = []
+    chains = []
+
+    seq = []
+    pdb_split = pdb_str.split("\n")
+    pdb_split = [x for x in pdb_split if x]
+    for lin in pdb_split:
+        l = lin.strip().split()
+        if 'ATOM' in l[0] or 'HETATM' in l[0]:
+            if l[2] == "CA":
+                if l[4] not in chains:
+                    chains.append(l[4])
+                    seqs.append("".join(seq))
+                    seq = []
+                
+                seq.append(three_to_one(l[3]))
+    seqs.append("".join(seq))
+    
+    seqs = [x for x in seqs if x]
+    return seqs
 
 def change_chainid_pdb(pdb, old_chain="A", new_chain="B"):
     pdb_lines = [x for x in pdb.split("\n") if x]
@@ -191,10 +217,11 @@ def get_coordinates_pdb_old(pdb, fil = False):
                 l = lin.strip().split()
                 if l:
                     if 'ATOM' in l[0] or 'HETATM' in l[0]:
-                        resid = l[4]+'_'+l[3]+'_'+l[5]
+                        resid = lin[21] + '_' + lin[17:20].strip() + "_" + lin[22:26].strip()
+                        #resid = l[4]+'_'+l[3]+'_'+l[5]
                         atominfo = (l[1], l[2], (x, y, z))
-                        if l[4] not in chains:
-                            chains.append(l[4])
+                        if lin[21] not in chains:
+                            chains.append(lin[21])
                         if resid not in residues:
                             residues[resid] = [atominfo]
                         else:
@@ -212,10 +239,11 @@ def get_coordinates_pdb_old(pdb, fil = False):
             z = lin[46:54].strip(' ')
             l = lin.strip().split()
             if 'ATOM' in l[0] or 'HETATM' in l[0]:
-                resid = l[4]+'_'+l[3]+'_'+l[5]
+                resid = lin[21] + '_' + lin[17:20].strip() + "_" + lin[22:26].strip()
+                #resid = l[4]+'_'+l[3]+'_'+l[5]
                 atominfo = (l[1], l[2], (x, y, z))
-                if l[4] not in chains:
-                    chains.append(l[4])
+                if lin[21] not in chains:
+                    chains.append(lin[21])
                 if resid not in residues:
                     residues[resid] = [atominfo]
                 else:
@@ -227,29 +255,12 @@ def get_coordinates_pdb_old(pdb, fil = False):
     return chains, residues, residueindices
 
 if __name__ == "__main__":
-    pdb1_name = "/proj/kuhl_lab/evopro/evopro/tests/pdb_parsing/test.pdb"
-    pdb2_name = "/proj/kuhl_lab/evopro/evopro/tests/pdb_parsing/test2.pdb"
+    pdb1_name = "/work/users/a/m/amritan/evopro_tests/rmsd/temp1.pdb"
+    #pdb2_name = "/proj/kuhl_lab/evopro/evopro/tests/pdb_parsing/test2.pdb"
     
     #test get_coordinates_pdb
     with open(pdb1_name, "r") as pdbf:
         pdb1 = pdbf.read()
-    chains, residues, resindices = get_coordinates_pdb(pdb1)
-    print(chains)
     
-    #test appending chains
-    """pdb = ""
-    with open(pdb1_name, "r") as pdbf:
-        pdb1 = pdbf.read()
-    with open(pdb2_name, "r") as pdbf:
-        pdb2 = pdbf.read()
-    
-    newpdb2 = change_chainid_pdb(pdb2, old_chain="A", new_chain="C")
-    with open("/proj/kuhl_lab/evopro/evopro/tests/pdb_parsing/test2_mod.pdb", "w") as pdbf:
-        pdbf.write(newpdb2)
-    
-
-    new_appended_pdb = append_pdbs(pdb1, newpdb2)
-    
-    with open("/proj/kuhl_lab/evopro/evopro/tests/pdb_parsing/test3.pdb", "w") as pdbf:
-        pdbf.write(new_appended_pdb)
-    #print(pdb, newpdb)"""
+    print(get_seq_from_pdb(pdb1))
+ 

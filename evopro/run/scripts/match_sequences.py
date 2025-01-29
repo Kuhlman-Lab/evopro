@@ -8,13 +8,13 @@ from evopro.score_funcs.score_funcs import get_rmsd
 import warnings
 warnings.filterwarnings("ignore")
 
-def get_seq_from_pdb(pdbfilename):
+def get_seq_from_pdb(pdbfilename, binder_chain_index=-1):
     seq = []
     with open(pdbfilename, "r") as f:
         for record in SeqIO.parse(f, 'pdb-atom'):
             seq.append(record.seq)
-    
-    return str("".join(seq[-1]))
+
+    return str("".join(seq[binder_chain_index]))
 
 def score_rmsd(pdb1, pdb2):
     _, residues1, _ = get_coordinates_pdb(pdb1)
@@ -47,11 +47,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--rf2_dir", type=str, default="./rf2_pdbs/")
-    parser.add_argument("--af2_dir", type=str, default='./outputs/')
+    parser.add_argument("--af2_dir", type=str, default='./af2_pdbs/')
     parser.add_argument("--output_file", type=str, default='af2_rf2_rmsd.csv')
     
     parser.add_argument("--get_rmsd", action='store_true', help='Default is False.')
     parser.add_argument("--get_rf2_plddt", action='store_true', help='Default is False.')
+    parser.add_argument("--binder_chain_index", type=int, default=-1, help='Default is -1 (binder is last chain). This value is zero-indexed.')
     
     args = parser.parse_args()
     
@@ -60,7 +61,7 @@ if __name__ == "__main__":
     
     pdb_dict_by_seq = {}
     for file in rf2_pdbs:
-        seq = get_seq_from_pdb(file)
+        seq = get_seq_from_pdb(file, binder_chain_index=args.binder_chain_index)
         with open(file, "r") as f:
             pdb_str = f.read()
         if args.get_rf2_plddt:
@@ -69,9 +70,13 @@ if __name__ == "__main__":
             plddt = None
         pdb_dict_by_seq[seq] = (pdb_str, file, plddt)
         
-    for file in af2_pdbs:
-        seq = get_seq_from_pdb(file)
-        print(seq)
+    for file, i in zip(af2_pdbs, range(len(af2_pdbs))):
+        seq = get_seq_from_pdb(file, binder_chain_index=args.binder_chain_index)
+        #print(file, seq)
+        print(len(pdb_dict_by_seq[seq]))
+        if len(pdb_dict_by_seq[seq]) > 3:
+            print(seq)
+            continue
         rf2_pdb, rf2_pdb_path, rf2_plddt = pdb_dict_by_seq[seq]
         with open(file, "r") as f:
             af2_pdb = f.read()
@@ -80,13 +85,18 @@ if __name__ == "__main__":
             rmsd = score_rmsd(af2_pdb, rf2_pdb)
         else:
             rmsd = None
+            
+        af2_plddt = get_average_plddt(af2_pdb)
         
         af2_file_name = file.split("/")[-1].split(".")[0]
         rf2_file_name = rf2_pdb_path.split("/")[-1].split(".")[0]
-        index = int(af2_file_name.split("_")[1])
+        try:
+            index = int(af2_file_name.split("_")[1])
+        except:
+            index = i
         
-        pdb_dict_by_seq[seq] = [index, rf2_file_name, af2_file_name, rmsd, rf2_plddt, rf2_pdb_path, file, rf2_pdb, af2_pdb]
+        pdb_dict_by_seq[seq] = [index, rf2_file_name, af2_file_name, rmsd, af2_plddt, rf2_plddt, rf2_pdb_path, file, rf2_pdb, af2_pdb]
     
     with open(args.output_file, "w") as opf:
         for seq in pdb_dict_by_seq:
-            opf.write(seq + "," + ",".join([str(x) for x in pdb_dict_by_seq[seq][:-4]]) + "\n")
+            opf.write(seq + "," + ",".join([str(x) for x in pdb_dict_by_seq[seq][:-3]]) + "\n")

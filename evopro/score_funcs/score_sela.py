@@ -82,6 +82,24 @@ def score_binder_3(results, dsobj, contacts=None, orient=None):
     print(score)
     return score, (score, confscore2, rmsd_score), pdb, results
 
+def score_binder_1_upweight_linker(results, dsobj, contacts=None, orient=None):
+    from alphafold.common import protein
+    pdb = protein.to_pdb(results['unrelaxed_protein'])
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+
+    reslist_designable = [x for x in residues.keys() if x in dsobj._get_designable_positions()]
+    reslist_not_designable = [x for x in residues.keys() if x not in dsobj._get_designable_positions()]
+
+    confscore_designable = score_plddt_confidence(results, reslist_designable, resindices, dsobj=dsobj, first_only=False)
+    confscore_nondesignable = score_plddt_confidence(results, reslist_not_designable, resindices, dsobj=dsobj, first_only=False)
+
+    path_to_starting = "/proj/kuhl_lab/evopro/evopro/data/d1truncated.pdb"
+    rmsd_score = score_binder_rmsd_to_starting(pdb, path_to_starting, dsobj=dsobj, resids_orig=contacts, resids_new=reslist_not_designable)
+    
+    score = -confscore_designable*3 - confscore_nondesignable + rmsd_score
+    print("Overall score", score)
+    return score, (score, confscore_designable, confscore_nondesignable, rmsd_score), pdb, results
+
 def score_binder_1_d2(results, dsobj, contacts=None, orient=None):
     from alphafold.common import protein
     pdb = protein.to_pdb(results['unrelaxed_protein'])

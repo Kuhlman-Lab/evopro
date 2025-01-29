@@ -67,14 +67,26 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
                         mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
             except:
                 raise ValueError("Invalid specification. Try using the asterisk after the chain ID.")
+            
+        elif "<G" in resind:
+            residue = resind.split("<")[0]
+            chain = re.split(r'(\d+)', residue)[0]
+            num_id = int(re.split(r'(\d+)', residue)[1])
+            chain_seq = chain_seqs[chain]
+            for i in range(num_id-1, len(chain_seq)):
+                if chain_seq[i] == "G":
+                    mutable.append({"chain":chain, "resid": i+1, "WTAA": "G", "MutTo": default})
+                else:
+                    break
+        
         elif "<" in resind:
             try:
                 residue = resind.split("<")[0]
-                chain = re.split('(\d+)', residue)[0]
-                num_id = int(re.split('(\d+)', residue)[1])
+                chain = re.split(r'(\d+)', residue)[0]
+                num_id = int(re.split(r'(\d+)', residue)[1])
                 for pdbid in pdbids:
-                    chain_compare = re.split('(\d+)', pdbid)[0]
-                    num_id_compare = int(re.split('(\d+)', pdbid)[1])
+                    chain_compare = re.split(r'(\d+)', pdbid)[0]
+                    num_id_compare = int(re.split(r'(\d+)', pdbid)[1])
                     if chain == chain_compare and num_id<=num_id_compare:
                         mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
             except:
@@ -149,15 +161,15 @@ def parse_mutres_input(mutresstring):
             mutres.append(elem)
         else:
             start, finish = elem.split("-")
-            chain = re.split('(\d+)', start)[0]
-            s = int(re.split('(\d+)', start)[1]) 
-            f = int(re.split('(\d+)', finish)[1]) 
+            chain = re.split(r'(\d+)', start)[0]
+            s = int(re.split(r'(\d+)', start)[1]) 
+            f = int(re.split(r'(\d+)', finish)[1]) 
             for i in range(s, f+1):
                 mutres.append(chain + str(i))
     return mutres
 
 def _check_res_validity(res_item):
-    split_item = [item for item in re.split('(\d+)', res_item) if item]
+    split_item = [item for item in re.split(r'(\d+)', res_item) if item]
 
     if len(split_item) != 2:
         raise ValueError(f'Unable to parse residue: {res_item}.')
@@ -190,7 +202,7 @@ def _check_range_validity_asterisk(range_item, pdbids):
     chain = range_item.split("*")[0]
     
     for pdbid in pdbids:
-        chain_id = re.split('(\d+)', pdbid)[0]
+        chain_id = re.split(r'(\d+)', pdbid)[0]
         if chain == chain_id:
             res_range.append( (chain_id, pdbids[pdbid][2]) )
     

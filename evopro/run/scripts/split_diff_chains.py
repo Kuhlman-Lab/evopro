@@ -1,3 +1,5 @@
+"""Script that parses a directory of PDB files from RFdiffusion and splits the diffused binder into a separate chain from the target."""
+
 import os
 import argparse
 

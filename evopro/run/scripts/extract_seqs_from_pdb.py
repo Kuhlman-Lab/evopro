@@ -1,3 +1,5 @@
+"""Script that parses a directory of multi-chain PDB files and writes out an AF2-compatible sequence file."""
+
 import os, sys
 from Bio import SeqIO   
 import argparse

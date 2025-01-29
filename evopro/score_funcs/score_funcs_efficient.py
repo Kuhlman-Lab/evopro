@@ -61,7 +61,47 @@ class ProteinContacts(nn.Module):
 
             return D_neighbors, E_idx, mask_neighbors
 
-def score_contacts_pae_weighted_efficient(results, pdb, reslist1, reslist2, dist=4, contact_cap=36, dsobj=None, first_only=False):
+def get_contacts_efficient(pdbfile, dist=4, contact_cap=36, chain1 = "A", chain2 = "B"):
+    with open(pdbfile, "r") as f:
+        pdb = f.read()
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    
+    prot = ProteinContacts(pdb, top_k=contact_cap)
+    _, E_idx, _ = prot._dist()
+    neighbors = E_idx.numpy()[0]
+    
+    #print("HERE")
+    reslist1_inds = [resindices[res] for res in residues.keys() if res.startswith(chain1)]
+    reslist2_inds = [resindices[res] for res in residues.keys() if res.startswith(chain2)]
+    #print(reslist1_inds, reslist2_inds, neighbors)
+    resindices_rev = dict((v, k) for k, v in resindices.items())
+
+    score = 0
+    pairs = []
+    for res1_ind in reslist1_inds:
+        neighbors_res1 = neighbors[res1_ind]
+        print(neighbors_res1, reslist2_inds)
+        hits = list(Intersection(neighbors_res1, reslist2_inds))
+        print(hits)
+        for res2_ind in hits:
+            contact = 0
+            weight = 0
+            res1 = resindices_rev[res1_ind]
+            res2 = resindices_rev[res2_ind]
+            for atom1 in residues[res1]:
+                for atom2 in residues[res2]:
+                    if distance(atom1[2], atom2[2])<=dist:
+                        pair = (res1, res2)
+                        pair_rev = (res2, res1)
+                        if pair not in pairs and pair_rev not in pairs:
+                            if len(pairs)<contact_cap:
+
+                                pairs.append(pair)
+    return pairs
+    
+
+def score_contacts_pae_weighted_efficient(results, pdb, reslist1, reslist2, dist=4, contact_cap=36, dsobj=None, first_only=False, rf2=False):
+    
     #start = time.time()
     if dsobj:
         reslist1 = get_seq_indices(dsobj, reslist1, first_only=first_only)
@@ -69,12 +109,14 @@ def score_contacts_pae_weighted_efficient(results, pdb, reslist1, reslist2, dist
 
     chains, residues, resindices = get_coordinates_pdb(pdb)
     #print(residues, resindices)
-    pae = results['pae_output'][0]
+    if rf2:
+        pae = results['pae']
+    else:
+        pae = results['pae_output'][0]
     
-    prot = ProteinContacts(pdb, top_k=36)
+    prot = ProteinContacts(pdb, top_k=contact_cap)
     _, E_idx, _ = prot._dist()
     neighbors = E_idx.numpy()[0]
-    #print(neighbors, neighbors.shape)
     
     reslist1_inds = [resindices[res] for res in reslist1]
     reslist2_inds = [resindices[res] for res in reslist2]

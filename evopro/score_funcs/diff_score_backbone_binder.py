@@ -4,16 +4,12 @@ from evopro.utils.pdb_parser import get_coordinates_pdb
 from evopro.score_funcs.score_funcs import Rg
 
 
-def score_diff_backbone_rG(pdb, diff_chain="B"):
-
-    chains, residues, resindices = get_coordinates_pdb(pdb)
+def score_diff_backbone_rG(pdbfile, diff_chain="A"):
     
-    reslist = [x for x in residues.keys() if x.startswith(diff_chain)]
+    with open(pdbfile, "r") as f:
+        pdb = f.read()
     
-    #doesnt work!
-    #print(reslist)
-    #rG = Rg(pdb, chnid=diff_chain)
-    #print(rG)
+    rG = Rg(pdb, chnid=diff_chain)
     
-    return (len(reslist), 0)
+    return rG
     

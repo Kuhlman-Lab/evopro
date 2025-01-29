@@ -1,0 +1,15 @@
+--num_iter 100
+--pool_size 20
+--num_gpus 1
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_binder_trimer.py
+--score_func score_binder_3
+--af2_preds AB,B
+--mpnn_chains AB
+--define_contact_area A1-A49
+--plot_scores_top
+--plot_scores_avg
+--plot_scores_median
+--mpnn_freq 2
+--skip_mpnn 1-10
+--plot_confidences
+--write_pdbs

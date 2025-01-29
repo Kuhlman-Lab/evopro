@@ -125,6 +125,7 @@ class Distributor:
             if pre_func:
                 val[-1]()
                 val = val[:-1]
+            print(val)
             result = f(val)
        
             lock.acquire()

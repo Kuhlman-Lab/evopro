@@ -69,7 +69,8 @@ class MultiStateProteinDesignInputFormatter:
 
         # if bidirectional, switch order of symmetric residues
         if bidirectional:
-            print('Applying bidirectional coding constraints...')
+            print('Reversing sequence symmetry to enable bidirectional coding')
+            # print('Applying bidirectional coding constraints...')
             self.apply_bidirectional()
 
 
@@ -571,4 +572,3 @@ if __name__=="__main__":
     elif args.sequence_dir:
         print('Sequence-first design not yet supported for multi-state design.')
         quit()
-

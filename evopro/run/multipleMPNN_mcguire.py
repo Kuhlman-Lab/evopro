@@ -20,39 +20,37 @@ def run_protein_mpnn(pdb_dir, jsonstring, mpnn_temp, mpnn_version="v_48_020", bi
 
     return results
 
-def run_mpnn_on_diff_backbone(pdb_backbone, jsonfile, output_dir, mpnn_temp="0.1", mpnn_version="s_48_020", num_seqs=100):
-    mpnn_seqs = []
-    mpnn_seqs_af2 = []
+def run_mpnn_on_diff_backbone(pdb_backbone, jsonfile, output_dir, mpnn_temp="0.1", mpnn_version="s_48_020"):
     with open(jsonfile, 'r') as f:
         jsondata = f.read()
 
-    while len(mpnn_seqs)<num_seqs:
-        new_seq = run_protein_mpnn(pdb_backbone, jsondata, mpnn_temp, mpnn_version=mpnn_version, bidir=False)
-        #print(new_seq)
-        seq = new_seq[0][-1][-1].strip().split("/")
-        newseq_sequence = ",".join(seq)
-        newseq_sequence = "," + newseq_sequence
-        if newseq_sequence not in mpnn_seqs:
+    new_seq = run_protein_mpnn(pdb_backbone, jsondata, mpnn_temp, mpnn_version=mpnn_version, bidir=False)
+    print(f"new_seq: {new_seq}")
+    seq = new_seq[0][-1][-1].strip().split("/")
+    print(f"seq: {seq}")
+        
+    af2seq = "," + seq[0] + seq[1]
+    print(f"af2seq: {af2seq}")
+        
+    pippackseq = seq[0] + "/" + seq[1]
+    print(f"pippackseq: {pippackseq}")
 
-            mpnn_seqs_af2.append([seq])
-
-            mpnn_seqs.append(newseq_sequence)
-
-    #print(mpnn_seqs)
     os.mkdir("af2_inputs")
-    with open(os.path.join(output_dir, "sequences.csv"), 'w') as f:
-        f.write("\n".join(mpnn_seqs))
+    with open(os.path.join(output_dir, "af2_inputs", "sequences.csv"), 'w') as f:
+        f.write(af2seq)
 
-    shutil.move('sequences.csv','af2_inputs/')
+    with open(os.path.join(output_dir,"pippacksequences.fasta"),"w") as f:
+        f.write(pippackseq)
 
-    return mpnn_seqs_af2
 
 def getFlagParser() -> FileArgumentParser:
     """Gets an FileArgumentParser with necessary arguments to run script."""
 
     parser = FileArgumentParser(description='Parser that can take flag options for script.',
                                 fromfile_prefix_chars='@')
-
+    parser.add_argument('--target_name',default='',help='name of the diffusion target')
+    parser.add_argument('--hotspot_res',default='',help='one-letter code of hotspots (eg YFL)')
+    parser.add_argument('--other',default='',help='other identifying info (date, #diffruns,etc)')
     parser.add_argument('--input_dir',
                         default='./',
                         type=str,
@@ -145,18 +143,10 @@ if __name__ == "__main__":
             
                         os.chdir(mpnn_run_dir)
                         print("generating json")
-                        subprocess.run(["python", "/proj/kuhl_lab/evopro/evopro/run/generate_json_dev.py", "@json.flags"])
+                        print(os.getcwd())
+                        subprocess.run(["python", "/proj/kuhl_lab/evopro/evopro/run/generate_json.py", "@json.flags"])
                         jsonfile = os.path.join(mpnn_run_dir, "residue_specs.json")
-                        mpnn_seqs_list = run_mpnn_on_diff_backbone(mpnn_run_dir, jsonfile, mpnn_run_dir, mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, num_seqs=1)
-
-                        print(f"mpnn_seqs_list: {mpnn_seqs_list}")
-
-                        mod_mpnn_seqs_list = []
-                        for element in mpnn_seqs_list:
-                            element.append(partial(change_dir, mpnn_dir))
-
-                        with open("pippacksequences.fasta", 'w') as f:
-                            f.write(f'{mpnn_seqs_list[0][0][0]}/{mpnn_seqs_list[0][0][1]}\n')
+                        run_mpnn_on_diff_backbone(mpnn_run_dir, jsonfile, mpnn_run_dir, mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version)
 
                         os.chdir("../")
 

@@ -1,8 +1,6 @@
-import multiprocessing as mp
 import importlib
 import math
 import sys, os
-from typing import Sequence, Union
 sys.path.append("/proj/kuhl_lab/evopro/")
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor
@@ -16,13 +14,10 @@ from evopro.utils.utils import compressed_pickle
 sys.path.append('/proj/kuhl_lab/RosettaFold2/RoseTTAFold2/run/')
 from run_rf2 import rf2_init
 
-from functools import partial
-import numpy as np
-
 def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], score_func_2=None, score_func_2_iter=30,
                                num_iter = 50, n_workers=1, mut_percents=None, contacts=None, distance_cutoffs=None,
                                rmsd_func=None, rmsd_to_starting_func=None, rmsd_to_starting_pdb=None,
-                               mpnn_temp="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, 
+                               mpnn_temps=None, mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, 
                                repeat_af2=True, af2_preds_extra=[], crossover_percent=0.2, vary_length=0, 
                                write_pdbs=False, plot=[], conf_plot=False, write_compressed_data=True):
 
@@ -37,10 +32,9 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
 
     print(lengths)
 
-    print("initializing distributor")
-    #print(af2_flags_file)
+    print("Initializing distributor")
     dist = Distributor(n_workers, rf2_init, af2_flags_file, lengths)
-    #dist = Distributor(rf2_init, af2_flags_file)
+    print("dist",dist)
 
     scored_seqs = {}
     if repeat_af2:
@@ -48,7 +42,6 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
     curr_iter = 1
     seqs_per_iteration = []
     newpool = startingseqs
-    all_results = {}
 
     while len(poolsizes) < num_iter:
         poolsizes.append(poolsizes[-1])
@@ -107,6 +100,7 @@ def run_genetic_alg_multistate(run_dir, af2_flags_file, score_func, startingseqs
 
         results = dist.churn(work_list_all)
         print("done churning")
+        print("results",results)
 
         if af2_preds_extra:
             num_lists = 1 + len(af2_preds_extra)
@@ -581,6 +575,6 @@ if __name__ == "__main__":
     run_genetic_alg_multistate(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, score_func_2=scorefunc2, score_func_2_iter=args.score_func_2_iteration, 
         num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, distance_cutoffs=distance_cutoffs,
         rmsd_func=rmsdfunc, rmsd_to_starting_func=rmsd_to_starting_func, rmsd_to_starting_pdb=path_to_starting,
-        mpnn_temp=mpnn_temps, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, 
+        mpnn_temps=mpnn_temps, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, 
         repeat_af2=not args.no_repeat_af2, af2_preds_extra = af2_preds_extra, crossover_percent=args.crossover_percent, vary_length=args.vary_length, 
         write_pdbs=args.write_pdbs, plot=plot_style, conf_plot=args.plot_confidences, write_compressed_data=not args.dont_write_compressed_data)

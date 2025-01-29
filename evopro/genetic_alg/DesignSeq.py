@@ -329,7 +329,7 @@ class DesignSeq:
     def get_sequence_string(self, divide=","):
         return divide.join([self.jsondata["sequence"][chain] for chain in self.jsondata["sequence"]])
 
-    def mutate(self, mut_percent = 0.125, num_mut_choice = [-1, 0, 1], var=0, var_weights = [0.8, 0.1, 0.1]):
+    def mutate(self, mut_percent = 0.125, num_mut_choice = [-1, 0, 1], var=0, var_weights = [0.8, 0.1, 0.1], single_mut_only=False):
         all_aas = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 
         #calculating number of mutants from mut_percent and maybe adding or subtracting one mutant for stochasticity
@@ -337,6 +337,8 @@ class DesignSeq:
         num_mut=round(mut_percent*len(self.mutable.keys()))+random.choice(num_mut_choice)
         if num_mut<1:
             num_mut=1
+        if single_mut_only:
+            num_mut = 1
 
         new_mut = copy.deepcopy(self.mutable) 
 
@@ -407,7 +409,7 @@ class DesignSeq:
         newseqobj = DesignSeq(sequence=self.sequence, mutable=new_mut, symmetric=self.symmetric)
         newseqobj._update_symmetric_positions(mutated)
         #newseqobj._check_symmetry()
-        newseqobj._update_sequence()
+        newseqobj._update_sequence()                  
         newseqobj._create_jsondata()
         newseqobj._check_symmetry()
         return newseqobj
@@ -416,7 +418,7 @@ class DesignSeq:
         designable = []
         for p in self.jsondata['designable']:
             designable.append(p['chain'] + str(p['resid']))
-            print(p)
+            #print(p)
         return designable
 
     def _get_aa_identity(self, index):

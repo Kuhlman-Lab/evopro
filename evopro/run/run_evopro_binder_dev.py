@@ -1,8 +1,6 @@
-import multiprocessing as mp
 import importlib
 import math
 import sys, os
-from typing import Sequence, Union
 sys.path.append("/proj/kuhl_lab/evopro/")
 from evopro.genetic_alg.DesignSeq import DesignSeq
 from evopro.utils.distributor import Distributor
@@ -12,19 +10,19 @@ from evopro.genetic_alg.geneticalg_helpers import read_starting_seqs, create_new
 from evopro.user_inputs.inputs import getEvoProParser
 from evopro.utils.plots import get_chain_lengths, plot_pae, plot_plddt
 from evopro.utils.utils import compressed_pickle
-from evopro.utils.pdb_parser import change_chainid_pdb, append_pdbs
 
 sys.path.append('/proj/kuhl_lab/alphafold/run')
 from run_af2 import af2_init
 
-def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], 
-                               num_iter = 50, n_workers=1, mut_percents=None, contacts=None, distance_cutoffs=None,
+def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, poolsizes = [], binder_chain="B",
+                               num_iter = 50, n_workers=1, mut_percents=None, contacts=None, contact_cap=100, distance_cutoffs=None,
                                mpnn_temp="0.1", mpnn_version="s_48_020", skip_mpnn=[], mpnn_iters=None, mpnn_chains=None,
-                               repeat_af2=True, af2_preds=[], crossover_percent=0.2, vary_length=0, 
+                               repeat_af2=True, af2_preds=[], crossover_percent=0.2, vary_length=0, starting_pdb=None,
                                write_pdbs=False, plot=[], conf_plot=False, write_compressed_data=True):
 
     num_af2=0
     
+    print("Using number of contacts cap: ", contact_cap)
     if vary_length>0:
         print("Varying length by", vary_length)
     lengths = []
@@ -45,7 +43,6 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
     curr_iter = 1
     seqs_per_iteration = []
     newpool = startingseqs
-    all_results = {}
 
     while len(poolsizes) < num_iter:
         poolsizes.append(poolsizes[-1])
@@ -70,9 +67,10 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
         pool = newpool
 
         if curr_iter == 1:
-            print("\nIteration 1: Creating new sequences.")
-            #do not use crossover to create the initial pool
-            pool = create_new_seqs(pool, 
+            if not starting_seqs:
+                print("\nIteration 1: Creating new sequences.")
+                #do not use crossover to create the initial pool
+                pool = create_new_seqs(pool, 
                                    poolsizes[curr_iter-1], 
                                    crossover_percent=0, 
                                    all_seqs = list(scored_seqs.keys()), 
@@ -125,7 +123,6 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
             
         print("done churning")
         
-        seqs_packed = [work_list_all[i:i+num_preds] for i in range(0, len(work_list_all), num_preds)]
         results_packed = [results_all[i:i+num_preds] for i in range(0, len(results_all), num_preds)]
 
         print("These should be equal", len(work_list_all), len(results_all), num_preds*len(results_packed))
@@ -135,42 +132,37 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
             contacts=(None, None, None)
         if not distance_cutoffs:
             distance_cutoffs=(4, 4, 8)
-        for seqs, results, dsobj in zip(seqs_packed, results_packed, scoring_pool):
-            scores.append(score_func(results, dsobj, contacts=contacts, distance_cutoffs=distance_cutoffs))
+        for results, dsobj in zip(results_packed, scoring_pool):
+            scores.append(score_func(results, 
+                                     dsobj, 
+                                     contacts=contacts, 
+                                     distance_cutoffs=distance_cutoffs, 
+                                     starting_pdb=starting_pdb, 
+                                     binder_chain=binder_chain, 
+                                     contact_cap=contact_cap))
         
         #adding sequences and scores into the dictionary
-        for score, seqs, results, dsobj in zip(scores, seqs_packed, results_packed, scoring_pool):
+        for score, results, dsobj in zip(scores, results_packed, scoring_pool):
             key_seq = dsobj.get_sequence_string()
-            #print(seqs)
-            #if key_seq != ",".join(seqs[0]):
-            #        print(key_seq, str(seqs[0]))
-            #        raise AssertionError("Sequence does not match DSobj sequence")
             
             overall_scores = [score[0]]
             overall_scores = overall_scores + [x[0] for x in score[1]]
             score_split = score[1]
             pdbs = score[-2]
             score_all = (overall_scores, score_split)
-            print(key_seq, overall_scores, score_split)
-            #print(score_all)
+            #print(key_seq, overall_scores, score_split)
             
             if key_seq in scored_seqs and repeat_af2:
-                scored_seqs[key_seq]["data"].append({"score": score_all, "pdb": pdbs, "result": result})
-                #don't need to sort when using all 5 for average score
-                #scored_seqs[key_seq]["data"].sort(key=lambda x: x["score"][0][0])
-                #print(scored_seqs[key_seq]["data"])
-                #print(overall_scores)
+                scored_seqs[key_seq]["data"].append({"score": score_all, "pdb": pdbs, "result": results})
+
                 sum_score = [0 for _ in overall_scores]
-                #print("Before", sum_score)
                 for elem in scored_seqs[key_seq]["data"]:
-                    #print("Element", elem, elem["score"])
-                    #print(sum_score, elem["score"][0], elem["score"][1])
+
                     sum_score = [x+y for x,y in zip(sum_score, elem["score"][0])]
                 avg_score = [x/len(scored_seqs[key_seq]["data"]) for x in sum_score]
-                #print("After", sum_score, avg_score)
                 scored_seqs[key_seq]["average"] = avg_score
             else:
-                scored_seqs[key_seq] = {"data": [{"score": score_all, "pdb": pdbs, "result": result}]}
+                scored_seqs[key_seq] = {"data": [{"score": score_all, "pdb": pdbs, "result": results}]}
                 scored_seqs[key_seq]["dsobj"] =  dsobj
                 
                 #set average score here
@@ -191,14 +183,12 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
             if repeat_af2:
                 if key_seq in repeat_af2_seqs:
                     sorted_scored_pool.append((key_seq, repeat_af2_seqs[key_seq]))
-                    #print(sorted_scored_pool)
+
                 else:
                     sorted_scored_pool.append((key_seq, scored_seqs[key_seq]["average"]))
-                    #print(sorted_scored_pool)
+
             else:
                 sorted_scored_pool.append((key_seq, scored_seqs[key_seq]["average"]))
-                #print(sorted_scored_pool)
-            
             
             if write_pdbs:
                 print("Writing pdbs...")
@@ -233,7 +223,6 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
         #pulling back DS objects for each sequence in new pool
         for key_seq, j in zip(newpool_seqs, range(len(newpool_seqs))):
             newpool.append(scored_seqs[key_seq]["dsobj"])
-            #pdbs = scored_seqs[key_seq]["data"][0]["pdb"]
 
         curr_iter+=1
 
@@ -246,17 +235,12 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
     for key_seq, j in zip(newpool_seqs, range(len(newpool_seqs))):
         seq = key_seq.split(" ")
         pdbs = scored_seqs[key_seq]["data"][0]["pdb"]
-        result = scored_seqs[key_seq]["data"][0]["result"]
+        result = scored_seqs[key_seq]["data"][0]["result"][0]
         results = [scored_seqs[key_seq]["data"][x]["result"] for x in range(len(scored_seqs[key_seq]["data"]))]
         
         if write_compressed_data:
             for r, k in zip(results, range(len(results))):
                 compressed_pickle(os.path.join(output_dir, "seq_" + str(j) + "_result_" + str(k)), r)
-        
-    
-        if conf_plot:
-            # Plot confidence.
-            Ls = get_chain_lengths(result)
 
         if conf_plot:
             # Plot confidence.
@@ -280,7 +264,6 @@ def run_genetic_alg_binder(run_dir, af2_flags_file, score_func, startingseqs, po
                         pdbf.write(str(pdb))
     
     print("Number of AlphaFold2 predictions: ", num_af2)
-    #plotting
     dist.spin_down()
         
     plotting = plot_scores_general_dev(plot, seqs_per_iteration, output_dir)
@@ -305,9 +288,6 @@ if __name__ == "__main__":
                 if "flag" in filename and "af2" in filename:
                     flagsfile = filename
                     break
-                if "flag" in filename and "of" in filename:
-                    flagsfile = filename
-                    break
 
             for filename in onlyfiles:
                 if "residue" in filename and "spec" in filename:
@@ -324,13 +304,11 @@ if __name__ == "__main__":
 
             for filename in onlyfiles:
                 if "starting" in filename and "seqs" in filename:
-                    if "mut" in filename:
-                        starting_seqs = read_starting_seqs(input_dir + filename, dsobj1, mut_only=True)
-                        starting_seqs.append(dsobj1)
-                    else:
-                        starting_seqs = read_starting_seqs(input_dir + filename, dsobj1)
-                        starting_seqs.append(dsobj1)
+                    
+                    starting_seqs = read_starting_seqs(input_dir + filename, dsobj1)
+                    starting_seqs.append(dsobj1)
                     break
+                    
             if not starting_seqs:
                 print("No starting sequences file provided. Random sequences will be generated.")
 
@@ -343,8 +321,7 @@ if __name__ == "__main__":
                     if "pool" in filename and "size" in filename:
                         poolfile = filename
                         break
-
-
+                    
     #get score function from flags file
     try:
         scorefile = args.score_file.rsplit("/", 1)
@@ -356,21 +333,6 @@ if __name__ == "__main__":
         scorefunc = getattr(mod, args.score_func)
     except:
         raise ValueError("Invalid score function")
-
-    if args.rmsd_func:
-        rmsdfunc = getattr(mod, args.rmsd_func)
-    else:
-        rmsdfunc = None
-    
-    if args.rmsd_to_starting:
-        try:
-            func_name, path_to_starting = args.rmsd_to_starting.split(" ")
-            rmsd_to_starting_func = getattr(mod, func_name)
-        except:
-            raise ValueError("Please provide name of function and path to pdb.")
-    else:
-        rmsd_to_starting_func=None
-        path_to_starting=None
 
     mult = args.num_iter
     mut_percents = []
@@ -441,10 +403,7 @@ if __name__ == "__main__":
                 pool_sizes.append(int(lin.strip()))
     else:
         for i in range(args.num_iter):
-            pool_sizes.append(args.pool_size)
-
-    #print(args.dont_write_compressed_data)
-    
+            pool_sizes.append(args.pool_size)    
     
     af2_preds = args.af2_preds.strip().split(",")
     if args.mpnn_chains:
@@ -452,8 +411,8 @@ if __name__ == "__main__":
     else:
         mpnn_chains = None
                                            
-    run_genetic_alg_binder(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, 
-        num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, 
+    run_genetic_alg_binder(input_dir, input_dir + flagsfile, scorefunc, starting_seqs, poolsizes=pool_sizes, binder_chain=args.binder_chain,
+        num_iter = args.num_iter, n_workers=args.num_gpus, mut_percents=mut_percents, contacts=contacts, contact_cap=args.contact_cap,
         mpnn_temp=args.mpnn_temp, mpnn_version=args.mpnn_version, skip_mpnn=mpnn_skips, mpnn_iters=mpnn_iters, mpnn_chains=mpnn_chains,
-        repeat_af2=not args.no_repeat_af2, af2_preds = af2_preds, crossover_percent=args.crossover_percent, vary_length=args.vary_length, 
+        repeat_af2=not args.no_repeat_af2, af2_preds = af2_preds, crossover_percent=args.crossover_percent, vary_length=args.vary_length, starting_pdb=args.path_to_starting,
         write_pdbs=args.write_pdbs, plot=plot_style, conf_plot=args.plot_confidences, write_compressed_data=not args.dont_write_compressed_data)

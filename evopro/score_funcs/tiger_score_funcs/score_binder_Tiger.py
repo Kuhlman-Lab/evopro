@@ -247,7 +247,7 @@ def score_binder_complex_clashes_improved(results, dsobj, contacts, orient=None)
     clashes, num_clashes = score_contacts(pdb, clash_resid_list, reslist2, dsobj=dsobj, first_only=False)
     clash_penalty = num_clashes*3
 
-    print("line 211: clash_penalty = 3*num_clashes ")
+    print("line 250: clash_penalty = 3*num_clashes ")
     print("num clashes: " +  str(num_clashes))
     #print(contacts)
     print(clashes)
@@ -289,7 +289,7 @@ def score_binder_complex_clashes_interface7(results, dsobj, contacts, penalty_we
     clashes, num_clashes = score_contacts(pdb, clash_resid_list, reslist2, dsobj=dsobj, first_only=False)
     clash_penalty = num_clashes*penalty_weight
 
-    print("line 211: clash_penalty = " +str(penalty_weight)+ "*num_clashes ")
+    print("line 291: clash_penalty = " +str(penalty_weight)+ "*num_clashes ")
     print("num clashes: " +  str(num_clashes))
     #print(contacts)
     #print(clashes)
@@ -529,7 +529,67 @@ def score_binder_rmsd_start_20_3(pdb, path_to_starting, binder_chain="D", dsobj=
 def score_binder_rmsd_start_20_5(pdb, path_to_starting, binder_chain="D", dsobj=None):
     # spring constant = 20
     # rmsd cutoff = 5
-    return score_binder_rmsd_to_starting(pdb, path_to_starting, 20, 5)     
+    return score_binder_rmsd_to_starting(pdb, path_to_starting, 20, 5)   
+
+def score_binder_amyloid_v1(results, dsobj, contacts=None, orient=None, distance_cutoffs=None):
+    from alphafold.common import protein
+    #print("Length of results list: " + str(len(results)))
+    #print(results.keys())
+    #print("Results [0]")
+    #print(results[0])
+    #print("")
+    #print(results[0].keys())
+
+    
+    pdb = protein.to_pdb(results['unrelaxed_protein'])
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    if len(chains)>1:
+        return score_binder_complex_peptide(results, dsobj, contacts, orient=orient)
+    else:
+        return score_binder_monomer(results, dsobj)
+
+def score_binder_complex_peptide(results, dsobj, contacts, orient=None, distance_cutoffs=None):
+    from alphafold.common import protein
+    pdb = protein.to_pdb(results['unrelaxed_protein'])
+    chains, residues, resindices = get_coordinates_pdb(pdb)
+    reslist1 = contacts[0] # de novo binder in chain A
+    #print("reslist1:")
+    #print(reslist1)
+    reslist2 = [x for x in residues.keys() if x.startswith("B")] # peptide target in chain B
+    #print("reslist2:")
+    #print(reslist2)
+    contacts, contactscore = score_contacts_pae_weighted(results, pdb, reslist1, reslist2, dsobj=dsobj, first_only=False)
+    #print("Binder contacts:")
+    #print(contacts)
+
+    num_contacts = len(contacts)    
+    score = -contactscore
+    PAE_per_contact = 0
+    if num_contacts > 0:
+        PAE_per_contact = (70.0-70.0*contactscore/num_contacts)/2
+    return score, (score, len(contacts), contactscore, PAE_per_contact), contacts, pdb, results
+
+def score_binder_rmsd_chainA(pdb1, pdb2, binder_chain="A", dsobj=None):
+    chains1, residues1, resindices1 = get_coordinates_pdb(pdb1)
+    chains2, residues2, resindices2 = get_coordinates_pdb(pdb2)
+    reslist1 = [x for x in residues1.keys() if x.startswith(binder_chain)]
+    reslist2 = [x for x in residues2.keys()]
+    print(reslist1)
+    print(reslist2)
+    rmsd_binder = get_rmsd(reslist1, pdb1, reslist2, pdb2, dsobj=dsobj)
+    print("RMSD: " + str(rmsd_binder) + ", Score=RMSDx2: " + str(rmsd_binder*2))
+    return rmsd_binder*2
+
+def score_binder_rmsd_CA_chainA(pdb1, pdb2, binder_chain="A", dsobj=None):
+    chains1, residues1, resindices1 = get_coordinates_pdb(pdb1)
+    chains2, residues2, resindices2 = get_coordinates_pdb(pdb2)
+    reslist1 = [x for x in residues1.keys() if x.startswith(binder_chain)]
+    reslist2 = [x for x in residues2.keys()]
+    print(reslist1)
+    print(reslist2)
+    rmsd_binder = get_rmsd(reslist1, pdb1, reslist2, pdb2, ca_only = True, dsobj=dsobj)
+    print("Ca_RMSD: " + str(rmsd_binder) + ", Score=(Ca_RMSD)x5: " + str(rmsd_binder*2))
+    return rmsd_binder*5    
 
 if __name__=="__main__":
     print("no main functionality")

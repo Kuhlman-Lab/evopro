@@ -1,0 +1,4 @@
+--pdb proteinA.pdb
+--mut_res A1-A60
+--default_mutres_setting all-C
+--output residue_specs.json

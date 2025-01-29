@@ -1,0 +1,10 @@
+--num_iter 6
+--pool_size 4
+--num_gpus 1
+--score_file /proj/kuhl_lab/evopro/evopro/score_funcs/score_multistate_henry.py
+--score_func score_monomer_combined
+--rmsd_to_starting score_monomer_combined /proj/kuhl_lab/evopro/evopro/examples/henry_multistate/NEW/monomer/monomer_combined/proteinA.pdb
+--af2_preds A
+--mpnn_freq 2
+--mutation_percents 0.4
+--mpnn_chains A

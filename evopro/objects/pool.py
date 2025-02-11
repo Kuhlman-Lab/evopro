@@ -1,6 +1,5 @@
 import sys
 import random
-sys.path.append("/proj/kuhl_lab/evopro2")
 from objects.sequence import DesignSeq
 
 class Pool:

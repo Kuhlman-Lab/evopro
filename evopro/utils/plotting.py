@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import statistics
 import numpy as np
 from string import ascii_uppercase, ascii_lowercase
 

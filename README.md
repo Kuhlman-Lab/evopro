@@ -63,13 +63,14 @@ Installation of Anaconda is required to load dependencies.
    python3 -m pip install /path/to/alphafold/alphafold/
    ```
 
+5. Set the path to your EvoPro installation at the top of run/generate_json.py and run/run_evopro.py.
 
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
 Usage of EvoPro requires GPUs.
-The running directory should contain a sequence file with input sequences, yaml file for EvoPro specifications, and flags file for AF2 specifications. See below for flag options and evopro/examples/ for examples of directory setups. 
+The running directory should contain a sequence file with input sequences, yaml file for EvoPro specifications, and flags files for AF2 and ProteinMPNN specifications. See below for flag options and evopro/examples/ for examples of directory setups. 
 
 The residue_specs.json file should be generated from the sequence file (can also be generated from a PDB).
 Specify sequence file and which residues to mutate in json.flags. (Include symmetry here if needed)
@@ -133,7 +134,6 @@ To use custom templates:
 
 Since we have modified the original AF2 code to allow for custom template databases, you will have to make sure each .pdb file within the templates folder has a name consisting of 4 letters and numbers, essentially mimicking a file from the PDB database with a PDB code (although the file name does not actually have to be a real PDB code). Some examples could be “temp.pdb”, “1uzg.pdb”, “PPPP.pdb”, etc.
 
- ```
 
 <!-- CONTACT -->
 ## Contact

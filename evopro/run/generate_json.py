@@ -3,8 +3,8 @@ import pprint
 import re
 import sys
 import math
-sys.path.append("/proj/kuhl_lab/evopro2/")
-#from evopro2.user_inputs.inputs import FileArgumentParser
+#SET PATH HERE
+sys.path.append("/proj/kuhl_lab/evopro/evopro/")
 from objects.chemical import to1letter, to3letter, alphabet, ptms
 from utils.parsing_utils import get_coordinates_pdb_extended, constituents_of_modified_fasta
 from typing import Optional, Sequence

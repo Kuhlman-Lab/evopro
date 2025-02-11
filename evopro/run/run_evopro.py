@@ -2,7 +2,8 @@ import sys, os, time
 import argparse
 import omegaconf
 
-sys.path.append("/proj/kuhl_lab/evopro2/")
+#SET PATH HERE
+sys.path.append("/proj/kuhl_lab/evopro/evopro/")
 from utils.inputs import parse_arguments
 from utils.parsing import parse_input_sequences
 from objects.sequence import DesignSeq
@@ -59,7 +60,7 @@ def run_genetic_alg(conf):
     #start genetic algorithm iteration
     while curr_iter <= conf.flags.num_iter:
         
-        print("Starting iteration", curr_iter)
+        print("\nSTARTING ITERATION", curr_iter)
         start = time.time()
         
         pool.size = conf.flags.pool_sizes[curr_iter-1]
@@ -82,7 +83,7 @@ def run_genetic_alg(conf):
                 formatted_inputs = parse_input_sequences(d, conf)
                 work_list_all.extend(formatted_inputs)
 
-        print("work list", work_list_all)
+        # print("work list", work_list_all)
         num_struct_preds += len(work_list_all)
 
         #running the structure prediction model

@@ -158,10 +158,8 @@ def calculate_residue_plddt(result, reslist=None):
 def score_contacts_pae_weighted(result, seq, reslist1, reslist2, conf):
     dist = conf.scoring.contacts.contact_distance
     contact_cap = conf.scoring.contacts.max_contacts
-    score_type = conf.scoring.contacts.score_type
     pdb = result['pdb']
-    with open("temp.pdb", "w") as f:
-        f.write(pdb)
+
     chains, residues, resindices = get_coordinates_pdb_tokens(pdb)
     pae = result['pae']
     

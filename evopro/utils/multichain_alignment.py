@@ -41,7 +41,6 @@ def kabsch_align(P, Q):
 def transform_coordinates(coords, R, t):
     """Apply rotation matrix and translation to coordinates."""
     coords = coords.astype(float)
-    print("R and t", R, t)
     try:
         return (R @ coords.T).T + t
     except:

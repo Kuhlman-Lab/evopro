@@ -1,10 +1,9 @@
 import json
 import string
-import os, sys, random
+import sys, random
 import omegaconf
 import sys
-import pandas as pd
-import numpy as np
+
 import random
 
 from utils.parsing_utils import get_coordinates_pdb
@@ -58,12 +57,6 @@ def create_new_seq_mpnn(conf, pool):
             mpnnf.write(str(mpnn_pdb))
         jsondata = dsobj._get_json()
         
-        with open("mpnn.json", "w") as mpnnf:
-            json.dump(jsondata, mpnnf)
         new_seq = run_mpnn(mpnn_conf, design_run=True, json_data=jsondata, pdb_paths=["mpnn.pdb"])
-        
-        print("MPNN", new_seq)
-        
-        return new_seq[0]
-
-    
+                
+        return ",".join(new_seq.split("/"))

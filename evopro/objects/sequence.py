@@ -1,6 +1,4 @@
 import json, re, random, copy
-import sys 
-sys.path.append("/proj/kuhl_lab/evopro2/")
 from objects.chemical import aa2num, num2aa, alphabet
 from utils.wrappers import create_new_seq_mpnn
 from utils.utils import merge_related_lists
@@ -175,6 +173,7 @@ class DesignSeq():
             # print(self.chains[chain].symmetric, self.chains[chain].sequence)
             for i in range(len(self.chains[chain].sequence)):
                 #print(i)
+                # print(self.chains[chain].symmetric, len(self.chains[chain].symmetric), i)
                 for sym in self.chains[chain].symmetric[i]:
                     ch, pos = re.split('(\d+)',sym)[:2]
                     self.chains[ch].sequence[int(pos)-1] = self.chains[chain].sequence[i]

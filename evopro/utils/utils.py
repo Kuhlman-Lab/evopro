@@ -8,7 +8,28 @@ import pickle
 import _pickle as cPickle
 import hashlib
 from typing import Any, Dict
+from Bio.PDB import MMCIFParser, PDBIO
+from io import StringIO
 
+def cif_to_pdb(mmcif_str):
+    parser = MMCIFParser()
+    cif_fh = StringIO(mmcif_str) 
+    structure = parser.get_structure("structure", cif_fh)
+    
+    # Truncate residue names to 3 letters
+    for model in structure:
+        for chain in model:
+            for residue in chain:
+                if len(residue.resname) > 3:
+                    residue.resname = residue.resname[:3]
+    
+    io = PDBIO()
+    io.set_structure(structure)
+    output = StringIO()
+    io.save(output)
+    pdb_string = output.getvalue()
+    
+    return pdb_string
 
 def full_pickle(title: str, data: Any) -> None:
     """
@@ -60,4 +81,49 @@ def print_timing(timing: Dict[str, float]) -> None:
     """
     for k, v in timing.items():
         print(f'{k} took {v:.2f} sec.')
+        
+def merge_related_lists(list_of_pairs):
+    """
+    Takes a list of two-element lists and merges lists that share common elements.
     
+    Args:
+        list_of_pairs: List of lists, where each inner list contains two elements
+        
+    Returns:
+        List of lists, where related elements are grouped together
+    """
+    # Initialize result list to store merged groups
+    merged_groups = []
+    
+    # Convert pairs to sets for easier comparison and merging
+    sets = [set(pair) for pair in list_of_pairs]
+    
+    while sets:
+        current = sets.pop(0)  # Take the first set
+        merged = False
+        
+        # Check against existing merged groups
+        for group in merged_groups:
+            if current & group:  # If there's any overlap
+                group.update(current)  # Merge current into existing group
+                merged = True
+                break
+                
+        if not merged:
+            merged_groups.append(current)
+            
+        # Check if any remaining sets can be merged with existing groups
+        i = 0
+        while i < len(sets):
+            merged_with_existing = False
+            for group in merged_groups:
+                if sets[i] & group:  # If there's any overlap
+                    group.update(sets[i])
+                    sets.pop(i)
+                    merged_with_existing = True
+                    break
+            if not merged_with_existing:
+                i += 1
+    
+    # Convert sets back to sorted lists
+    return [sorted(list(group)) for group in merged_groups]

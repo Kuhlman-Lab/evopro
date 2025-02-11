@@ -1,3 +1,0 @@
---sequence_file seqfile.txt
---bias_res A1-A100
---custom_bias 0.0 0.0 1.4 1.4 0.0 0.0 1.4 0.0 1.4 0.0 0.0 1.4 0.0 1.4 1.4 1.4 1.4 0.0 0.0 1.4 0.0

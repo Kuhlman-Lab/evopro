@@ -1,14 +1,47 @@
-import sys
-
-#SET PATH TO YOUR EVOPRO INSTALLATION HERE
-#sys.path.append("/proj/kuhl_lab/evopro/")
-sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
-from evopro.user_inputs.inputs import FileArgumentParser
-from evopro.utils.aa_utils import three_to_one, one_to_three
-from evopro.utils.pdb_parser import get_coordinates_pdb_old
-import math
-import json
+import argparse
+import pprint
 import re
+import sys
+import math
+sys.path.append("/proj/kuhl_lab/evopro2/")
+#from evopro2.user_inputs.inputs import FileArgumentParser
+from objects.chemical import to1letter, to3letter, alphabet, ptms
+from utils.parsing_utils import get_coordinates_pdb_extended, constituents_of_modified_fasta
+from typing import Optional, Sequence
+
+class FileArgumentParser(argparse.ArgumentParser):
+    """Overwrites default ArgumentParser to better handle flag files."""
+
+    def convert_arg_line_to_args(self, arg_line: str) -> Optional[Sequence[str]]:
+        """ Read from files where each line contains a flag and its value, e.g.
+        '--flag value'. Also safely ignores comments denoted with '#' and
+        empty lines.
+        """
+
+        # Remove any comments from the line
+        arg_line = arg_line.split('#')[0]
+
+        # Escape if the line is empty
+        if not arg_line:
+            return None
+
+        # Separate flag and values
+        split_line = arg_line.strip().split(' ')
+
+        # If there is actually a value, return the flag value pair
+        if len(split_line) > 1:
+            return [split_line[0], ' '.join(split_line[1:])]
+        # Return just flag if there is no value
+        else:
+            return split_line
+
+def find_all(a_str, sub):
+    start = 0
+    while True:
+        start = a_str.find(sub, start)
+        if start == -1: return
+        yield start
+        start += len(sub)
 
 def parse_seqfile(filename):
     ids = {}
@@ -17,19 +50,31 @@ def parse_seqfile(filename):
         i=0
         for lin in f:
             l = lin.strip().split(":")
-            chains[l[0]] = l[1]
+            if len(l[2]) > 1:
+                chains[l[0]] = [l[1],"".join(l[2:])]
+            else:
+                chains[l[0]] = [l[1],l[2]]
     
     for chain in chains:
-        reslist = list(chains[chain])
-        for aa, i in zip(reslist, range(len(reslist))):
-            resid = chain + str(i+1)
-            extended_resid = chain + "_" + one_to_three(aa) + "_" + str(i+1)
-            ids[resid] = (extended_resid, chain, i+1)
+        if chains[chain][0] == "ligand":
+            reslist = chains[chain][1]
+            resid = chain + "1"
+            extended_resid = chain + "_LIG_1"
+            ids[resid] = (extended_resid, chain, 1)
+        else:
+            reslist = constituents_of_modified_fasta(chains[chain][-1], chains[chain][0])
+            for aa, i in zip(reslist, range(len(reslist))):
+                resid = chain + str(i+1)
+                if len(aa) == 1:
+                    extended_resid = chain + "_" + to3letter[aa] + "_" + str(i+1)
+                else:
+                    extended_resid = chain + "_" + aa + "_" + str(i+1)
+                ids[resid] = (extended_resid, chain, i+1)
 
     return ids, chains
 
 def parse_pdbfile(filename):
-    chains, residues, resindices = get_coordinates_pdb_old(filename, fil=True)
+    chains, residues, _ = get_coordinates_pdb_extended(filename, fil=True)
 
     pdbids = {}
     chain_seqs = {}
@@ -48,54 +93,111 @@ def parse_pdbfile(filename):
         pdbid = chain+str(num_id)
         pdbids[pdbid] = (residue, chain, res_index_chain)
 
-        aa = three_to_one(residue.split("_")[1])
+        try:
+            aa = to1letter[residue.split("_")[1]]
+        except:
+            aa = "X"
+        
         chain_seqs[chain].append(aa)
         res_index_chain += 1
 
     for chain in chains:
         chain_seqs[chain] = "".join([x for x in chain_seqs[chain] if x is not None])
-    
+
+    for chain_id in chain_seqs:
+        sequence = chain_seqs[chain_id]
+        type = "protein"
+        if "a" in sequence or "t" in sequence or "c" in sequence or "g" in sequence:
+            type = "dna"
+        elif "b" in sequence or "u" in sequence or "d" in sequence or "h" in sequence:
+            type = "rna"
+        elif "X" in sequence:
+            type = "ligand"
+        chain_seqs[chain_id] = [type, sequence]
+        
     return pdbids, chain_seqs
 
 def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
+    if "all" in default:
+        if default == "all":
+            include = alphabet
+        else:
+            omit = list(default.split("-")[1])
 
+            
+        include = [x for x in alphabet if x not in omit]
+        default = "".join(include)
+    
+    mods = []
+    for pdbid in pdbids:
+        pdbid = pdbids[pdbid][0]
+        chain, res, num = pdbid.split("_")
+        if res not in to1letter and res not in ["LIG", "dna"]:
+            if res in ptms:
+                mods.append({"chain":chain, "resid":num, "type":res})
+            else:
+                raise ValueError("Invalid residue type: " + res + ". Please use a valid residue type or PTM. You can add more PTM types to ptms list in objects/chemical.py.")
+            
     mutable = []
-    for resind in mut_res:
-        if "*" in resind:
-            try:
-                chain = resind.split("*")[0]
-                for pdbid in pdbids:
-                    if pdbid.startswith(chain):
-                        mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
-            except:
-                raise ValueError("Invalid specification. Try using the asterisk after the chain ID.")
+    if "~" in "".join(mut_res):
+        try:
+            fixed_res = []
+            fixed_seqs = [seq.strip("~") for seq in mut_res]
+            #print(fixed_seqs)
+            for c in chain_seqs:
+                for fixed in fixed_seqs:
+                    
+                    if fixed in chain_seqs[c][-1]:
+                        indices = list(find_all(chain_seqs[c][-1], fixed))
+
+                        for i in indices:
+                            
+                            for j in range(i, len(fixed)+i):
+                                fixed_res.append(pdbids[str(c) + str(j+1)])
             
-        elif "<G" in resind:
-            residue = resind.split("<")[0]
-            chain = re.split('(\d+)', residue)[0]
-            num_id = int(re.split('(\d+)', residue)[1])
-            chain_seq = chain_seqs[chain]
-            for i in range(num_id-1, len(chain_seq)):
-                if chain_seq[i] == "G":
-                    mutable.append({"chain":chain, "resid": i+1, "WTAA": "G", "MutTo": default})
-                else:
-                    break
-        
-        elif "<" in resind:
-            try:
+            for pdbid in pdbids:
+                if pdbids[pdbid] not in fixed_res:
+                    mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": to1letter[pdbids[pdbid][0].split("_")[1]], "MutTo": default})
+        except:
+            raise ValueError("Invalid specification. Try using the less than sign after the residue ID.")
+                
+    else:
+        for resind in mut_res:
+            if "*" in resind:
+                try:
+                    chain = resind.split("*")[0]
+                    for pdbid in pdbids:
+                        if pdbid.startswith(chain):
+                            mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": to1letter[pdbids[pdbid][0].split("_")[1]], "MutTo": default})
+                except:
+                    raise ValueError("Invalid specification. Try using the asterisk after the chain ID.")
+            #starts with residue number specified (inclusive)
+            elif "<G" in resind:
                 residue = resind.split("<")[0]
-                chain = re.split('(\d+)', residue)[0]
-                num_id = int(re.split('(\d+)', residue)[1])
-                for pdbid in pdbids:
-                    chain_compare = re.split('(\d+)', pdbid)[0]
-                    num_id_compare = int(re.split('(\d+)', pdbid)[1])
-                    if chain == chain_compare and num_id<=num_id_compare:
-                        mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": three_to_one(pdbids[pdbid][0].split("_")[1]), "MutTo": default})
-            except:
-                raise ValueError("Invalid specification. Try using the less than sign after the residue ID.")
+                chain = re.split('(\\d+)', residue)[0]
+                num_id = int(re.split('(\\d+)', residue)[1])
+                chain_seq = chain_seqs[chain][-1]
+                for i in range(num_id-1, len(chain_seq)):
+                    if chain_seq[i] == "G":
+                        mutable.append({"chain":chain, "resid": i+1, "WTAA": "G", "MutTo": default})
+                    else:
+                        break
             
-        elif resind in pdbids:
-            mutable.append({"chain":pdbids[resind][1], "resid": pdbids[resind][2], "WTAA": three_to_one(pdbids[resind][0].split("_")[1]), "MutTo": default})
+            elif "<" in resind:
+                try:
+                    residue = resind.split("<")[0]
+                    chain = re.split('(\\d+)', residue)[0]
+                    num_id = int(re.split('(\\d+)', residue)[1])
+                    for pdbid in pdbids:
+                        chain_compare = re.split('(\\d+)', pdbid)[0]
+                        num_id_compare = int(re.split('(\\d+)', pdbid)[1])
+                        if chain == chain_compare and num_id<=num_id_compare:
+                            mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": to1letter[pdbids[pdbid][0].split("_")[1]], "MutTo": default})
+                except:
+                    raise ValueError("Invalid specification. Try using the less than sign after the residue ID.")
+                
+            elif resind in pdbids:
+                mutable.append({"chain":pdbids[resind][1], "resid": pdbids[resind][2], "WTAA": to1letter[pdbids[resind][0].split("_")[1]], "MutTo": default})
 
     symmetric = []
     for symmetry in symmetric_res:
@@ -115,8 +217,17 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
             if not skip_tie:
                 symmetric.append(sym_res)
 
-    dictionary = {"sequence" : chain_seqs, "designable": mutable, "symmetric": symmetric}
-    jsonobj = json.dumps(dictionary, indent = 4)
+    chain_seqs_mod = {}
+    for chain in chain_seqs:
+        if chain_seqs[chain][0] == "ligand":
+            chain_seqs_mod[chain] = {"sequence":chain_seqs[chain][-1], "type":chain_seqs[chain][0]}
+        else:
+            chain_seqs_mod[chain] = {"sequence":constituents_of_modified_fasta(chain_seqs[chain][-1], chain_seqs[chain][0]), "type":chain_seqs[chain][0]}
+    dictionary = {"chains" : chain_seqs_mod, "modifications" : mods, "designable": mutable, "symmetric": symmetric}
+    
+    # write json to file with human-friendly formatting
+    #jsonobj = json.dumps(dictionary, indent = 4)
+    jsonobj = pprint.pformat(dictionary, compact=True, sort_dicts=False).replace("'",'"')
 
     with open(opf, "w") as outfile:
         outfile.write(jsonobj)
@@ -128,7 +239,7 @@ def getPDBParser() -> FileArgumentParser:
                                 ' and convert to json file format for input to EvoPro', 
                                 fromfile_prefix_chars='@')
 
-    parser.add_argument('--pdb',
+    parser.add_argument('--pdb_file',
                         default=None,
                         type=str,
                         help='Path to and name of PDB file to extract chains and sequences.')
@@ -163,15 +274,15 @@ def parse_mutres_input(mutresstring):
             mutres.append(elem)
         else:
             start, finish = elem.split("-")
-            chain = re.split('(\d+)', start)[0]
-            s = int(re.split('(\d+)', start)[1]) 
-            f = int(re.split('(\d+)', finish)[1]) 
+            chain = re.split('(\\d+)', start)[0]
+            s = int(re.split('(\\d+)', start)[1]) 
+            f = int(re.split('(\\d+)', finish)[1]) 
             for i in range(s, f+1):
                 mutres.append(chain + str(i))
     return mutres
 
 def _check_res_validity(res_item):
-    split_item = [item for item in re.split('(\d+)', res_item) if item]
+    split_item = [item for item in re.split('(\\d+)', res_item) if item]
 
     if len(split_item) != 2:
         raise ValueError(f'Unable to parse residue: {res_item}.')
@@ -204,7 +315,7 @@ def _check_range_validity_asterisk(range_item, pdbids):
     chain = range_item.split("*")[0]
     
     for pdbid in pdbids:
-        chain_id = re.split('(\d+)', pdbid)[0]
+        chain_id = re.split('(\\d+)', pdbid)[0]
         if chain == chain_id:
             res_range.append( (chain_id, pdbids[pdbid][2]) )
     
@@ -260,10 +371,9 @@ if __name__=="__main__":
         pdbids, chain_seqs = parse_seqfile(args.sequence_file)
         
     else:
-        pdbids, chain_seqs = parse_pdbfile(args.pdb)
-    
+        pdbids, chain_seqs = parse_pdbfile(args.pdb_file)
+        
     symres = parse_symmetric_res(args.symmetric_res, pdbids)
-    #print(symres)
     mutres = parse_mutres_input(args.mut_res)
-    #generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res)
+
     generate_json(pdbids, chain_seqs, mutres, args.output, args.default_mutres_setting, symres)

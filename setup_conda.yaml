@@ -1,4 +1,4 @@
-name: af2_mpnn2
+name: evopro
 channels:
   - kimlab
   - bioconda

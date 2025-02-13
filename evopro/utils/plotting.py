@@ -22,7 +22,7 @@ def save_csv(csv_name, vals):
     d = {'iter':iter_list}
     for l, i in zip(vals, range(len(vals))):
         d['score '+str(i)] = l
-    print(d)
+    # print(d)
     df = pd.DataFrame(data = d)
     df.to_csv(csv_name)
 
@@ -73,7 +73,7 @@ def plot_scores(data, plot_name, stat_type='average'):
             label=f'{stat_label} Total Score', linewidth=2)
     
     # Colors for components
-    colors = ['r', 'g', 'm', 'c', 'y', 'orange', 'purple', 'brown', 'pink', 'gray']
+    colors = ['r', 'g', 'm', 'c', 'y', 'k', 'b']
     
     # Plot component score statistics
     for i in range(num_components):

@@ -59,4 +59,7 @@ def create_new_seq_mpnn(conf, pool):
         
         new_seq = run_mpnn(mpnn_conf, design_run=True, json_data=jsondata, pdb_paths=["mpnn.pdb"])
                 
-        return ",".join(new_seq.split("/"))
+        if type(new_seq) == str:
+            return ",".join(new_seq.split("/"))
+        else:
+            return ",".join(new_seq)

@@ -103,12 +103,12 @@ def run_genetic_alg(conf):
         scores = []
         for results, sequences, dsobj in zip(results_packed, work_list_packed, pool.pool):
             if not dsobj.scored:
-                score, pdbs, results_parsed = score_overall(results, sequences, dsobj, conf)
+                score, pdbs, results_parsed, label = score_overall(results, sequences, dsobj, conf)
                 dsobj.set_score(conf, score, pdbs, results_parsed)
                 scores.append(score)
 
         pool.sort_by_score()
-        pool.log_scores(log_file, curr_iter)
+        pool.log_scores(log_file, curr_iter, labels = label)
 
         if conf.flags.write_all_pdbs:
             for i, d in enumerate(pool.pool):
@@ -134,7 +134,9 @@ def run_genetic_alg(conf):
         for j, elem in enumerate(scores):
             if not conf.flags.dont_write_compressed_data:
                 compressed_pickle(output_dir + "seq_" + str(i) + "_result_" + str(j), elem[2])
-            for pdb, result, chain in zip(elem[1], elem[2], conf.structure_prediction.structure_pred_chains):
+            
+            Ls = get_lengths(dsobj1, conf)
+            for pdb, result, chain, L in zip(elem[1], elem[2], conf.structure_prediction.structure_pred_chains, Ls):
                 with open(output_dir + "seq_" + str(i) + "_pred_" + str(j) +  "_chain"+str(chain)+".pdb", "w") as pdbf:
                     pdbf.write(str(pdb))
                 if not conf.flags.no_plots_output:
@@ -146,16 +148,15 @@ def run_genetic_alg(conf):
                     if 'iptm' in result:
                         iptm = result['iptm']
 
-                    Ls = get_lengths(dsobj1, conf)
                     # print(Ls)
                     if 'pae' in result:
-                        pae_fig = plot_pae(result['pae'], Ls=Ls, ptm=ptm, iptm=iptm)
+                        pae_fig = plot_pae(result['pae'], Ls=L, ptm=ptm, iptm=iptm)
                         pae_fig.savefig(output_dir + "seq_" + str(i) + "_pred_" + str(j) +  "_chain" + str(chain) + "_pae.png")
 
                     # Plot pLDDTs. 
                     # TODO: residue plddt for af3
                     if 'plddt' in result:
-                        plddt_fig = plot_plddt(result['plddt'], Ls=Ls)
+                        plddt_fig = plot_plddt(result['plddt'], Ls=L)
                         plddt_fig.savefig(output_dir + "seq_" + str(i) + "_pred_" + str(j) +  "_chain" + str(chain) + "_plddt.png")
             
     print("Final sequences and structures written to", output_dir)

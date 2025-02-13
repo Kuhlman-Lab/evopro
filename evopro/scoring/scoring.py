@@ -6,6 +6,7 @@ from utils.parsing import parse_results
 def score_overall(results, sequences, dsobj, conf):
     all_chains = [x.strip() for x in conf.structure_prediction.structure_pred_chains]
 
+    label = ""
     results, pdbs = parse_results(results, conf)
 
     plddt_scores = []
@@ -23,6 +24,7 @@ def score_overall(results, sequences, dsobj, conf):
                     residue_plddt_df, plddt_score = calculate_residue_plddt(result, reslist=residues)
                 plddt_scores.append((plddt_score, plddt_weights[i]))
                 i+=1
+        label += ",pLDDT,weighted_pLDDT"
                 
     ptm_scores = []
     if conf.scoring.ptm.score_ptm:
@@ -34,6 +36,7 @@ def score_overall(results, sequences, dsobj, conf):
                 if 'ptm' in result:
                     ptm_scores.append((result['ptm'], ptm_weights[i]))
                     i+=1
+        label += ",pTM,weighted_pTM"
                     
     if conf.scoring.iptm.score_iptm:
         iptm_chains = [x.strip() for x in conf.scoring.iptm.preds.split(",")]
@@ -44,6 +47,7 @@ def score_overall(results, sequences, dsobj, conf):
                 if 'iptm' in result:
                     ptm_scores.append((result['iptm'], iptm_weights[i]))
                     i+=1
+        label += ",ipTM,weighted_ipTM"
                 
     contacts_scores = []
     if conf.scoring.contacts.score_contacts:
@@ -51,11 +55,15 @@ def score_overall(results, sequences, dsobj, conf):
         contacts_weights = parse_weights(conf.scoring.contacts.weights, contacts_chains)
         reslist1 = get_tokens(conf.scoring.contacts.interface_1, dsobj)
         reslist2 = get_tokens(conf.scoring.contacts.interface_2, dsobj)
+        label += ",ContactScore,weighted_ContactScore"
         
         if conf.scoring.contacts.bonus_residues:
             bonus_residues = get_tokens(conf.scoring.contacts.bonus_residues, dsobj)
+            label += ",BonusScore,weighted_BonusScore"
         if conf.scoring.contacts.penalty_residues:
             penalty_residues = get_tokens(conf.scoring.contacts.penalty_residues, dsobj)
+            label += ",PenaltyScore,weighted_PenaltyScore"
+
         
         i=0
         for result, seq, pred in zip(results, sequences, all_chains):
@@ -90,6 +98,7 @@ def score_overall(results, sequences, dsobj, conf):
         reslist = get_residues(conf.scoring.conf_change.residues, dsobj)
         conf_change = score_rmsd(pdb1, pdb2, reslist=reslist)
         rmsd_scores.append((conf_change, conf_change_weight))
+        label += ",ConfDiffScore,weighted_ConfDiffScore"
         
     #rmsd score
     if conf.scoring.rmsd.score_rmsd:
@@ -105,6 +114,8 @@ def score_overall(results, sequences, dsobj, conf):
                 rmsd_score = score_rmsd(result['pdb'], rmsd_pdb, reslist)
                 rmsd_scores.append((rmsd_score, rmsd_weights[i]))
                 i+=1
+        label += ",RMSDScore,weighted_RMSDScore"
+
     
     custom_scores = []
     if conf.scoring.custom.score_custom:
@@ -116,6 +127,8 @@ def score_overall(results, sequences, dsobj, conf):
                 custom_score = score_custom(result, conf)
                 custom_scores.append((custom_score, custom_weights[i]))
                 i+=1
+        label += ",CustomScore,weighted_CustomScore"
+
     
     other_scores = []
     #TODO add H bond score
@@ -131,7 +144,7 @@ def score_overall(results, sequences, dsobj, conf):
         overall_score += s[0]*s[1]
     
     all_scores.insert(0, overall_score)
-    return all_scores, pdbs, results
+    return all_scores, pdbs, results, label
 
 def score_custom(result, conf):
     try:

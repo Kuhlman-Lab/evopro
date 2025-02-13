@@ -7,7 +7,7 @@ inference:
   model_type: ligand_mpnn #Choose your model: protein_mpnn, ligand_mpnn, per_residue_label_membrane_mpnn, global_label_membrane_mpnn, soluble_mpnn
   batch_size: 1 #Number of sequence to generate per one pass
   number_of_batches: 1 #Number of times to design sequence using a chosen batch size
-  verbose: 1
+  verbose: 0 #1 - to print more information, 0 - to print less information
   save_stats: False
   zero_indexed: 0 #1 - to start output PDB numbering with 0
   force_hetatm: 0 #To force ligand atoms to be written as HETATM to PDB file after packing

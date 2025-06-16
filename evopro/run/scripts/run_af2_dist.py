@@ -3,9 +3,7 @@ By default, the PDBs are scored for average plDDT score and sorted by that score
 
 import sys, os
 import importlib
-#SET PATH TO YOUR EVOPRO INSTALLATION HERE
-#sys.path.append("/proj/kuhl_lab/evopro/")
-sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
+
 from evopro.utils.inputs import FileArgumentParser
 from evopro.utils.distributor import Distributor
 from evopro.utils.utils import compressed_pickle

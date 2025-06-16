@@ -1,4 +1,6 @@
-ptms = ["TPO", "SEP", "PHO", "MSE"]
+ptms_dict = {"TPO":"T", "SEP":"S",  "MSE":"M", "PTR":"Y", "PCA":"E", "HY3":"P", "PHO":"X","ACE":"X", "NH2":"X", "UNK":"X"}
+ptms = ["TPO", "SEP",  "MSE", "PTR", "PCA", "HY3", "PHO","ACE", "NH2", "UNK"]
+
 
 num2aa_full=[
     'ALA','ARG','ASN','ASP','CYS',

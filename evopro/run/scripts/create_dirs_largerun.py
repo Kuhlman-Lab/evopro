@@ -1,7 +1,7 @@
 import sys
 #SET PATH TO YOUR EVOPRO INSTALLATION HERE
 #sys.path.append("/proj/kuhl_lab/evopro/")
-sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
+sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_public/evopro/")
 from evopro.utils.inputs import FileArgumentParser
 import os
 import sys

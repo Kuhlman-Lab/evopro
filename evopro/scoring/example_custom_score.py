@@ -1,6 +1,6 @@
 from utils.parsing_utils import *
 
-def example_custom_score(result, conf):
+def example_custom_score(result, conf, dsobj):
     #get inputs from yaml file
     pdb = result['pdb']
     print(result.keys())

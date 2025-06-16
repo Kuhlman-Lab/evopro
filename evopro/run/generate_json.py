@@ -3,11 +3,11 @@ import pprint
 import re
 import sys
 import math
-#SET PATH HERE
-sys.path.append("/proj/kuhl_lab/evopro/evopro/")
-from objects.chemical import to1letter, to3letter, alphabet, ptms
-from utils.parsing_utils import get_coordinates_pdb_extended, constituents_of_modified_fasta
 from typing import Optional, Sequence
+
+from evopro.objects.chemical import to1letter, to3letter, alphabet, ptms, ptms_dict
+from evopro.utils.parsing_utils import get_coordinates_pdb_extended, constituents_of_modified_fasta
+
 
 class FileArgumentParser(argparse.ArgumentParser):
     """Overwrites default ArgumentParser to better handle flag files."""
@@ -49,20 +49,28 @@ def parse_seqfile(filename):
     with open(filename, "r") as f:
         i=0
         for lin in f:
+            # loop over lines of seqfile.txt
             l = lin.strip().split(":")
             if len(l[2]) > 1:
+                # chain[A] = [type, sequence]
                 chains[l[0]] = [l[1],"".join(l[2:])]
             else:
                 chains[l[0]] = [l[1],l[2]]
     
     for chain in chains:
+        # parse ligand chains
         if chains[chain][0] == "ligand":
             reslist = chains[chain][1]
             resid = chain + "1"
             extended_resid = chain + "_LIG_1"
             ids[resid] = (extended_resid, chain, 1)
+        # parse non-ligand chains
         else:
             reslist = constituents_of_modified_fasta(chains[chain][-1], chains[chain][0])
+            # print("70: parsing non-ligand chains")
+            # print(chains[chain][-1])
+            # print(chains[chain][0])
+            # print(reslist)
             for aa, i in zip(reslist, range(len(reslist))):
                 resid = chain + str(i+1)
                 if len(aa) == 1:
@@ -133,6 +141,7 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
         pdbid = pdbids[pdbid][0]
         chain, res, num = pdbid.split("_")
         if res not in to1letter and res not in ["LIG", "dna"]:
+            # add ptm modifications
             if res in ptms:
                 mods.append({"chain":chain, "resid":num, "type":res})
             else:
@@ -159,7 +168,7 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
                 if pdbids[pdbid] not in fixed_res:
                     mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": to1letter[pdbids[pdbid][0].split("_")[1]], "MutTo": default})
         except:
-            raise ValueError("Invalid specification. Try using the less than sign after the residue ID.")
+            raise ValueError("Invalid mut_res specification. Try modifying the input syntax.")
                 
     else:
         for resind in mut_res:
@@ -194,15 +203,14 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
                         if chain == chain_compare and num_id<=num_id_compare:
                             mutable.append({"chain":pdbids[pdbid][1], "resid": pdbids[pdbid][2], "WTAA": to1letter[pdbids[pdbid][0].split("_")[1]], "MutTo": default})
                 except:
-                    raise ValueError("Invalid specification. Try using the less than sign after the residue ID.")
+                    raise ValueError("Invalid mut_res specification. Try using the less than sign after the residue ID.")
                 
             elif resind in pdbids:
-                mutable.append({"chain":pdbids[resind][1], "resid": pdbids[resind][2], "WTAA": to1letter[pdbids[resind][0].split("_")[1]], "MutTo": default})
+                mutable.append({"chain": pdbids[resind][1], "resid": pdbids[resind][2], "WTAA": to1letter[pdbids[resind][0].split("_")[1]], "MutTo": default})
 
     symmetric = []
     for symmetry in symmetric_res:
         values = list(symmetry.values())
-        #print(values)
         for tied_pos in zip(*values):
             skip_tie = False
             sym_res = []
@@ -222,11 +230,21 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
         if chain_seqs[chain][0] == "ligand":
             chain_seqs_mod[chain] = {"sequence":chain_seqs[chain][-1], "type":chain_seqs[chain][0]}
         else:
-            chain_seqs_mod[chain] = {"sequence":constituents_of_modified_fasta(chain_seqs[chain][-1], chain_seqs[chain][0]), "type":chain_seqs[chain][0]}
+            seq_input = constituents_of_modified_fasta(chain_seqs[chain][-1], chain_seqs[chain][0])
+            # loop over seq and convert ptms to their 1 letter code
+            for i, val in enumerate(seq_input):
+                if val in ptms:
+                    # print(f"237: found ptm {val}, converting to {ptms[val]}")
+                    seq_input[i] = ptms_dict[val]
+            # print("240, printing seq input")
+            # print(seq_input)
+            chain_seqs_mod[chain] = {"sequence":seq_input, "type":chain_seqs[chain][0]}
+            # chain_seqs_mod[chain] = {"sequence":constituents_of_modified_fasta(chain_seqs[chain][-1], chain_seqs[chain][0]), "type":chain_seqs[chain][0]}
+    # here for modified residues, the sequence should be written using the original residue
+    #   chain_seqs_mod should be dictionary of chains written in 1 letter code
     dictionary = {"chains" : chain_seqs_mod, "modifications" : mods, "designable": mutable, "symmetric": symmetric}
     
     # write json to file with human-friendly formatting
-    #jsonobj = json.dumps(dictionary, indent = 4)
     jsonobj = pprint.pformat(dictionary, compact=True, sort_dicts=False).replace("'",'"')
 
     with open(opf, "w") as outfile:

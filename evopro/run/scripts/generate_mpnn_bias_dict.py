@@ -1,14 +1,12 @@
 import sys
-
-#SET PATH TO YOUR EVOPRO INSTALLATION HERE
-#sys.path.append("/proj/kuhl_lab/evopro/")
-sys.path.append("/nas/longleaf/home/amritan/Desktop/kuhlmanlab/evopro_temp/evopro/")
-from evopro.utils.inputs import FileArgumentParser
-from evopro.utils.aa_utils import three_to_one, one_to_three
-from evopro.utils.pdb_parser import get_coordinates_pdb_old
 import json
 import re
 import sys
+
+from evopro.utils.inputs import FileArgumentParser
+from evopro.utils.aa_utils import three_to_one, one_to_three
+from evopro.utils.pdb_parser import get_coordinates_pdb_old
+
 
 def getBiasParser() -> FileArgumentParser:
     """Gets an FileArgumentParser with necessary arguments to run generate_json"""

@@ -9,6 +9,8 @@ def get_lengths(dsobj, conf):
         c = list(chains)
         lengths.append([dsobj.get_lengths(chain) for chain in c])
     
+    if conf.structure_prediction.structure_prediction_tool == "af3":
+        lengths = [sum(lengths[0])]
     return lengths
 
 def initialize_distributor(conf, lengths=None, pre_func=False):
@@ -23,6 +25,10 @@ def initialize_distributor(conf, lengths=None, pre_func=False):
     elif mode == "rf2":
         from run_rf2 import rf2_init
         dist = Distributor(n_workers=conf.flags.num_gpus, f_init=rf2_init, arg_file=conf.structure_prediction.structure_pred_flags_file, lengths=lengths, pre_func=pre_func)
+    
+    elif mode == "af3":
+        from evopro_utils import init_af3
+        dist = Distributor(1, f_init=init_af3, arg_file=conf.structure_prediction.structure_pred_flags_file, lengths=lengths)
     
     else:
         raise ValueError("Invalid structure prediction tool")

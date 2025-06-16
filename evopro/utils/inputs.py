@@ -1,6 +1,6 @@
 import json
 import os
-import argparse
+import argparse, math
 from typing import Optional, Sequence
 
 from utils.parsing_utils import *
@@ -74,6 +74,24 @@ def parse_arguments(conf):
     
     conf.flags.plot_scores = plot_styles
 
+    seeds = []
+
+    if conf.structure_prediction.seed:
+        seed_list = str(conf.structure_prediction.seed)
+        seed_list = seed_list.split(",") 
+        if len(seed_list)>1:
+            mult = math.ceil(conf.flags.num_iter/len(seed_list))
+        else:
+            mult = conf.flags.num_iter 
+    else:
+        seed_list = ["random"]
+        mult = conf.flags.num_iter
+    for s in seed_list:
+        seeds = seeds + [s for _ in range(mult)]
+    
+    seeds = seeds[:conf.flags.num_iter]
+
+    conf.structure_prediction.seed = seeds
 
     #TODO: pool sizes without file
     pool_sizes = []
@@ -102,6 +120,23 @@ def parse_arguments(conf):
                 bias_by_res_dict = json.load(json_file)
     
     conf.sequence_prediction.bias_by_res = bias_by_res_dict
+    
+    mut_percents = []
+    mult = conf.flags.num_iter
+    if conf.flags.mutation_percents:
+        mutation_percents = str(conf.flags.mutation_percents)
+        mutation_percents = mutation_percents.split(",")
+        if len(mutation_percents)>1:
+            mult = math.ceil(conf.flags.num_iter/len(mutation_percents))
+    else:
+        mutation_percents = [0.125]
+        
+    for mut_percent in mutation_percents:
+        mut_percents = mut_percents + [float(mut_percent) for x in range(mult)]
+
+    mut_percents = mut_percents[:conf.flags.num_iter]
+
+    conf.flags.mutation_percents = mut_percents
 
     # print("Writing compressed data:", arguments["write_compressed_data"])
     # print("Writing pdb files every iteration:", arguments["write_pdbs"])

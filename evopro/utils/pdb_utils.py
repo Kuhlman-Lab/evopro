@@ -102,6 +102,10 @@ def find_min_coordinates(pdb):
     return (min(all_x), min(all_y), min(all_z))
 
 def append_pdbs(pdb1, pdb2):
+    # with open("pdb1.pdb", "w") as pdb1f:
+    #     pdb1f.write(pdb1)
+    # with open("pdb2.pdb", "w") as pdb2f:
+    #     pdb2f.write(pdb2)
     pdb1_lines = [x.strip() for x in pdb1.split("\n") if x]
     new_pdb_lines = []
     for lin in pdb1_lines:

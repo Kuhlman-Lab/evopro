@@ -1,0 +1,147 @@
+flags:
+  run_dir: ./
+  num_gpus: 1
+  num_iter: 50
+  
+  pool_size: 20
+  pool_size_variable: False  #set one of the two options below if True
+  pool_sizes_file: null
+  pool_sizes: null
+  
+  mutation_percents: 0.125 #used when no MPNN for pool refill (first iteration only by default). percentage of designable residues that are mutated at once.
+  crossover_percent: 0
+  single_mut_only: False
+  residue_specs_file: ./residue_specs.json
+  starting_seqs_file: null
+
+  no_plots_output: False
+  plot_scores: average
+  num_repeat_scoring: 5
+  dont_write_compressed_data: False
+  write_all_pdbs: False
+
+structure_prediction:
+  structure_pred_chains: AB,A
+  structure_prediction_tool: af2
+  structure_prediction_tool_location: /proj/kuhl_lab/alphafold/run/
+  
+  custom_msa_chains: null #set these four lines only with af3 (for af2, set these options in af2.flags)
+  custom_msa_paths: null
+  custom_template_chains: null
+  custom_template_paths: null
+  
+  seed: 42
+  structure_pred_flags_file: ./af2.flags
+
+sequence_prediction:
+  sequence_pred_chains: AB
+  sequence_prediction_tool_location: /proj/kuhl_lab/LigandMPNN/
+  sequence_prediction_tool_conf: ./mpnn_evopro.yaml
+  mpnn_version: s_48_020
+  mpnn_freq: 1 #run mpnn every iteration (except for the first iteration)
+  #mpnn_freq: 2 #run mpnn every other iteration
+  mpnn_iters: null #overwridden by mpnn_freq. set this only if mpnn_freq is null
+  skip_mpnn: null #skip mpnn on these specific iterations
+  mpnn_temp: 0.1
+  mpnn_temp_variable: False
+  
+  bias_AA: null
+  bias_by_res: null
+  
+scoring:
+  plddt:
+    score_plddt: True
+    preds: AB,A #which predictions to calculate score on
+    residues: A*
+    weights: -0.1,-0.1 #weight for scores calculated for each prediction
+
+  plddt_interface:
+    score_plddt_interface: True
+    preds: AB #which predictions to calculate score on
+    interface_1: B* #target interface, if more than one chain, separate using commas. eg. B*,C*
+    interface_2: A* #binder interface
+    weights: -1
+    
+    max_contacts: 50
+    contact_distance: 4 #Angstroms, all atom calculation
+
+  ptm:
+    score_ptm: False
+    preds: AB
+    weights: -10
+
+  iptm:
+    score_iptm: False
+    preds: AB
+    weights: -10
+
+  contacts:
+    score_contacts: True
+    preds: AB
+    score_type: ca
+    weights: -1
+
+    interface_1: B* #target interface
+    interface_2: A* #binder interface
+    max_contacts: 50
+    contact_distance: 4 #Angstroms, all atom calculation
+    
+    bonus_residues: B34 #residues on the target that the binder should contact
+    bonus_distance: 4 #Angstroms, all atom calculation
+    bonus_weight: 5
+    penalty_residues: B6 #residues on the target that the binder should NOT contact
+    penalty_distance: 8 #Angstroms, all atom calculation
+    penalty_weight: 5
+
+  conf_change:
+    score_conf_change: True
+    preds: AB,A #preds between which to calculate the score
+    residues: A*
+    weights: 1 #only one weight here since this score is calculated between two predictions
+
+    threshold_penalty: False
+    threshold: 5
+    spring_constant: 10
+
+  rmsd:
+    score_rmsd: False
+    preds: AB
+    rmsd_pdb: ./design.pdb
+    residues: null
+    weights: 1
+
+    threshold_penalty: False
+    threshold: 5
+    spring_constant: 10
+  
+  hbond:
+    score_hbond: False
+    preds: AB
+    max_don_h_dist: 1.1
+
+    interface_1: B*
+    interface_2: A*
+    weights: -1
+
+  hydrophobic_interface:
+    score_hydrophobic_interface: False
+    hydrophobic_residues: ALA,VAL,ILE,LEU,MET,PHE,TYR,TRP,PRO
+    preds: AB
+    weights: 1
+
+    #define chains between which interface is being scored
+    chain_1: A 
+    chain_2: B 
+
+  hydrophobic_surface:
+    score_hydrophobic_surface: False
+    hydrophobic_residues: ALA,VAL,ILE,LEU,MET,PHE,TYR,TRP,PRO
+    preds: AB
+    weights: 1
+
+  custom:
+    score_custom: False
+    preds: AB
+    custom_script: null
+    custom_score_func: null
+    weights: 1

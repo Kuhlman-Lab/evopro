@@ -2,12 +2,14 @@ import re
 import string
 from string import ascii_letters
 from rdkit import Chem
+from objects.chemical import to1letter, to3letter, alphabet, ptms
 
 def constituents_of_modified_fasta(x: str, chain_type: str):
     """
     Accepts amino acid and RNA/DNA inputs: 'agtc', 'AGT(ASP)TG', etc. Does not accept SMILES strings.
     Returns constituents, e.g, [A, G, T, ASP, T, G] or None if string is incorrect.
     Everything in returned list is single character, except for blocks specified in brackets.
+        - PTMs in () should be returned as single characters
     """
     if chain_type == "protein":
         x = x.strip().upper()
@@ -29,6 +31,10 @@ def constituents_of_modified_fasta(x: str, chain_type: str):
                 return None  # closed without opening
             if len(current_modified) <= 1:
                 return None  # empty modification: () or single (K)
+            # consider converting  current modified 3-letter format to 1-letter
+            # print(f"35: {current_modified}")
+            # current_modified = ptms[current_modified]
+            # print(f"37, after convert to 1-letter: {current_modified}")
             constituents.append(current_modified)
             current_modified = None
         else:
@@ -72,7 +78,7 @@ def count_nonH_atoms(smiles):
     
 def get_tokens(resstring, dsobj):
     if not resstring:
-        return []
+        return None
     resstring = str(resstring)
     res_temp = resstring.strip().split(",")
     res_temp = [x.strip() for x in res_temp if x]
@@ -94,7 +100,7 @@ def get_tokens(resstring, dsobj):
         
         elif "~" in elem:
             motif = elem.split("~")[0]
-            #TODO: find motif and set all other residues mutable
+            #TODO: find motif and select all other residues
             raise NotImplementedError("Motif-based design not yet implemented")
             
         elif "<G" in elem:
@@ -124,7 +130,7 @@ def get_tokens(resstring, dsobj):
 
 def get_residues(resstring, dsobj):
     if not resstring:
-        return []
+        return None
     resstring = str(resstring)
     res_temp = resstring.strip().split(",")
     res_temp = [x.strip() for x in res_temp if x]

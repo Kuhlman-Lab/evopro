@@ -1,0 +1,5 @@
+No starting sequences file provided. Random mutations will be generated for starting pool.
+Compiling structure prediction model for lengths: [[113, 113, 113]]
+Initializing distributor
+/var/spool/slurmd/job3988697/slurm_script: line 17:  5482 Killed                  python /proj/kuhl_lab/evopro2/run/run_evopro.py --config_file evopro_basic.yaml
+slurmstepd: error: Detected 1 oom_kill event in StepId=3988697.batch. Some of the step tasks have been OOM Killed.

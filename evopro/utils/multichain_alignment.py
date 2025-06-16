@@ -44,8 +44,7 @@ def transform_coordinates(coords, R, t):
     try:
         return (R @ coords.T).T + t
     except:
-        print("R", R)
-        print("t", t)
+
         raise ValueError("Error in transformation. Check that the two PDBs have the same number of ca atoms.")
 
 def get_ca_coordinates(pdb_df, chain_id):
@@ -171,7 +170,6 @@ def multichain_permutation_alignment(pdb1, pdb2, output_path=None):
     for chain in chains2:
         coords2[chain] = get_ca_coordinates(pdb2.df['ATOM'], chain)
     
-    # print(coords1, coords2)
     c2 = create_1d_array(coords2)
     
     # Try all possible chain permutations
@@ -180,10 +178,7 @@ def multichain_permutation_alignment(pdb1, pdb2, output_path=None):
     best_transformations = {}
     
     best_R, best_t = None, None
-    # print("chains2", chains2)
     for perm in permutations(chains2):
-        # print("perm", perm)
-        # current_transformations = {}
         perm_coords1 = OrderedDict()
         
         for p in perm:
@@ -192,14 +187,11 @@ def multichain_permutation_alignment(pdb1, pdb2, output_path=None):
         c1 = create_1d_array(perm_coords1)
             
         if len(c1) != len(c2):
-            # print("continue")
-            # print(c1, c2, len(c1), len(c2))
             continue
         
         R, t = kabsch_align(c1, c2)
         aligned_coords = transform_coordinates(c1, R, t)
         rmsd = calculate_rmsd(aligned_coords, c2)
-        # print(perm, rmsd)
         
         if rmsd < best_rmsd:
             best_rmsd = rmsd
@@ -224,10 +216,10 @@ def multichain_permutation_alignment(pdb1, pdb2, output_path=None):
 def main():
     """Example usage of the multichain alignment function."""
     
-    path = "/work/users/a/m/amritan/evopro_tests/rmsd/multichain_perm/test7/"
-    pdb1_path = path + "seq_2_final_model_1_chainABCDE.pdb"
-    pdb2_path = path + "rfdiff_model25step_0_renumbered.pdb"
-    output_path = path + "aligned_badRMSD_test.pdb"
+    path = "/work/users/a/m/amritan/evopro_tests/mh_f3_105/test/"
+    pdb1_path = path + "test1.pdb"
+    pdb2_path = path + "test2.pdb"
+    output_path = path + "aligned_test.pdb"
     
     pdb1 = PandasPdb().read_pdb(pdb1_path)
     pdb2 = PandasPdb().read_pdb(pdb2_path)

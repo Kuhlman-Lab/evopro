@@ -1,14 +1,13 @@
 import json, re, random, copy
-from objects.chemical import aa2num, num2aa, alphabet
-from utils.wrappers import create_new_seq_mpnn
-from utils.utils import merge_related_lists
-from utils.parsing_utils import count_nonH_atoms
+
+from evopro.objects.chemical import aa2num, num2aa, alphabet
+from evopro.utils.wrappers import create_new_seq_mpnn
+from evopro.utils.utils import merge_related_lists
+from evopro.utils.parsing_utils import count_nonH_atoms
 
 def sequencestring_to_sequence(seqstr):
     l = []
     for x in seqstr:
-        if x == "X":
-            print("HERE", aa2num[x])
         l.append(aa2num[x])
     return l
 def sequence_to_sequencestring(seq):
@@ -73,7 +72,6 @@ class DesignSeq():
         with open(jsoninputsfile, "r") as inpf:
             jdata = json.load(inpf)
 
-        #TODO ensure jdata has all the necessary keys in generate json
         for chain_id in jdata["chains"]:
             chain = jdata["chains"][chain_id]
             chain_obj = Chain(type=chain["type"], sequence=chain["sequence"])
@@ -145,23 +143,21 @@ class DesignSeq():
         return jdata
 
     def _update_sequence(self, sequence):
-        # print(sequence)
         for chain, newseq in zip(self.chains, sequence.split(",")):
+            #dont update ligand sequences
+            if self.chains[chain].type == "ligand":
+                continue
             nseq = sequencestring_to_sequence(newseq)
             new_seq = []
-            skip = False
             for i, s in enumerate(nseq):
                 if s == 21:
-                    #TODO: check why ligandmpnn adds an extra residue
                     new_seq.append(self.chains[chain].sequence[i])
-                    skip = True
                 else:
-                    if not skip:
-                        new_seq.append(s)
-                    skip = False
-            # print(len(nseq), len(new_seq), len(self.chains[chain].sequence))
+                    new_seq.append(s)
+
             self.chains[chain].sequence = new_seq
             for mut in self.chains[chain].mutable:
+
                 if aa2num[mut["WTAA"]] != self.chains[chain].sequence[mut["resid"]-1]:
                     mut["WTAA"] = num2aa[self.chains[chain].sequence[mut["resid"]-1]]
 
@@ -169,11 +165,7 @@ class DesignSeq():
     
     def _update_symmetry(self):
         for chain in self.chains:
-            #print(self.chains[chain].sequence)
-            # print(self.chains[chain].symmetric, self.chains[chain].sequence)
             for i in range(len(self.chains[chain].sequence)):
-                #print(i)
-                # print(self.chains[chain].symmetric, len(self.chains[chain].symmetric), i)
                 for sym in self.chains[chain].symmetric[i]:
                     ch, pos = re.split('(\d+)',sym)[:2]
                     self.chains[ch].sequence[int(pos)-1] = self.chains[chain].sequence[i]
@@ -181,15 +173,12 @@ class DesignSeq():
                         if aa2num[mut["WTAA"]] != self.chains[chain].sequence[mut["resid"]-1]:
                             mut["WTAA"] = num2aa[self.chains[chain].sequence[mut["resid"]-1]]
         
-    def _mutate_random(self, conf):
-        all_dna_bases = ["a", "c", "g", "t"]
-        all_rna_bases = ["b", "d", "h", "u"]
-        new_desseq = copy.deepcopy(self)
+    def _mutate_random(self, conf, curr_iter=1):
         
         mutable = []
         for chain in self.chains:
             mutable.extend(self.chains[chain].mutable)
-        num_mut = round(conf.flags.mutation_percents * len(mutable))
+        num_mut = round(conf.flags.mutation_percents[curr_iter-1] * len(mutable))
         
         if num_mut<1:
             num_mut=1
@@ -202,6 +191,8 @@ class DesignSeq():
         
         weights = [1 for x in alphabet]
         
+        new_desseq = DesignSeq(template_desseq=self, sequence=str(self))
+
         num_mut_curr = 0
         while num_mut_curr < num_mut:
             mut_id = mut_set[num_mut_curr]
@@ -227,26 +218,46 @@ class DesignSeq():
                 
             chain = mut_id['chain']
             id = mut_id['resid']
+            wtaa = mut_id['WTAA']
+            #set the weight of the wildtype amino acid to 0 so it cannot be selected
+            if wtaa in alphabet:
+                weights[alphabet.index(wtaa)] = 0
             
             if self.chains[chain].type == "protein":
                 new_aa = random.choices(alphabet, weights)[0]
-            # elif self.chains[chain].type == "rna":
-            #     new_aa = random.choices(all_rna_bases, weights)[0]
-            # elif self.chains[chain].type == "dna":
-            #     new_aa = random.choices(all_dna_bases, weights)[0]
             else:
                 print(self.chains[chain].type)
                 raise ValueError("Invalid type of chain for mutation. Must be protein chain.")
             
             new_desseq._replace_residue(chain, id, new_aa)
-            #print("after mutation", new_mut[mut_id])
             num_mut_curr+=1
 
+        old_seq = self.get_chain_sequence(chain)
+        new_seq = new_desseq.get_chain_sequence(chain)
         return new_desseq
     
-    def _mutate_mpnn(self, conf, pool):
-        new_seq = create_new_seq_mpnn(conf, pool)
+    def _mutate_mpnn(self, conf, curr_iter, pool):
+        new_seq = create_new_seq_mpnn(conf, curr_iter, pool)
         new_desseq = DesignSeq(template_desseq=self, sequence=new_seq)
+        return new_desseq
+    
+    def _mutate_crossover(self, pool, conf):
+        # Choose a mate from the pool
+        mate = random.choice(pool.pool)
+        parent1 = str(self)
+        parent2 = str(mate)
+
+        # Ensure sequences are the same length
+        if len(parent1) != len(parent2):
+            raise ValueError("Sequences must be of equal length for crossover.")
+        point = random.randint(1, len(parent1) - 1)
+
+        # Create new sequence
+        new_seq = parent1[:point] + parent2[point:]
+
+        # Create a copy and update the sequence
+        new_desseq = DesignSeq(template_desseq=self, sequence=new_seq)
+        
         return new_desseq
         
     def _replace_residue(self, chain, id, new_aa):
@@ -256,28 +267,33 @@ class DesignSeq():
                 mut["WTAA"] = new_aa
         self._update_symmetry()
     
-    def mutate(self, pool, conf, seq_pred_mode="random"):
-        # all_aas = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-        # all_dna_bases = ["a", "c", "g", "t"]
-        # all_rna_bases = ["b", "d", "h", "u"]
+    def mutate(self, pool, conf, curr_iter, seq_pred_mode="random"):
         
         if seq_pred_mode == "mpnn":
-            return self._mutate_mpnn(conf, pool)
+            return self._mutate_mpnn(conf, curr_iter, pool)
         
         elif seq_pred_mode == "random":
             while True:
-                new_desseq = self._mutate_random(conf)
+                new_desseq = self._mutate_random(conf, curr_iter=curr_iter)
                 #check if duplicate with same sequence
                 if str(new_desseq) not in pool.data:
                     return new_desseq
                 else:
                     continue
         
-    def get_scores(self):  
+        elif seq_pred_mode == "crossover":
+            while True:
+                new_desseq = self._mutate_crossover(pool, conf)
+                #check if duplicate with same sequence
+                if str(new_desseq) not in pool.data:
+                    return new_desseq
+                else:
+                    continue
+        
+    def get_scores(self):
         sorted_scores = sorted(self.score, key=lambda x: x[0])
         return sorted_scores
         
-    
     def set_score(self, conf, score, pdbs, results):
         self.score.insert(0, (score, pdbs, results))
         if len(self.score) >= conf.flags.num_repeat_scoring:
@@ -314,7 +330,6 @@ class Chain:
         return hash(self.get_sequence_string())
     
     def get_sequence_string(self):
-        #print(self.sequence)
         if self.type == "ligand":
             return "".join(self.sequence)
         else:

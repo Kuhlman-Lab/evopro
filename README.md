@@ -171,8 +171,8 @@ Since we have modified the original AF2 code to allow for custom template databa
 <!-- CONTACT -->
 ## Contact
 
-Amrita Nallathambi - anallathambi@unc.edu  
-Since I am a grad student, this code may not be perfect. Please email me with any questions or concerns!
+Amrita Nallathambi - amritan1707@gmail.com
+Since I wrote this while I was a graduate student, the code may not be perfect. Please email me with any questions or concerns!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

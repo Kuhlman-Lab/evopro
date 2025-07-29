@@ -62,8 +62,7 @@ Installation of Anaconda is required to load dependencies.
    cd ../../
    ```
 
-5.	Navigate to the EvoPro directory and create a Conda environment containing all the dependencies needed to run EvoPro using the YAML file provided.
-
+4.	Navigate to the EvoPro directory and create a Conda environment containing all the dependencies needed to run EvoPro using the YAML file provided.
    NOTE: If using mamba/micromamba, replace “conda” with the respective command.
    ```sh
    cd evopro
@@ -74,13 +73,15 @@ Installation of Anaconda is required to load dependencies.
    ```
    NOTE: After running the last command, you will likely see errors during the pip install about incompatible versions (for example, with jax/jaxlib and orbax, chex, flax etc.). These can be safely ignored.
 
-6. Add the EvoPro and AlphaFold install directories to your PYTHONPATH. To make it permanent, modify these lines to contain the absolute paths and add them to your ~/.bashrc file so they are executed every time you start a new session in the terminal. Otherwise, you will have to add these lines to your slurm job file or run them in every new terminal session.
+5. Add the EvoPro and AlphaFold install directories to your PYTHONPATH. To make it permanent, modify these lines to contain the absolute paths and add them to your ~/.bashrc file so they are executed every time you start a new session in the terminal. Otherwise, you will have to add these lines to your slurm job file or run them in every new terminal session.
    ```sh
    export PYTHONPATH=$PYTHONPATH:${DIR}/evopro/
    export PYTHONPATH=$PYTHONPATH:${DIR}/evopro/evopro/
    export PYTHONPATH=$PYTHONPATH:${DIR}/alphafold/
    export PYTHONPATH=$PYTHONPATH:${DIR}/alphafold/alphafold/
    ```
+
+
 
 NOTE: If you would like to model molecules other than proteins, you can use the AF3 version of EvoPro. Follow the instructions above, but use af3_setup_conda.yaml instead of setup_conda.yaml to create the environment. 
 ```sh

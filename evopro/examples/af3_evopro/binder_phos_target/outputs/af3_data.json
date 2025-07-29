@@ -1,0 +1,16 @@
+{
+    "name": "design",
+    "modelSeeds": [
+        42.0
+    ],
+    "sequences": [
+        {
+            "protein": {
+                "sequence": "SRAERLAALTAQARAAAAANGYTGPVRVVEADGVYTVLLEGANVDQAIAVAEATGLAVVLLP",
+                "id": [
+                    "A"
+                ]
+            }
+        }
+    ]
+}

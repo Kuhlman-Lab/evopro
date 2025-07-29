@@ -1,0 +1,32 @@
+{
+    "name": "design",
+    "modelSeeds": [
+        42
+    ],
+    "sequences": [
+        {
+            "protein": {
+                "sequence": "PAPKPLAPSEPITFGEYTFYPVTQEIIDALLEYFGISLEWLIKNFDELTPEEFSKFMSEYTGVDTDYVLIRPKGLPIDDFSSWLITPAFPNEEVKNENIEWLKKHMGAEDVEWEVL",
+                "id": [
+                    "A"
+                ]
+            }
+        },
+        {
+            "dna": {
+                "sequence": "TGTCAGAATGAATT",
+                "id": [
+                    "B"
+                ]
+            }
+        },
+        {
+            "dna": {
+                "sequence": "AATTCATTCT",
+                "id": [
+                    "C"
+                ]
+            }
+        }
+    ]
+}

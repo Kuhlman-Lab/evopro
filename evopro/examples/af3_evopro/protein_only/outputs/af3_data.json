@@ -1,0 +1,32 @@
+{
+    "name": "design",
+    "modelSeeds": [
+        42
+    ],
+    "sequences": [
+        {
+            "protein": {
+                "sequence": "SSVLEEDDKETKEFENWASDWIKDHLTMKISELYKYIPNEKKNSGYALTLISDEWKDKPMYMMFKKGYPANNRDNAIYETLNTCNTEHYTGNILNFSDTYYRRFGYVASAISNYVTKIS",
+                "id": [
+                    "A"
+                ]
+            }
+        },
+        {
+            "protein": {
+                "sequence": "SSVLEEDDKETKEFENWASDWIKDHLTMKISELYKYIPNEKKNSGYALTLISDEWKDKPMYMMFKKGYPANNRDNAIYETLNTCNTEHYTGNILNFSDTYYRRFGYVASAISNYVTKIS",
+                "id": [
+                    "B"
+                ]
+            }
+        },
+        {
+            "protein": {
+                "sequence": "SSVLEEDDKETKEFENWASDWIKDHLTMKISELYKYIPNEKKNSGYALTLISDEWKDKPMYMMFKKGYPANNRDNAIYETLNTCNTEHYTGNILNFSDTYYRRFGYVASAISNYVTKIS",
+                "id": [
+                    "C"
+                ]
+            }
+        }
+    ]
+}

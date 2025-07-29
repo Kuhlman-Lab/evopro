@@ -1,0 +1,24 @@
+{
+    "name": "design",
+    "modelSeeds": [
+        42
+    ],
+    "sequences": [
+        {
+            "protein": {
+                "sequence": "PVEFAKVTLHFAPDTPEEFVTVVLKAVFRMSEDTGRRVMMTAHRFGSAVVVVCERDIAETKAKEATDLGKEAGFPLMFTTEPE",
+                "id": [
+                    "A"
+                ]
+            }
+        },
+        {
+            "ligand": {
+                "smiles": "NC(=O)[C@@H]([NH3+])Cc1ccccc1",
+                "id": [
+                    "B"
+                ]
+            }
+        }
+    ]
+}

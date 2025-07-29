@@ -1,0 +1,4 @@
+--sequence_file seqfile.txt
+--mut_res A1-A18
+--default_mutres_setting all-C
+--output residue_specs.json

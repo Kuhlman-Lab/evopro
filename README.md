@@ -63,15 +63,16 @@ Installation of Anaconda is required to load dependencies.
    ```
 
 4.	Navigate to the EvoPro directory and create a Conda environment containing all the dependencies needed to run EvoPro using the YAML file provided.
-   NOTE: If using mamba/micromamba, replace “conda” with the respective command.
-   ```sh
-   cd evopro
-   conda env create -n evopro -f setup_conda.yaml
-   conda activate evopro
-   python3 -m pip install ../alphafold/alphafold
-   pip3 install --upgrade jax==0.3.25 jaxlib==0.3.25+cuda11.cudnn805 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-   ```
-   NOTE: After running the last command, you will likely see errors during the pip install about incompatible versions (for example, with jax/jaxlib and orbax, chex, flax etc.). These can be safely ignored.
+   
+      NOTE: If using mamba/micromamba, replace “conda” with the respective command.
+      ```sh
+      cd evopro
+      conda env create -n evopro -f setup_conda.yaml
+      conda activate evopro
+      python3 -m pip install ../alphafold/alphafold
+      pip3 install --upgrade jax==0.3.25 jaxlib==0.3.25+cuda11.cudnn805 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+      ```
+      NOTE: After running the last command, you will likely see errors during the pip install about incompatible versions (for example, with jax/jaxlib and orbax, chex, flax etc.). These can be safely ignored.
 
 5. Add the EvoPro and AlphaFold install directories to your PYTHONPATH. To make it permanent, modify these lines to contain the absolute paths and add them to your ~/.bashrc file so they are executed every time you start a new session in the terminal. Otherwise, you will have to add these lines to your slurm job file or run them in every new terminal session.
    ```sh

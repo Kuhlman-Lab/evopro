@@ -23,9 +23,9 @@
 ## About EvoPro
 
 EvoPro is a genetic algorithm-based protein binder optimization pipeline, used in published work for in silico evolution of highly accurate, tight protein binders.  
-Now with updated code including multistate design - PREPRINT COMING SOON!
+Now with updated code including multistate design - PROTOCOLS PAPER COMING SOON!
 
-PLEASE MAKE SURE TO USE "MAIN" BRANCH for stable version. Branch "pd1_paper" contains old code used in paper. Current working version is on "dev branch". 
+PLEASE MAKE SURE TO USE "MAIN" BRANCH for stable version. Branch "pd1_paper" contains old code used in first paper. Current working version is on "dev branch". 
 
 [paper]  
 
@@ -48,22 +48,39 @@ Installation of Anaconda is required to load dependencies.
    ```sh
    git clone https://github.com/Kuhlman-Lab/evopro.git 
    ```
-2. Clone our AF2 and ProteinMPNN repos:
+2. Clone our modified AF2 and LigandMPNN (contains ProteinMPNN) repos:
    ```sh
    git clone https://github.com/Kuhlman-Lab/alphafold.git
-   git clone https://github.com/Kuhlman-Lab/proteinmpnn.git
+   git clone https://github.com/Kuhlman-Lab/ligandmpnn.git
    ```
-3. Load AlphaFold2 model weights from source using script: https://github.com/Kuhlman-Lab/alphafold/blob/main/setup/download_alphafold_params.sh 
-
-4. Set up conda environment:
+3. Set the variable DIR to the installation directory. Load AlphaFold2 model weights from source using the provided script.
    ```sh
-   conda env create -n evopro -f setup_conda.yaml
-   pip3 install --upgrade jax==0.3.25 jaxlib==0.3.25+cuda11.cudnn805 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-   python3 -m pip install /path/to/alphafold/alphafold/
+   DIR=$(pwd)
+   cd alphafold/alphafold/
+   mkdir data
+   bash ../setup/download_alphafold_params.sh data
+   cd ../../
    ```
 
-5. Set the path to your EvoPro installation at the top of run/generate_json.py and run/run_evopro.py.
+5.	Navigate to the EvoPro directory and create a Conda environment containing all the dependencies needed to run EvoPro using the YAML file provided.
 
+   NOTE: If using mamba/micromamba, replace “conda” with the respective command.
+   ```sh
+   cd evopro
+   conda env create -n evopro -f setup_conda.yaml
+   conda activate evopro
+   python3 -m pip install ../alphafold/alphafold
+   pip3 install --upgrade jax==0.3.25 jaxlib==0.3.25+cuda11.cudnn805 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+   ```
+   NOTE: After running the last command, you will likely see errors during the pip install about incompatible versions (for example, with jax/jaxlib and orbax, chex, flax etc.). These can be safely ignored.
+
+6. Add the EvoPro and AlphaFold install directories to your PYTHONPATH. To make it permanent, modify these lines to contain the absolute paths and add them to your ~/.bashrc file so they are executed every time you start a new session in the terminal. Otherwise, you will have to add these lines to your slurm job file or run them in every new terminal session.
+   ```sh
+   export PYTHONPATH=$PYTHONPATH:${DIR}/evopro/
+   export PYTHONPATH=$PYTHONPATH:${DIR}/evopro/evopro/
+   export PYTHONPATH=$PYTHONPATH:${DIR}/alphafold/
+   export PYTHONPATH=$PYTHONPATH:${DIR}/alphafold/alphafold/
+   ```
 
 <!-- USAGE EXAMPLES -->
 ## Usage

@@ -82,6 +82,19 @@ Installation of Anaconda is required to load dependencies.
    export PYTHONPATH=$PYTHONPATH:${DIR}/alphafold/alphafold/
    ```
 
+NOTE: If you would like to model molecules other than proteins, you can use the AF3 version of EvoPro. Follow the instructions above, but use af3_setup_conda.yaml instead of setup_conda.yaml to create the environment. 
+```sh
+git clone https://github.com/Kuhlman-Lab/alphafold3.git
+cd evopro
+mamba env create -n evopro_af3 -f af3_setup_conda.yaml
+mamba activate evopro_af3
+cd ../alphafold3
+pip3 install --no-deps .
+build_data
+```
+AF3 weights must be acquired and used as outlined by the official AF3 repository. [af3_repo]
+Once acquired, make a new directory called models in the base alphafold3 folder and place the weights file (e.g. af3.bin.zst) inside.
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
@@ -165,3 +178,4 @@ Since I am a grad student, this code may not be perfect. Please email me with an
 [conda-install-link]: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html  
 [preprint]: https://www.biorxiv.org/content/10.1101/2023.05.03.539278v1
 [paper]: https://www.pnas.org/doi/10.1073/pnas.2307371120
+[af3_repo]: https://github.com/google-deepmind/alphafold3 

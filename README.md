@@ -23,12 +23,11 @@
 ## About EvoPro
 
 EvoPro is a genetic algorithm-based protein binder optimization pipeline, used in published work for in silico evolution of highly accurate, tight protein binders.  
-Now including multistate design - PREPRINT AND UPDATED CODE COMING SOON!
+Now with updated code including multistate design - PROTOCOLS PAPER COMING SOON!
 
-PLEASE MAKE SURE TO USE "MAIN" BRANCH for stable version. Branch "pd1_paper" contains code used in paper. Current working version is on "dev branch". 
+PLEASE MAKE SURE TO USE "MAIN" BRANCH for stable version. Branch "pd1_paper" contains old code used in first paper. Current working version is on "dev branch". 
 
 [paper]  
-[preprint]
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -49,22 +48,56 @@ Installation of Anaconda is required to load dependencies.
    ```sh
    git clone https://github.com/Kuhlman-Lab/evopro.git 
    ```
-2. Clone our AF2 and ProteinMPNN repos:
+2. Clone our modified AF2 and LigandMPNN (contains ProteinMPNN) repos:
    ```sh
    git clone https://github.com/Kuhlman-Lab/alphafold.git
-   git clone https://github.com/Kuhlman-Lab/proteinmpnn.git
+   git clone https://github.com/Kuhlman-Lab/ligandmpnn.git
    ```
-3. Load AlphaFold2 model weights from source using script: https://github.com/Kuhlman-Lab/alphafold/blob/main/setup/download_alphafold_params.sh 
-
-4. Set up conda environment:
+3. Set the variable DIR to the installation directory. Load AlphaFold2 model weights from source using the provided script.
    ```sh
-   conda env create -n evopro -f setup_conda.yaml
-   pip3 install --upgrade jax==0.3.25 jaxlib==0.3.25+cuda11.cudnn805 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-   python3 -m pip install /path/to/alphafold/alphafold/
+   DIR=$(pwd)
+   cd alphafold/alphafold/
+   mkdir data
+   bash ../setup/download_alphafold_params.sh data
+   cd ../../
    ```
 
-5. Set the path to your EvoPro installation at the top of run/generate_json.py and run/run_evopro.py.
+4.	Navigate to the EvoPro directory and create a Conda environment containing all the dependencies needed to run EvoPro using the YAML file provided.
+   
+      NOTE: If using mamba/micromamba, replace “conda” with the respective command.
+      ```sh
+      cd evopro
+      conda env create -n evopro -f setup_conda.yaml
+      conda activate evopro
+      python3 -m pip install ../alphafold/alphafold
+      pip3 install --upgrade jax==0.3.25 jaxlib==0.3.25+cuda11.cudnn805 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+      ```
+      NOTE: After running the last command, you will likely see errors during the pip install about incompatible versions (for example, with jax/jaxlib and orbax, chex, flax etc.). These can be safely ignored.
 
+5. Add the EvoPro and AlphaFold install directories to your PYTHONPATH. To make it permanent, modify these lines to contain the absolute paths and add them to your ~/.bashrc file so they are executed every time you start a new session in the terminal. Otherwise, you will have to add these lines to your slurm job file or run them in every new terminal session.
+   ```sh
+   export PYTHONPATH=$PYTHONPATH:${DIR}/evopro/
+   export PYTHONPATH=$PYTHONPATH:${DIR}/evopro/evopro/
+   export PYTHONPATH=$PYTHONPATH:${DIR}/alphafold/
+   export PYTHONPATH=$PYTHONPATH:${DIR}/alphafold/alphafold/
+   ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+NOTE: If you would like to model molecules other than proteins, you can use the AF3 version of EvoPro. Follow the instructions above, but use af3_setup_conda.yaml instead of setup_conda.yaml to create the environment. 
+```sh
+git clone https://github.com/Kuhlman-Lab/alphafold3.git
+cd evopro
+mamba env create -n evopro_af3 -f af3_setup_conda.yaml
+mamba activate evopro_af3
+cd ../alphafold3
+pip3 install --no-deps .
+build_data
+```
+AF3 weights must be acquired and used as outlined by the official AF3 repository. [af3_repo]
+
+Once acquired, make a new directory called models in the base alphafold3 folder and place the weights file (e.g. af3.bin.zst) inside.
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -138,8 +171,8 @@ Since we have modified the original AF2 code to allow for custom template databa
 <!-- CONTACT -->
 ## Contact
 
-Amrita Nallathambi - anallathambi@unc.edu  
-Since I am a grad student, this code may not be perfect. Please email me with any questions or concerns!
+Amrita Nallathambi - amritan1707@gmail.com
+Since I wrote this while I was a graduate student, the code may not be perfect. Please email me with any questions or concerns!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -149,3 +182,4 @@ Since I am a grad student, this code may not be perfect. Please email me with an
 [conda-install-link]: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html  
 [preprint]: https://www.biorxiv.org/content/10.1101/2023.05.03.539278v1
 [paper]: https://www.pnas.org/doi/10.1073/pnas.2307371120
+[af3_repo]: https://github.com/google-deepmind/alphafold3 

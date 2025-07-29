@@ -1,0 +1,54 @@
+channels:
+- bioconda
+- conda-forge
+- nvidia
+- pkgs/main
+- pytorch
+dependencies:
+- biopandas=0.5.1=pyhd8ed1ab_1
+- biopython=1.84=py311h331c9d8_0
+- hmmer=3.4=hdbdd923_2
+- matplotlib=3.10.0=py311h38be061_0
+- ml-collections=1.0.0=pyh29332c3_0
+- mmtf-python=1.1.3=pyhd8ed1ab_0
+- numpy=1.26.4=py311h64a7726_0
+- omegaconf
+- pandas=2.2.3=py311h7db5c69_1
+- pip=24.3.1=pyh8b19718_0
+- prody=2.4.1=pyh94de1ce_1
+- python=3.11.10=hc5c86c4_3_cpython
+- python_abi=3.11=5_cp311
+- pytorch=2.5.1=py3.11_cuda12.4_cudnn9.1.0_0
+- scipy=1.14.1=py311he9a78e4_2
+- setuptools=75.3.0=pyhd8ed1ab_0
+- torchaudio=2.5.1=py311_cu124
+- torchvision=0.20.1=py311_cu124
+- wheel=0.45.0=pyhd8ed1ab_0
+- pip:
+  - chex
+  - dm-haiku==0.0.13
+  - dm-tree==0.1.8
+  - jax-cuda12-pjrt==0.4.34
+  - jax-cuda12-plugin==0.4.34
+  - jax-triton==0.2.0
+  - jax==0.4.34
+  - jaxlib==0.4.34
+  - jaxtyping==0.2.34
+  - jmp==0.0.4
+  - ml_dtypes==0.5.0
+  - nvidia-cublas-cu12==12.6.3.3
+  - nvidia-cuda-cupti-cu12==12.6.80
+  - nvidia-cuda-nvcc-cu12==12.6.77
+  - nvidia-cuda-runtime-cu12==12.6.77
+  - nvidia-cudnn-cu12==9.5.1.17
+  - nvidia-cufft-cu12==11.3.0.4
+  - nvidia-cusolver-cu12==11.7.1.2
+  - nvidia-cusparse-cu12==12.5.4.2
+  - nvidia-nccl-cu12==2.23.4
+  - nvidia-nvjitlink-cu12==12.6.77
+  - opt_einsum==3.4.0
+  - rdkit==2024.3.5
+  - tabulate==0.9.0
+  - toolz==1.0.0
+  - tqdm==4.67.0
+  - typeguard==2.13.3

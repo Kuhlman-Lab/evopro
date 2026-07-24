@@ -1,0 +1,37 @@
+name: evopro
+channels:
+  - conda-forge
+  - nvidia
+dependencies:
+  - python=3.9
+  - pip
+  - numpy=1.*
+  - scipy
+  - pandas
+  - cairo
+  - pillow
+  - h5py
+  - openmm
+  - rdkit
+  - dglteam/label/th24_cu124::dgl
+  - omegaconf
+  - psutil
+  - pdbfixer
+  - pytorch::pytorch=2.4.1
+  - pytorch::torchvision=0.19.1
+  - pytorch::torchaudio=2.4.1
+  - pytorch::pytorch-cuda=12.4
+  - fonttools
+  - scipy
+  - prody
+  - pip:
+      - gitpython
+      - wandb
+      - flax
+      - optax
+      - dm-haiku==0.0.9
+      - chex
+      - biopandas
+      - biopython==1.79
+      - matplotlib
+      - ipython

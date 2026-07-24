@@ -96,6 +96,9 @@ cd ../alphafold3
 pip3 install --no-deps .
 build_data
 ```
+
+If you have issues running evopro, you may to use a different cuda version that is compatible with the GPUs you are using. An alternative setup .yaml `setup_conda_alt.yaml` is provided that uses CUDA 12.4 and is compatible with volta and a100 GPUs.
+
 AF3 weights must be acquired and used as outlined by the official AF3 repository. [af3_repo]
 
 Once acquired, make a new directory called models in the base alphafold3 folder and place the weights file (e.g. af3.bin.zst) inside.

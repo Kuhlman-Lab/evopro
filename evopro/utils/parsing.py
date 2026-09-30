@@ -155,18 +155,21 @@ def parse_results_af2(results, conf):
     from alphafold.common import protein
     parsed_results = []
     pdbs = []
-    for result in results:
+    all_chains = [x.strip() for x in conf.structure_prediction.structure_pred_chains] 
+    assert len(all_chains)==len(results)
+    for ch, result in zip(all_chains,results):
         parsed_result = {}
-        pdb = protein.to_pdb(result['unrelaxed_protein'])
+        pdb = protein.to_pdb(result['unrelaxed_protein'], chain_names=ch)
         pdbs.append(pdb)
         parsed_result['pdb'] = pdb
         parsed_result['plddt'] = result['plddt']
-        parsed_result['pae'] = result['pae_output'][0]
-        parsed_result['average_pae'] = result['pae_output'][1]
-        parsed_result['ptm'] = result['ptm']
         parsed_result['ranking_confidence'] = result['ranking_confidence']
         parsed_result['structure_module'] = result['structure_module']
-        
+        if 'pae_output' in result:
+            parsed_result['pae'] = result['pae_output'][0]
+            parsed_result['average_pae'] = result['pae_output'][1]
+        if 'ptm' in result:
+            parsed_result['ptm'] = result['ptm']        
         if 'iptm' in result:
             parsed_result['iptm'] = result['iptm']
 

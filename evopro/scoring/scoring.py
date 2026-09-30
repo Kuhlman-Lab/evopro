@@ -30,6 +30,28 @@ def score_overall(results, sequences, dsobj, conf):
                 plddt_scores.append((plddt_score, plddt_weights[i]))
                 i+=1
                 label += ",pLDDT_chain" + pred + ",weighted_pLDDT_chain" + pred
+
+    if conf.scoring.plddt_interface.score_plddt_interface:
+        plddt_chains = [x.strip() for x in conf.scoring.plddt_interface.preds.split(",")]
+        plddt_weights = parse_weights(conf.scoring.plddt_interface.weights, plddt_chains)
+        reslist1 = get_tokens(conf.scoring.plddt_interface.interface_1, dsobj)
+        reslist2 = get_tokens(conf.scoring.plddt_interface.interface_2, dsobj)
+        
+        i = 0
+        for result, pred in zip(results, all_chains):
+            if pred in plddt_chains:
+                residues = get_interface_residues(result, 
+                                                  conf.scoring.plddt_interface.interface_1, 
+                                                  conf.scoring.plddt_interface.interface_2, 
+                                                  cutoff=conf.scoring.plddt_interface.contact_distance)
+                residues=[f"{residue.parent.id}{residue.id[1]}" for residue in residues]
+                if 'plddt' in result:
+                    plddt_score = get_avg_plddt(result, reslist=residues)
+                else:
+                    residue_plddt_df, plddt_score = calculate_residue_plddt(result, reslist=residues)
+                plddt_scores.append((plddt_score, plddt_weights[i]))
+                i+=1
+                label += ",pLDDT_interface_chain" + pred + ",weighted_pLDDT_interface_chain" + pred
                 
     ptm_scores = []
     if conf.scoring.ptm.score_ptm:
@@ -196,7 +218,6 @@ def score_overall(results, sequences, dsobj, conf):
     
     overall_score = 0
     all_scores = plddt_scores + ptm_scores + contacts_scores + rmsd_scores + other_scores + custom_scores
-    print(all_scores)
     for s in all_scores:
         overall_score += s[0]*s[1]
     

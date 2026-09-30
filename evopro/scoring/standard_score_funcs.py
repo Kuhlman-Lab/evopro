@@ -524,9 +524,17 @@ def get_interface_residues(structure, chain_id1, chain_id2, cutoff=5.0):
     dict
         Dictionary with chain IDs as keys and lists of interface residue IDs as values
     """
+    if isinstance(structure,dict):
+        pdb_str = structure['pdb']
+        parser = PDBParser(QUIET=True)
+        pdb_fh = StringIO(pdb_str)
+        pdb = parser.get_structure('protein', pdb_fh)
+    else:
+        pdb=structure
+
     # Get the chains
-    chain1 = structure[0][chain_id1]
-    chain2 = structure[0][chain_id2]
+    chain1 = pdb[0][chain_id1]
+    chain2 = pdb[0][chain_id2]
     
     # Get all atoms from both chains
     atoms1 = Selection.unfold_entities(chain1, 'A')  # A for atoms

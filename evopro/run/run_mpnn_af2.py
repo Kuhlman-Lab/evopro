@@ -6,14 +6,17 @@ import shutil
 import subprocess
 import omegaconf
 
-sys.path.append("/proj/kuhl_lab/evopro_public/evopro/")
+evopro_path=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_path=os.path.dirname(evopro_path)
+sys.path.append(evopro_path)
+
 from evopro.utils.inputs import FileArgumentParser
 from evopro.utils.distributor import Distributor
 from evopro.utils.utils import compressed_pickle
 from evopro.utils.parsing import parse_results_af2
 
-af2_path = "/proj/kuhl_lab/alphafold/run/"
-mpnn_path = "/proj/kuhl_lab/LigandMPNN/"
+af2_path = os.path.join(project_path,"alphafold","run")
+mpnn_path = os.path.join(project_path,"ligandmpnn")
 
 def change_dir(path):
     os.chdir(path)
@@ -35,7 +38,7 @@ def getFlagParser() -> FileArgumentParser:
                         help='Max length of each chain across all PDB inputs, separated by commas.')
     
     parser.add_argument('--custom_score',
-                        default="/proj/kuhl_lab/evopro2/scoring/standard_score_funcs.py score_seq_diff_backbone_af2",
+                        default=f"{evopro_path}/evopro/scoring/standard_score_funcs.py score_seq_diff_backbone_af2",
                         type=str,
                         help='Name of python file and function to calculate scores on each prediction.')
 
@@ -173,7 +176,7 @@ def main():
             
         os.chdir(mpnn_dir)
         
-        subprocess.run(["python", "/proj/kuhl_lab/evopro2/run/generate_json.py", "@json.flags"])
+        subprocess.run(["python", f"{evopro_path}/evopro/run/generate_json.py", "@json.flags"])
         jsonfile = os.path.join(mpnn_dir, "residue_specs.json")
         if args.mpnn_only:
             run_ligmpnn(mpnn_dir, mpnn_yaml, jsonfile, design_run=False)

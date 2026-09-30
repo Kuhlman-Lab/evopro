@@ -131,9 +131,7 @@ def generate_json(pdbids, chain_seqs, mut_res, opf, default, symmetric_res):
             include = alphabet
         else:
             omit = list(default.split("-")[1])
-
-            
-        include = [x for x in alphabet if x not in omit]
+            include = [x for x in alphabet if x not in omit]
         default = "".join(include)
     
     mods = []
